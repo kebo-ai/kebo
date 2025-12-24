@@ -1,51 +1,59 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import Link from 'next/link';
+import { AnimatePresence, motion } from "framer-motion"
+import { ChevronDown, ChevronUp } from "lucide-react"
+import Link from "next/link"
+import { useState } from "react"
 
 interface FAQ {
-  question: string;
-  answer: string;
+  question: string
+  answer: string
 }
 
 interface FAQsContentProps {
-  faqs: FAQ[];
-  title: string;
-  notFound: string;
-  contactUs: string;
-  lang: string;
+  faqs: FAQ[]
+  title: string
+  notFound: string
+  contactUs: string
+  lang: string
 }
 
-export default function FAQsContent({ faqs, title, notFound, contactUs, lang }: FAQsContentProps) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+export default function FAQsContent({
+  faqs,
+  title,
+  notFound,
+  contactUs,
+  lang,
+}: FAQsContentProps) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold text-center text-gray-900 mb-12">
+        <h1 className="text-4xl font-bold text-center text-foreground mb-12">
           {title}
         </h1>
-        
+
         <div className="space-y-4">
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+              className="bg-card rounded-lg shadow-sm border border-border overflow-hidden"
             >
               <button
                 className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none"
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
               >
-                <span className="font-medium text-gray-900">{faq.question}</span>
+                <span className="font-medium text-foreground">
+                  {faq.question}
+                </span>
                 {openIndex === index ? (
-                  <ChevronUp className="h-5 w-5 text-gray-500" />
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
                 ) : (
-                  <ChevronDown className="h-5 w-5 text-gray-500" />
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
                 )}
               </button>
-              
+
               <AnimatePresence>
                 {openIndex === index && (
                   <motion.div
@@ -55,7 +63,7 @@ export default function FAQsContent({ faqs, title, notFound, contactUs, lang }: 
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <div className="px-6 pb-4 text-gray-600">
+                    <div className="px-6 pb-4 text-muted-foreground">
                       {faq.answer}
                     </div>
                   </motion.div>
@@ -66,18 +74,15 @@ export default function FAQsContent({ faqs, title, notFound, contactUs, lang }: 
         </div>
 
         <div className="mt-12 text-center">
-          <p className="text-gray-600">
-            {notFound}
-          </p>
+          <p className="text-muted-foreground">{notFound}</p>
           <Link
             href={`/${lang}/contacto`}
-            className="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium"
+            className="mt-4 inline-block text-primary hover:text-primary/80 font-medium"
           >
             {contactUs}
           </Link>
         </div>
       </div>
     </div>
-  );
+  )
 }
-

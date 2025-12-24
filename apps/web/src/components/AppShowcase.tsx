@@ -32,7 +32,7 @@ export default function AppShowcase({ images }: AppShowcaseProps) {
   return (
     <div className="relative">
       {/* Main device display */}
-      <div className="relative mx-auto w-[260px] sm:w-[300px]">
+      <div className="relative ml-auto w-[260px] sm:w-[300px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}
@@ -55,7 +55,7 @@ export default function AppShowcase({ images }: AppShowcaseProps) {
       </div>
 
       {/* Minimal dot indicators */}
-      <div className="mt-8 flex justify-center gap-2">
+      <div className="ml-auto mt-8 flex w-[260px] justify-center gap-2 sm:w-[300px]">
         {images.map((_, index) => (
           <button
             key={index}
@@ -65,7 +65,7 @@ export default function AppShowcase({ images }: AppShowcaseProps) {
               "h-1.5 rounded-full transition-all duration-300",
               current === index
                 ? "w-6 bg-foreground"
-                : "w-1.5 bg-foreground/20 hover:bg-foreground/40"
+                : "w-1.5 bg-foreground/20 hover:bg-foreground/40",
             )}
             aria-label={`Go to slide ${index + 1}`}
           />

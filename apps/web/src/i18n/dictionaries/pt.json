@@ -6,9 +6,7 @@
     "badge": "Já somos mais de 50.000 usuários!",
     "hero": {
       "title": "Seu dinheiro sob controle,<br/>seu futuro mais brilhante",
-      "description": "Simplifique suas finanças com IA. Economize mais, gaste melhor e alcance seus objetivos financeiros com um assistente inteligente que te guia em cada passo.",
-      "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "description": "Simplifique suas finanças com IA. Economize mais, gaste melhor e alcance seus objetivos financeiros com um assistente inteligente que te guia em cada passo."
     },
     "features": {
       "title": "Descubra o poder do Kebo",
@@ -42,9 +40,7 @@
   },
   "cta": {
     "title": "Pronto para assumir o controle das suas finanças?",
-    "description": "Junte-se a mais de 50.000 usuários que já estão gerenciando seu dinheiro de forma inteligente.",
-    "appStore": "App Store",
-    "googlePlay": "Google Play"
+    "description": "Junte-se a mais de 50.000 usuários que já estão gerenciando seu dinheiro de forma inteligente."
   },
   "footer": {
     "email": "ola@kebo.app",

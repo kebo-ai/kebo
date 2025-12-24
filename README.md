@@ -1,12 +1,6 @@
-<!-- Add your banner image: assets/images/kebo-banner.png -->
-<!-- <p align="center">
-  <img src="assets/images/kebo-banner.png" alt="Kebo" width="600" />
-</p> -->
+![hero](assets/images/kebo-baner.png)
 
 <h1 align="center">
-  <br />
-  <img src="assets/icon-ios.png" alt="Kebo" width="80" />
-  <br />
   Kebo
   <br />
 </h1>

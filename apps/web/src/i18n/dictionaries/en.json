@@ -1,0 +1,125 @@
+{
+  "header": {
+    "contact": "Contact Us"
+  },
+  "home": {
+    "badge": "We already have more than 30,000 users!",
+    "hero": {
+      "title": "Your money under control,<br/>your future brighter",
+      "description": "Simplify your finances with AI. Save more, spend smarter and reach your financial goals with an intelligent assistant that guides you every step of the way.",
+      "appStore": "App Store",
+      "googlePlay": "Google Play"
+    },
+    "features": {
+      "title": "Discover the power of Kebo",
+      "description": "An app designed to transform the way you manage your money, with smart tools that adapt to your lifestyle",
+      "feature1": {
+        "title": "All your money in one place",
+        "description": "Manage all your accounts and transactions in a single intuitive and easy-to-use application."
+      },
+      "feature2": {
+        "title": "Smart AI analysis",
+        "description": "Thanks to AI, understand your finances without complications, receiving personalized recommendations."
+      },
+      "feature3": {
+        "title": "Adaptable budgets",
+        "description": "Create budgets that adjust to your lifestyle and track your progress in real time."
+      }
+    },
+    "screenshots": {
+      "alt1": "All your money in one place",
+      "alt2": "Save more, enjoy just as much",
+      "alt3": "Budgets that adapt to you",
+      "alt4": "Record your expenses in seconds",
+      "alt5": "Understand your finances"
+    }
+  },
+  "footer": {
+    "email": "hello@kebo.app",
+    "products": {
+      "title": "Products",
+      "howItWorks": "How it works?",
+      "integrations": "Integrations",
+      "pricing": "Pricing",
+      "faqs": "FAQs"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About us",
+      "careers": "Join the team",
+      "blog": "Blog"
+    },
+    "download": "Download the App",
+    "copyright": "© 2023, 2024, 2025 Kebo. All rights reserved.",
+    "legal": {
+      "terms": "Terms of use",
+      "privacy": "Privacy"
+    }
+  },
+  "faqs": {
+    "title": "Frequently Asked Questions",
+    "notFound": "Didn't find the answer you were looking for?",
+    "contactUs": "Contact us",
+    "items": [
+      {
+        "question": "How do I delete my Kebo account?",
+        "answer": "To delete your account, follow these steps: 1) Open the Kebo app 2) Go to Settings 3) Select 'Delete Account' 4) Type 'Confirm' in the text field 5) Press the delete button. Note that this action is irreversible and will delete all your associated financial data."
+      },
+      {
+        "question": "How can I connect my bank accounts?",
+        "answer": "To connect your bank accounts: 1) Go to the 'Connect Accounts' section 2) Select your bank from the list of supported financial institutions 3) Follow the secure authentication process 4) Select the accounts you want to connect. Your bank data is protected with bank-level encryption."
+      },
+      {
+        "question": "How does automatic budgeting work?",
+        "answer": "Kebo analyzes your spending and creates a personalized budget based on your spending patterns. You can adjust categories and limits according to your needs. The app will notify you when you approach your spending limits."
+      },
+      {
+        "question": "How can I export my financial data?",
+        "answer": "To export your data: 1) Go to Settings 2) Select 'Export Data' 3) Choose the format (CSV, Excel, PDF) 4) Select the date range 5) Confirm the export. The data will be sent to your registered email address."
+      },
+      {
+        "question": "How does investment analysis work?",
+        "answer": "Kebo provides detailed analysis of your investments, including performance, diversification and personalized recommendations. You can view transaction history, gains/losses and compare with benchmark indices."
+      },
+      {
+        "question": "What information do I need to get started?",
+        "answer": "To get started, you need: 1) Valid identification document 2) Contact information 3) Bank account for verification 4) Basic information about your financial goals. The app will guide you step by step through the setup process."
+      },
+      {
+        "question": "How does my data security work?",
+        "answer": "Kebo uses bank-level encryption to protect your financial data. All connections are secure and your banking credentials are never stored on our servers. We use two-factor authentication for added security."
+      },
+      {
+        "question": "Can I set up custom alerts?",
+        "answer": "Yes, you can set up alerts for: excessive spending, budget limits, payment dates, investment changes, and more. Alerts can be received via push notification, email or SMS according to your preferences."
+      }
+    ]
+  },
+  "metadata": {
+    "title": "Kebo - Your financial future",
+    "description": "Download Kebo and join the financial revolution. Available on App Store: https://apps.apple.com/app/kebo-tu-asistente-financiero/id6742430536",
+    "applicationName": "Kebo",
+    "appleWebApp": {
+      "title": "Kebo - Your financial assistant"
+    },
+    "keywords": [
+      "personal finance",
+      "financial education",
+      "savings",
+      "investments",
+      "finance for women",
+      "money management",
+      "financial planning"
+    ],
+    "openGraph": {
+      "siteName": "Kebo App",
+      "title": "Kebo | Your financial companion",
+      "description": "Take control of your personal finances with Kebo. Download the app now."
+    },
+    "twitter": {
+      "title": "Kebo | Your financial companion",
+      "description": "Take control of your personal finances with Kebo. Download the app now."
+    }
+  }
+}
+

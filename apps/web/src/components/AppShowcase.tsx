@@ -32,7 +32,7 @@ export default function AppShowcase({ images }: AppShowcaseProps) {
   return (
     <div className="relative">
       {/* Main device display */}
-      <div className="relative ml-auto w-[260px] sm:w-[300px]">
+      <div className="relative mx-auto w-[260px] sm:w-[300px] lg:ml-auto lg:mr-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}
@@ -55,7 +55,7 @@ export default function AppShowcase({ images }: AppShowcaseProps) {
       </div>
 
       {/* Minimal dot indicators */}
-      <div className="ml-auto mt-8 flex w-[260px] justify-center gap-2 sm:w-[300px]">
+      <div className="mx-auto mt-8 flex w-[260px] justify-center gap-2 sm:w-[300px] lg:ml-auto lg:mr-0">
         {images.map((_, index) => (
           <button
             key={index}

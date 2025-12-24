@@ -40,18 +40,18 @@
 <p align="center">
   <sub>
     Supported by:
-    <ul align="center" style="list-style: none; padding-left: 0;">
-      <li>
+    <div align="center">
+      <div>
         <a href="https://crafter.station">
           <img src="https://raw.githubusercontent.com/Railly/crafter-station/main/public/logo.png" alt="Crafter Station" width="16" valign="middle" /> Crafter Station
         </a>
-      </li>
-      <li>
+      </div>
+      <div>
         <a href="https://moraleja.co">
-          <img src="https://www.moraleja.co/brand_assets/MORALEJA_FAVICON.png" alt="Moraleja" width="16" valign="middle" /> Moraleja Studio
+          <img src="https://www.moraleja.co/brand_assets/MORALEJA_FAVICON.png" alt="Moraleja" width="16" valign="middle" /> Moraleja Design
         </a>
-      </li>
-    </ul>
+      </div>
+    </div>
   </sub>
 </p>
 

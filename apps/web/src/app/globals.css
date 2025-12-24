@@ -198,3 +198,109 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* Blog Prose Styles - Kebo Style */
+.prose-kebo {
+  @apply text-foreground leading-relaxed;
+}
+
+.prose-kebo > p:first-child {
+  @apply text-xl sm:text-2xl text-muted-foreground mb-8;
+}
+
+.prose-kebo p {
+  @apply mb-6 text-base sm:text-lg leading-relaxed;
+}
+
+.prose-kebo h1 {
+  @apply mt-16 mb-6 text-3xl sm:text-4xl font-bold tracking-tight;
+}
+
+.prose-kebo h2 {
+  @apply mt-14 mb-4 text-2xl sm:text-3xl font-bold tracking-tight;
+}
+
+.prose-kebo h3 {
+  @apply mt-10 mb-3 text-xl sm:text-2xl font-semibold;
+}
+
+.prose-kebo h4 {
+  @apply mt-8 mb-2 text-lg sm:text-xl font-semibold;
+}
+
+.prose-kebo strong {
+  @apply font-semibold text-foreground;
+}
+
+.prose-kebo a {
+  @apply text-kebo-600 dark:text-kebo-400 underline underline-offset-4 decoration-kebo-600/30 dark:decoration-kebo-400/30 transition-colors hover:decoration-kebo-600 dark:hover:decoration-kebo-400;
+}
+
+.prose-kebo blockquote {
+  @apply my-8 border-l-4 border-kebo-500 bg-kebo-50/50 dark:bg-kebo-900/20 px-6 py-4 rounded-r-lg;
+}
+
+.prose-kebo blockquote p {
+  @apply mb-0 text-xl sm:text-2xl font-medium text-foreground;
+}
+
+.prose-kebo hr {
+  @apply my-12 border-border/60;
+}
+
+.prose-kebo ul {
+  @apply mb-6 space-y-3 list-none pl-0;
+}
+
+.prose-kebo ul li {
+  @apply relative pl-6 text-base sm:text-lg;
+}
+
+.prose-kebo ul li::before {
+  content: "";
+  @apply absolute left-0 top-2.5 h-2 w-2 rounded-full bg-kebo-500;
+}
+
+.prose-kebo ol {
+  @apply mb-6 space-y-3 list-decimal pl-6;
+}
+
+.prose-kebo ol li {
+  @apply text-base sm:text-lg pl-2;
+}
+
+.prose-kebo ol li::marker {
+  @apply text-kebo-500 font-semibold;
+}
+
+.prose-kebo code {
+  @apply px-1.5 py-0.5 rounded bg-secondary text-sm font-mono;
+}
+
+.prose-kebo pre {
+  @apply my-6 p-4 rounded-xl bg-secondary overflow-x-auto;
+}
+
+.prose-kebo pre code {
+  @apply p-0 bg-transparent;
+}
+
+.prose-kebo img {
+  @apply my-8 rounded-xl;
+}
+
+.prose-kebo table {
+  @apply my-6 w-full border-collapse;
+}
+
+.prose-kebo th {
+  @apply border-b border-border p-3 text-left font-semibold;
+}
+
+.prose-kebo td {
+  @apply border-b border-border/50 p-3;
+}
+
+.prose-kebo em {
+  @apply italic;
+}

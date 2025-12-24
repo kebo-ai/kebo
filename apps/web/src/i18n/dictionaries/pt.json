@@ -120,13 +120,13 @@
       "planejamento financeiro"
     ],
     "openGraph": {
-      "siteName": "Kebo App",
-      "title": "Kebo | Sua companheira financeira",
-      "description": "Assuma o controle de suas finanças pessoais com o Kebo. Baixe o app agora."
+      "siteName": "Kebo",
+      "title": "Kebo - Finanças Pessoais Open Source para LATAM",
+      "description": "Junte-se a mais de 50.000 usuários que controlam seu dinheiro. Registre gastos, crie orçamentos e obtenha insights com IA. Agora open source."
     },
     "twitter": {
-      "title": "Kebo | Sua companheira financeira",
-      "description": "Assuma o controle de suas finanças pessoais com o Kebo. Baixe o app agora."
+      "title": "Kebo - Finanças Pessoais Open Source para LATAM",
+      "description": "Junte-se a mais de 50.000 usuários que controlam seu dinheiro. Registre gastos, crie orçamentos e obtenha insights com IA. Agora open source."
     }
   }
 }

@@ -42,7 +42,7 @@
     Supported by:
     <div align="center">
       <div>
-        <a href="https://crafter.station">
+        <a href="https://crafterstation.com">
           <img src="https://raw.githubusercontent.com/Railly/crafter-station/main/public/logo.png" alt="Crafter Station" width="16" valign="middle" /> Crafter Station
         </a>
       </div>

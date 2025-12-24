@@ -11,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { ThemeSwitcherButton } from "@/components/elements/theme-switcher-button"
 import LanguageSwitcher from "./LanguageSwitcher"
 import { Locale } from "@/i18n/config"
 
@@ -41,6 +42,8 @@ export default function Header({ lang }: HeaderProps) {
 
         {/* Desktop Navigation Pill */}
         <nav className="hidden items-center gap-3 rounded-full border border-border/60 bg-background/90 px-4 py-2 shadow-sm shadow-black/5 backdrop-blur-xl md:flex">
+          <ThemeSwitcherButton className="h-7 w-7 rounded-full border-0 bg-transparent" />
+          <div className="h-4 w-px bg-border/50" />
           <LanguageSwitcher currentLang={lang} />
           <div className="h-4 w-px bg-border/50" />
           <Button variant="ghost" size="sm" className="h-7 rounded-full px-3 text-sm text-muted-foreground hover:text-foreground" asChild>
@@ -69,6 +72,10 @@ export default function Header({ lang }: HeaderProps) {
               </SheetTitle>
             </SheetHeader>
             <nav className="mt-8 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Theme</span>
+                <ThemeSwitcherButton className="h-8 w-8 rounded-full" />
+              </div>
               <LanguageSwitcher currentLang={lang} />
               <Button variant="ghost" asChild className="justify-start">
                 <Link href={`/${lang}/faqs`}>FAQs</Link>

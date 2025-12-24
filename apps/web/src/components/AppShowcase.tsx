@@ -47,7 +47,7 @@ export default function AppShowcase({ images }: AppShowcaseProps) {
               alt={images[current].alt}
               width={300}
               height={650}
-              className="h-auto w-full drop-shadow-xl"
+              className="h-auto w-full rounded-[2.5rem] drop-shadow-xl"
               priority={current === 0}
             />
           </motion.div>

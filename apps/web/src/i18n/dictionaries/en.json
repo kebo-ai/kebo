@@ -6,9 +6,7 @@
     "badge": "We already have more than 50,000 users!",
     "hero": {
       "title": "Your money under control,<br/>your future brighter",
-      "description": "Simplify your finances with AI. Save more, spend smarter and reach your financial goals with an intelligent assistant that guides you every step of the way.",
-      "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "description": "Simplify your finances with AI. Save more, spend smarter and reach your financial goals with an intelligent assistant that guides you every step of the way."
     },
     "features": {
       "title": "Discover the power of Kebo",
@@ -42,9 +40,7 @@
   },
   "cta": {
     "title": "Ready to take control of your finances?",
-    "description": "Join 50,000+ users who are already managing their money smarter.",
-    "appStore": "App Store",
-    "googlePlay": "Google Play"
+    "description": "Join 50,000+ users who are already managing their money smarter."
   },
   "footer": {
     "email": "hello@kebo.app",
@@ -62,7 +58,7 @@
       "blog": "Blog"
     },
     "download": "Download the App",
-    "copyright": "© 2023, 2024, 2025 Kebo. All rights reserved.",
+    "copyright": "© 2024, 2025, 2026 Kebo. All rights reserved.",
     "legal": {
       "terms": "Terms of use",
       "privacy": "Privacy"

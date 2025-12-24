@@ -1,13 +1,10 @@
-import { AppleIcon, GooglePlayIcon } from "@/components/icons/StoreIcons"
-import { Button } from "@/components/ui/button"
+import { AppStoreBadge, GooglePlayBadge } from "@/components/icons/StoreBadges"
 
 interface CTAProps {
   dict: {
     cta?: {
       title: string
       description: string
-      appStore: string
-      googlePlay: string
     }
   }
 }
@@ -15,8 +12,6 @@ interface CTAProps {
 const defaultTexts = {
   title: "Ready to take control of your finances?",
   description: "Join 50,000+ users who are already managing their money smarter.",
-  appStore: "App Store",
-  googlePlay: "Google Play",
 }
 
 export default function CTA({ dict }: CTAProps) {
@@ -38,27 +33,9 @@ export default function CTA({ dict }: CTAProps) {
               {texts.description}
             </p>
 
-            <div className="flex flex-col justify-center gap-3 sm:flex-row">
-              <Button size="lg" className="h-12 gap-2.5 px-6 text-base" asChild>
-                <a
-                  href="https://apps.apple.com/app/kebo-tu-asistente-financiero/id6742430536"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <AppleIcon className="h-5 w-5" />
-                  {texts.appStore}
-                </a>
-              </Button>
-              <Button size="lg" variant="outline" className="h-12 gap-2.5 px-6 text-base" asChild>
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.kebo.app.mobile&hl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <GooglePlayIcon className="h-5 w-5" />
-                  {texts.googlePlay}
-                </a>
-              </Button>
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <AppStoreBadge />
+              <GooglePlayBadge />
             </div>
           </div>
         </div>

@@ -59,15 +59,24 @@
 }
 
 @layer utilities {
-  /* Dotted grid pattern */
+  /* Dotted grid pattern - stronger in light mode */
   .bg-grid-pattern {
-    background-image: radial-gradient(circle, hsl(var(--foreground) / 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(circle, hsl(var(--foreground) / 0.15) 1px, transparent 1px);
     background-size: 24px 24px;
   }
   
   .bg-grid-pattern-subtle {
-    background-image: radial-gradient(circle, hsl(var(--foreground) / 0.05) 1px, transparent 1px);
+    background-image: radial-gradient(circle, hsl(var(--foreground) / 0.12) 1px, transparent 1px);
     background-size: 32px 32px;
+  }
+  
+  /* Lighter dots for dark mode */
+  .dark .bg-grid-pattern {
+    background-image: radial-gradient(circle, hsl(var(--foreground) / 0.08) 1px, transparent 1px);
+  }
+  
+  .dark .bg-grid-pattern-subtle {
+    background-image: radial-gradient(circle, hsl(var(--foreground) / 0.05) 1px, transparent 1px);
   }
 
   /* Fade mask for grid */
@@ -89,6 +98,12 @@
   inherits: false;
 }
 
+@property --glow-opacity {
+  syntax: "<number>";
+  initial-value: 0.5;
+  inherits: false;
+}
+
 @keyframes stellar-rotate {
   from {
     --angle: 0deg;
@@ -98,11 +113,21 @@
   }
 }
 
+@keyframes stellar-glow {
+  0%, 100% {
+    --glow-opacity: 0.4;
+  }
+  50% {
+    --glow-opacity: 0.8;
+  }
+}
+
 .stellar-border {
   position: relative;
   background: hsl(var(--secondary));
   border-radius: 9999px;
   isolation: isolate;
+  transition: transform 0.2s ease;
 }
 
 .stellar-border::before,
@@ -120,21 +145,30 @@
   z-index: -2;
 }
 
-/* Moving light with comet tail */
+/* Moving light with comet tail - smoother gradient */
 .stellar-border::after {
   background: conic-gradient(
     from var(--angle),
     transparent 0%,
-    transparent 75%,
-    hsl(var(--foreground) / 0.03) 85%,
-    hsl(262 66% 52% / 0.5) 92%,
-    hsl(262 66% 65% / 0.8) 95%,
-    hsl(262 66% 75% / 1) 97%,
-    hsl(262 66% 65% / 0.8) 99%,
+    transparent 70%,
+    hsl(262 66% 52% / 0.15) 78%,
+    hsl(262 66% 52% / 0.35) 84%,
+    hsl(262 66% 60% / 0.6) 89%,
+    hsl(262 66% 70% / 0.9) 93%,
+    hsl(262 66% 75% / 1) 96%,
+    hsl(262 66% 70% / 0.9) 97%,
+    hsl(262 66% 60% / 0.6) 98%,
+    hsl(262 66% 52% / 0.3) 99%,
     transparent 100%
   );
-  animation: stellar-rotate 4s linear infinite;
+  animation: stellar-rotate 3s linear infinite;
   z-index: -1;
+  filter: blur(0.5px);
+}
+
+/* Subtle glow effect on hover */
+.stellar-border:hover::after {
+  filter: blur(0.5px) brightness(1.2);
 }
 
 /* Inner background to create border effect */

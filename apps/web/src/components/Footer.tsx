@@ -1,9 +1,9 @@
-import Image from "next/image"
 import Link from "next/link"
 import { Mail } from "lucide-react"
-import { AppleIcon, GooglePlayIcon } from "@/components/icons/StoreIcons"
+import { AppStoreBadge, GooglePlayBadge } from "@/components/icons/StoreBadges"
 import { CrafterStationLogo } from "@/components/logos/crafter-station"
 import { MoralejaDesignLogo } from "@/components/logos/moraleja"
+import { KeboWordmark } from "@/components/logos/kebo-wordmark"
 import { GithubLogo } from "@/components/logos/github"
 import { InstagramLogo } from "@/components/logos/instagram"
 import { LinkedinLogo } from "@/components/logos/linkedin"
@@ -68,16 +68,10 @@ export default function Footer({ lang, dict }: FooterProps) {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href={`/${lang}`} className="inline-block">
-              <Image
-                src="/images/logos/footer-logo.png"
-                alt="Kebo"
-                width={100}
-                height={35}
-                className="h-7 w-auto opacity-90 transition-opacity hover:opacity-100"
-              />
+              <KeboWordmark className="h-8 w-auto opacity-90 transition-opacity hover:opacity-100" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              {dict.cta?.description || "Your finances under control, your future brighter."}
+              Your finances under control, your future brighter.
             </p>
             
             {/* Social Links */}
@@ -142,24 +136,8 @@ export default function Footer({ lang, dict }: FooterProps) {
           <div>
             <h3 className="mb-4 text-sm font-medium">{dict.footer.download}</h3>
             <div className="flex flex-col gap-2">
-              <a
-                href="https://apps.apple.com/app/kebo-tu-asistente-financiero/id6742430536"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <AppleIcon className="h-4 w-4" />
-                App Store
-              </a>
-              <a
-                href="https://play.google.com/store/apps/details?id=com.kebo.app.mobile&hl"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <GooglePlayIcon className="h-4 w-4" />
-                Google Play
-              </a>
+              <AppStoreBadge />
+              <GooglePlayBadge />
             </div>
           </div>
         </div>

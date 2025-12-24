@@ -1,33 +1,33 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { Menu } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import Image from "next/image";
+import Link from "next/link";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
-import { ThemeSwitcherButton } from "@/components/elements/theme-switcher-button"
-import LanguageSwitcher from "./LanguageSwitcher"
-import { Locale } from "@/i18n/config"
+} from "@/components/ui/sheet";
+import { ThemeSwitcherButton } from "@/components/elements/theme-switcher-button";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { Locale } from "@/i18n/config";
 
 interface HeaderProps {
-  lang: Locale
+  lang: Locale;
   dict: {
     header: {
-      contact: string
-    }
-  }
+      contact: string;
+    };
+  };
 }
 
 export default function Header({ lang }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 w-full px-4 pt-4 sm:px-6">
-      <div className="mx-auto flex max-w-5xl items-center justify-between">
+    <header className="sticky top-0 z-50 w-full pt-4">
+      <div className="container mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* Logo */}
         <Link href={`/${lang}`} className="flex items-center">
           <Image
@@ -46,7 +46,12 @@ export default function Header({ lang }: HeaderProps) {
           <div className="h-4 w-px bg-border/50" />
           <LanguageSwitcher currentLang={lang} />
           <div className="h-4 w-px bg-border/50" />
-          <Button variant="ghost" size="sm" className="h-7 rounded-full px-3 text-sm text-muted-foreground hover:text-foreground" asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 rounded-full px-3 text-sm text-muted-foreground hover:text-foreground"
+            asChild
+          >
             <Link href={`/${lang}/faqs`}>FAQs</Link>
           </Button>
         </nav>
@@ -54,7 +59,11 @@ export default function Header({ lang }: HeaderProps) {
         {/* Mobile Navigation */}
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full border border-border/60 bg-background/90 shadow-sm shadow-black/5 backdrop-blur-xl md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 rounded-full border border-border/60 bg-background/90 shadow-sm shadow-black/5 backdrop-blur-xl md:hidden"
+            >
               <Menu className="h-4 w-4" />
               <span className="sr-only">Toggle menu</span>
             </Button>
@@ -85,5 +94,5 @@ export default function Header({ lang }: HeaderProps) {
         </Sheet>
       </div>
     </header>
-  )
+  );
 }

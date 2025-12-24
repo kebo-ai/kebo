@@ -56,6 +56,16 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
+  
+  ::selection {
+    background-color: hsl(262 66% 52%);
+    color: hsl(0 0% 100%);
+  }
+  
+  ::-moz-selection {
+    background-color: hsl(262 66% 52%);
+    color: hsl(0 0% 100%);
+  }
 }
 
 @layer utilities {

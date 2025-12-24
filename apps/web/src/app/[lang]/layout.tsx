@@ -55,10 +55,10 @@ export async function generateMetadata({
       description: dict.metadata.openGraph.description,
       images: [
         {
-          url: "/images/screenshot/prev.png",
+          url: "/KEBO-OpenSource-LK.png",
           width: 1200,
           height: 630,
-          alt: "Kebo App Preview",
+          alt: "Kebo - Open Source Personal Finance App",
         },
       ],
     },
@@ -66,7 +66,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: dict.metadata.twitter.title,
       description: dict.metadata.twitter.description,
-      images: ["/images/og-image.jpg"],
+      images: ["/KEBO-OpenSource-LK.png"],
       creator: "@kebo_app",
     },
     robots: {

@@ -2,4 +2,155 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tus estilos globales personalizados aquí */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 262 66% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 262 66% 52%;
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 262 66% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 262 66% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer utilities {
+  /* Dotted grid pattern */
+  .bg-grid-pattern {
+    background-image: radial-gradient(circle, hsl(var(--foreground) / 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  
+  .bg-grid-pattern-subtle {
+    background-image: radial-gradient(circle, hsl(var(--foreground) / 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Fade mask for grid */
+  .mask-fade-bottom {
+    mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 100%);
+  }
+
+  .mask-fade-edges {
+    mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+  }
+}
+
+/* Stellar border animation */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes stellar-rotate {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}
+
+.stellar-border {
+  position: relative;
+  background: hsl(var(--secondary));
+  border-radius: 9999px;
+  isolation: isolate;
+}
+
+.stellar-border::before,
+.stellar-border::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+/* Base border */
+.stellar-border::before {
+  background: hsl(var(--border));
+  z-index: -2;
+}
+
+/* Moving light with comet tail */
+.stellar-border::after {
+  background: conic-gradient(
+    from var(--angle),
+    transparent 0%,
+    transparent 75%,
+    hsl(var(--foreground) / 0.03) 85%,
+    hsl(262 66% 52% / 0.5) 92%,
+    hsl(262 66% 65% / 0.8) 95%,
+    hsl(262 66% 75% / 1) 97%,
+    hsl(262 66% 65% / 0.8) 99%,
+    transparent 100%
+  );
+  animation: stellar-rotate 4s linear infinite;
+  z-index: -1;
+}
+
+/* Inner background to create border effect */
+.stellar-border > * {
+  position: relative;
+  z-index: 1;
+}
+
+.stellar-border-inner {
+  background: hsl(var(--secondary));
+  border-radius: 9999px;
+  position: absolute;
+  inset: 1px;
+  z-index: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}

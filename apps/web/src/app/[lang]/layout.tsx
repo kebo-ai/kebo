@@ -5,7 +5,6 @@ import "../globals.css"
 import { Analytics } from "@vercel/analytics/react"
 import { i18n, type Locale } from "@/i18n/config"
 import { getDictionary } from "@/i18n/get-dictionary"
-import { GithubBadge } from "@/components/GithubBadge"
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -102,7 +101,11 @@ export default async function RootLayout({
   const { lang } = await params
 
   return (
-    <html lang={lang} className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+    <html
+      lang={lang}
+      className={`${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -115,21 +118,21 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           {/* Dotted grid background */}
-          <div 
+          <div
             className="pointer-events-none fixed inset-0 z-0"
             style={{
-              backgroundImage: 'radial-gradient(circle, hsl(var(--foreground) / 0.07) 1px, transparent 1px)',
-              backgroundSize: '24px 24px',
-              maskImage: 'linear-gradient(to bottom, black 0%, black 30%, transparent 80%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 30%, transparent 80%)',
+              backgroundImage:
+                "radial-gradient(circle, hsl(var(--foreground) / 0.07) 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+              maskImage:
+                "linear-gradient(to bottom, black 0%, black 30%, transparent 80%)",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, black 0%, black 30%, transparent 80%)",
             }}
             aria-hidden="true"
           />
           <Analytics />
-          <GithubBadge />
-          <div className="relative z-10">
-            {children}
-          </div>
+          <div className="relative z-10">{children}</div>
         </ThemeProvider>
       </body>
     </html>

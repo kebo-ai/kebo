@@ -83,18 +83,23 @@ export default function Hero({ dict, screenshots }: HeroProps) {
 
             {/* Badge */}
             <motion.div variants={badgeVariants} className="mb-6">
-              <motion.div 
+              <motion.div
                 className="stellar-border inline-flex items-center gap-2 px-4 py-1.5 text-sm font-medium"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
                 <div className="stellar-border-inner" />
-                <motion.span 
+                <motion.span
                   className="relative flex h-2 w-2"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: 0.5, type: "spring", stiffness: 300, damping: 15 }}
+                  transition={{
+                    delay: 0.5,
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 15,
+                  }}
                 >
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-kebo-500 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-kebo-500" />
@@ -105,7 +110,7 @@ export default function Hero({ dict, screenshots }: HeroProps) {
 
             <motion.h1
               variants={itemVariants}
-              className="mb-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+              className="mb-6 text-4xl font-bold tracking-tight text-foreground text-balance sm:text-5xl lg:text-6xl"
               dangerouslySetInnerHTML={{ __html: dict.home.hero.title }}
             />
 
@@ -129,12 +134,12 @@ export default function Hero({ dict, screenshots }: HeroProps) {
           <motion.div
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ 
-              duration: 0.6, 
+            transition={{
+              duration: 0.6,
               delay: 0.4,
               type: "spring",
               stiffness: 80,
-              damping: 15
+              damping: 15,
             }}
             className="w-full max-w-sm lg:max-w-[380px]"
           >

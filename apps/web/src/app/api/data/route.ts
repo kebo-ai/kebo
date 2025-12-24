@@ -2,16 +2,28 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase environment variables are not configured');
+  }
+  return createClient(url, key);
+}
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY is not configured');
+  }
+  return new Resend(apiKey);
+}
 
 export async function POST(req: Request) {
   try {
     const { name, email, meta } = await req.json();
+
+    const supabase = getSupabase();
 
     // Insertamos en Supabase
     const { error: insertError } = await supabase
@@ -36,6 +48,8 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
+
+    const resend = getResend();
 
     // Enviamos el email de confirmación
     await resend.emails.send({

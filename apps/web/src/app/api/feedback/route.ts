@@ -2,17 +2,22 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Check if environment variables are defined
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error('Missing Supabase environment variables');
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase environment variables are not configured');
+  }
+  return createClient(url, key);
 }
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY is not configured');
+  }
+  return new Resend(apiKey);
+}
 
 export async function POST(req: Request) {
   try {
@@ -27,6 +32,7 @@ export async function POST(req: Request) {
 
     // Try to store feedback in Supabase
     try {
+      const supabase = getSupabase();
       const { data, error: insertError } = await supabase
         .from('app_feedback')
         .insert([{ 
@@ -64,6 +70,7 @@ export async function POST(req: Request) {
 
     // Send email notification to team
     try {
+      const resend = getResend();
       await resend.emails.send({
         from: 'Kebo <hola@kebo.app>',
         to: 'hola@kebo.app',

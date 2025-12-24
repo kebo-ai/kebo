@@ -98,7 +98,7 @@ If you've ever wanted to shape a product you use, this is an open invite:
 
 **Repo:** [github.com/kebo-ai/kebo](https://github.com/kebo-ai/kebo)
 
-**Web:** [kebo.finance](https://kebo.finance)
+**Web:** [kebo.finance](https://kebo.app)
 
 ---
 
@@ -184,7 +184,7 @@ export default async function OpenSourceBlogPage({
         </section>
 
         {/* Article Content */}
-        <article className="container mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
+        <article className="container mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
           <div className="prose-kebo">
             <Markdown remarkPlugins={[remarkGfm]}>{markdownContent}</Markdown>
           </div>

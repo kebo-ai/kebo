@@ -1,0 +1,11 @@
+name: Issue Report
+description: File a general issue or bug report
+title: "[Issue] "
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: Describe the issue...
+    validations:
+      required: true

@@ -38,7 +38,7 @@
 </p>
 
 <p align="center">
-  <sub>Supported by <a href="https://crafter.station"><img src="assets/images/crafter-station-logo.svg" alt="Crafter Station" width="16" valign="middle" /> Crafter Station</a></sub>
+  <sub>Supported by <a href="https://crafter.station"><img src="https://raw.githubusercontent.com/Railly/crafter-station/main/public/logo.png" alt="Crafter Station" width="16" valign="middle" /> Crafter Station</a></sub>
 </p>
 
 ## About Kebo

@@ -3,7 +3,7 @@
     "contact": "Contate-nos"
   },
   "home": {
-    "badge": "Já somos mais de 30.000 usuários!",
+    "badge": "Já somos mais de 50.000 usuários!",
     "hero": {
       "title": "Seu dinheiro sob controle,<br/>seu futuro mais brilhante",
       "description": "Simplifique suas finanças com IA. Economize mais, gaste melhor e alcance seus objetivos financeiros com um assistente inteligente que te guia em cada passo.",
@@ -33,6 +33,18 @@
       "alt4": "Registre suas despesas em segundos",
       "alt5": "Entenda suas finanças"
     }
+  },
+  "stats": {
+    "users": "Usuários",
+    "rating": "Avaliação",
+    "downloads": "Downloads",
+    "countries": "Países"
+  },
+  "cta": {
+    "title": "Pronto para assumir o controle das suas finanças?",
+    "description": "Junte-se a mais de 50.000 usuários que já estão gerenciando seu dinheiro de forma inteligente.",
+    "appStore": "App Store",
+    "googlePlay": "Google Play"
   },
   "footer": {
     "email": "ola@kebo.app",
@@ -122,4 +134,3 @@
     }
   }
 }
-

@@ -3,7 +3,7 @@
     "contact": "Contact Us"
   },
   "home": {
-    "badge": "We already have more than 30,000 users!",
+    "badge": "We already have more than 50,000 users!",
     "hero": {
       "title": "Your money under control,<br/>your future brighter",
       "description": "Simplify your finances with AI. Save more, spend smarter and reach your financial goals with an intelligent assistant that guides you every step of the way.",
@@ -33,6 +33,18 @@
       "alt4": "Record your expenses in seconds",
       "alt5": "Understand your finances"
     }
+  },
+  "stats": {
+    "users": "Total Users",
+    "rating": "App Rating",
+    "downloads": "Downloads",
+    "countries": "Countries"
+  },
+  "cta": {
+    "title": "Ready to take control of your finances?",
+    "description": "Join 50,000+ users who are already managing their money smarter.",
+    "appStore": "App Store",
+    "googlePlay": "Google Play"
   },
   "footer": {
     "email": "hello@kebo.app",
@@ -122,4 +134,3 @@
     }
   }
 }
-

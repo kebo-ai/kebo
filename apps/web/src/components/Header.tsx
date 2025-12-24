@@ -13,7 +13,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import type { Locale } from "@/i18n/config"
+import { GithubBadge } from "./GithubBadge"
 import LanguageSwitcher from "./LanguageSwitcher"
+import { KeboLogo } from "./logos/kebo"
 
 interface HeaderProps {
   lang: Locale
@@ -28,20 +30,19 @@ export default function Header({ lang }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full pt-4">
       <div className="container mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6">
-        {/* Logo */}
-        <Link href={`/${lang}`} className="flex items-center">
-          <Image
-            src="/images/logos/kebo-icon.svg"
-            alt="Kebo"
-            width={40}
-            height={40}
-            className="h-9 w-9"
-            priority
-          />
-        </Link>
+        {/* Left side: Logo and GitHub Badge */}
+        <div className="flex items-center gap-3">
+          {/* Logo */}
+          <Link href={`/${lang}`} className="flex items-center">
+            <KeboLogo className="size-8 shadow-sm" />
+          </Link>
+
+          {/* GitHub Badge */}
+          <GithubBadge />
+        </div>
 
         {/* Desktop Navigation Pill */}
-        <nav className="hidden items-center gap-3 rounded-full border border-border/60 bg-background/90 px-4 py-2 shadow-sm shadow-black/5 backdrop-blur-xl md:flex">
+        <nav className="hidden h-[38px] items-center gap-3 rounded-full border border-border/60 bg-background/90 px-4 shadow-sm shadow-black/5 backdrop-blur-xl md:flex">
           <ThemeSwitcherButton className="h-7 w-7 rounded-full border-0 bg-transparent" />
           <div className="h-4 w-px bg-border/50" />
           <LanguageSwitcher currentLang={lang} />

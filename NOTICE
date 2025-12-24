@@ -1,0 +1,42 @@
+Kebo Mobile
+Copyright 2024-present Kebo Contributors
+
+This product includes software developed by contributors to the Kebo project.
+https://github.com/kebo/kebo-mobile
+
+Licensed under the Apache License, Version 2.0.
+
+================================================================================
+
+Third-Party Software Notices
+================================================================================
+
+This software includes the following third-party components:
+
+React Native
+  License: MIT
+  https://github.com/facebook/react-native
+
+Expo
+  License: MIT
+  https://github.com/expo/expo
+
+MobX-State-Tree
+  License: MIT
+  https://github.com/mobxjs/mobx-state-tree
+
+Supabase JS Client
+  License: MIT
+  https://github.com/supabase/supabase-js
+
+PostHog React Native
+  License: MIT
+  https://github.com/PostHog/posthog-js-lite
+
+i18next
+  License: MIT
+  https://github.com/i18next/i18next
+
+For complete license information for all dependencies, see the package.json
+file and their respective repositories.
+

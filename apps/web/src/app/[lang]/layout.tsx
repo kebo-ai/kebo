@@ -1,11 +1,22 @@
-import type { Metadata } from "next";
-import { Inter } from 'next/font/google'
-import "../globals.css";
+import type { Metadata } from "next"
+import localFont from "next/font/local"
+import "../globals.css"
 import { Analytics } from "@vercel/analytics/react"
-import { i18n, type Locale } from '@/i18n/config'
-import { getDictionary } from '@/i18n/get-dictionary'
+import { i18n, type Locale } from "@/i18n/config"
+import { getDictionary } from "@/i18n/get-dictionary"
+import { GithubBadge } from "@/components/GithubBadge"
 
-const inter = Inter({ subsets: ['latin'] })
+const geistSans = localFont({
+  src: "../fonts/GeistVF.woff",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+})
+
+const geistMono = localFont({
+  src: "../fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+})
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }))
@@ -29,34 +40,34 @@ export async function generateMetadata({
       statusBarStyle: "default",
     },
     other: {
-      "apple-itunes-app": "app-id=6742430536"
+      "apple-itunes-app": "app-id=6742430536",
     },
     keywords: dict.metadata.keywords,
-    authors: [{ name: 'Kebo App' }],
-    creator: 'Kebo App',
-    publisher: 'Kebo App',
+    authors: [{ name: "Kebo App" }],
+    creator: "Kebo App",
+    publisher: "Kebo App",
     openGraph: {
-      type: 'website',
-      locale: lang === 'es' ? 'es_ES' : lang === 'pt' ? 'pt_BR' : 'en_US',
-      url: 'https://kebo.app',
+      type: "website",
+      locale: lang === "es" ? "es_ES" : lang === "pt" ? "pt_BR" : "en_US",
+      url: "https://kebo.app",
       siteName: dict.metadata.openGraph.siteName,
       title: dict.metadata.openGraph.title,
       description: dict.metadata.openGraph.description,
       images: [
         {
-          url: '/images/screenshot/prev.png',
+          url: "/images/screenshot/prev.png",
           width: 1200,
           height: 630,
-          alt: 'Kebo App Preview',
+          alt: "Kebo App Preview",
         },
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: dict.metadata.twitter.title,
       description: dict.metadata.twitter.description,
-      images: ['/images/og-image.jpg'],
-      creator: '@kebo_app',
+      images: ["/images/og-image.jpg"],
+      creator: "@kebo_app",
     },
     robots: {
       index: true,
@@ -64,17 +75,17 @@ export async function generateMetadata({
       googleBot: {
         index: true,
         follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
       },
     },
     alternates: {
-      canonical: 'https://kebo.app',
+      canonical: "https://kebo.app",
       languages: {
-        'es': 'https://kebo.app/es',
-        'en': 'https://kebo.app/en',
-        'pt': 'https://kebo.app/pt',
+        es: "https://kebo.app/es",
+        en: "https://kebo.app/en",
+        pt: "https://kebo.app/pt",
       },
     },
   }
@@ -88,18 +99,18 @@ export default async function RootLayout({
   params: Promise<{ lang: Locale }>
 }) {
   const { lang } = await params
-  
+
   return (
-    <html lang={lang} className={inter.className}>
+    <html lang={lang} className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body>
+      <body className="font-sans">
         <Analytics />
+        <GithubBadge />
         {children}
       </body>
     </html>
   )
 }
-

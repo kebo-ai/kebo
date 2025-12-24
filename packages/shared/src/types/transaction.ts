@@ -27,6 +27,7 @@ export const recurrenceDisplayMap: Record<RecurrenceType, string> = {
   [RecurrenceType.MONTHLY]: "transactionScreen:monthly",
   [RecurrenceType.YEARLY]: "transactionScreen:yearly",
 };
+
 export const recurrenceDisplayValueMap: Record<string, RecurrenceType> = {
   ["transactionScreen:never"]: RecurrenceType.NEVER,
   ["transactionScreen:daily"]: RecurrenceType.DAILY,
@@ -47,19 +48,6 @@ export interface TransactionFormValues {
   recurrence_end_date: string;
   displayEndDate: string;
   note: string;
-}
-
-export interface TransactionScreenProps {
-  navigation: any;
-  route: any & {
-    params?: {
-      transactionType?: TransactionType;
-      transactionId?: string;
-      fromCategoryScreen?: boolean;
-      fromBankScreen?: boolean;
-      fromModal?: boolean;
-    };
-  };
 }
 
 export interface Budget {
@@ -102,3 +90,4 @@ export interface BudgetResponse {
   budget_lines: BudgetLine[];
   total_metrics: TotalMetrics;
 }
+

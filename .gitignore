@@ -38,5 +38,17 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-.package-lock.json
-.yarn.lock
+# lock files (use bun.lock)
+package-lock.json
+yarn.lock
+
+# Turbo
+.turbo
+
+# Next.js
+.next/
+out/
+
+# Build outputs
+dist/
+build/

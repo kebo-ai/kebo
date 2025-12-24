@@ -39,3 +39,4 @@ export interface BannerContent {
   slides: BannerSlide[];
   visible_to_existing_users_only: boolean;
 }
+

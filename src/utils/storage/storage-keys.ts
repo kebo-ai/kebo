@@ -1,0 +1,11 @@
+export const AUTH_DATA = "AUTH_DATA";
+export const AUTH_TOKEN = "AUTH_TOKEN";
+export const USER_DATA = "USER_DATA";
+export const TRUE = "true";
+export const FALSE = "false";
+export const HAS_SEEN_ONBOARDING = "has_seen_onboarding";
+export const LAST_APP_VERSION = "last_app_version";
+export const HAS_SEEN_BANNER = "has_seen_banner";
+export const REPORTS_INCOME_PERIOD = "reports_income_period";
+export const BALANCE_VISIBILITY = "balance_visibility";
+export const REVIEW_MODAL_SHOULD_SHOW = "review_modal_should_show";

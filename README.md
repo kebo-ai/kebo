@@ -11,7 +11,7 @@
   <br />
   <a href="https://kebo.app">Website</a>
   ·
-  <a href="https://github.com/kebo/kebo-mobile/issues">Issues</a>
+  <a href="https://github.com/kebo-ai/kebo/issues">Issues</a>
   ·
   <a href="https://discord.gg/UmU9mbDkUx">Discord</a>
 </p>

@@ -1,27 +1,27 @@
-"use client";
+"use client"
 
-import Image from "next/image";
-import Link from "next/link";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { ThemeSwitcherButton } from "@/components/elements/theme-switcher-button"
+import { Button } from "@/components/ui/button"
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { ThemeSwitcherButton } from "@/components/elements/theme-switcher-button";
-import LanguageSwitcher from "./LanguageSwitcher";
-import { Locale } from "@/i18n/config";
+} from "@/components/ui/sheet"
+import type { Locale } from "@/i18n/config"
+import LanguageSwitcher from "./LanguageSwitcher"
 
 interface HeaderProps {
-  lang: Locale;
+  lang: Locale
   dict: {
     header: {
-      contact: string;
-    };
-  };
+      contact: string
+    }
+  }
 }
 
 export default function Header({ lang }: HeaderProps) {
@@ -94,5 +94,5 @@ export default function Header({ lang }: HeaderProps) {
         </Sheet>
       </div>
     </header>
-  );
+  )
 }

@@ -129,7 +129,7 @@ export default async function OpenSourceBlogPage({
         <section className="relative overflow-hidden border-b border-border/50 bg-gradient-to-b from-kebo-50/50 via-background to-background dark:from-kebo-900/20">
           <div className="absolute inset-0 bg-grid-pattern-subtle mask-fade-bottom opacity-40" />
 
-          <div className="container relative z-10 mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-20">
+          <div className="container relative z-10 mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-16">
             {/* Back link */}
             <Link
               href={`/${lang}`}

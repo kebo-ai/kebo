@@ -10,15 +10,30 @@ import type { Locale } from "@/i18n/config"
 import { getDictionary } from "@/i18n/get-dictionary"
 
 export const metadata: Metadata = {
-  title: "Kebo is now open source | Kebo Blog",
+  title: "Kebo is now open source | Kebo",
   description:
-    "Today we're taking a step that's been on our minds for a while: We're open sourcing Kebo. Not because it's trendy, but because the best products are built in public.",
+    "We're open sourcing Kebo. Not because it's trendy, but because the best products are built in public. Join 50,000+ users building the future of personal finance in LATAM.",
   openGraph: {
     title: "Kebo is now open source",
     description:
-      "Today we're taking a step that's been on our minds for a while: We're open sourcing Kebo.",
+      "We're open sourcing Kebo. Join 50,000+ users building the future of personal finance in LATAM, together.",
     type: "article",
     publishedTime: "2024-12-24",
+    images: [
+      {
+        url: "/KEBO-OpenSource-LK.png",
+        width: 1200,
+        height: 630,
+        alt: "Kebo - Open Source Personal Finance App",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kebo is now open source",
+    description:
+      "We're open sourcing Kebo. Join 50,000+ users building the future of personal finance in LATAM, together.",
+    images: ["/KEBO-OpenSource-LK.png"],
   },
 }
 

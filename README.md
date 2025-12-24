@@ -1,4 +1,4 @@
-![hero](assets/images/kebo-baner.png)
+![hero](kebo-baner.png)
 
 <h1 align="center">
   Kebo
@@ -38,7 +38,21 @@
 </p>
 
 <p align="center">
-  <sub>Supported by <a href="https://crafter.station"><img src="https://raw.githubusercontent.com/Railly/crafter-station/main/public/logo.png" alt="Crafter Station" width="16" valign="middle" /> Crafter Station</a></sub>
+  <sub>
+    Supported by:
+    <ul align="center" style="list-style: none; padding-left: 0;">
+      <li>
+        <a href="https://crafter.station">
+          <img src="https://raw.githubusercontent.com/Railly/crafter-station/main/public/logo.png" alt="Crafter Station" width="16" valign="middle" /> Crafter Station
+        </a>
+      </li>
+      <li>
+        <a href="https://moraleja.co">
+          <img src="https://www.moraleja.co/brand_assets/MORALEJA_FAVICON.png" alt="Moraleja" width="16" valign="middle" /> Moraleja Studio
+        </a>
+      </li>
+    </ul>
+  </sub>
 </p>
 
 ## About Kebo

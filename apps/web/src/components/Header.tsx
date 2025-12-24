@@ -37,10 +37,8 @@ export default function Header({ lang }: HeaderProps) {
             <KeboLogo className="size-8 shadow-sm" />
           </Link>
 
-          {/* GitHub Badge - Desktop only */}
-          <div className="hidden md:block">
-            <GithubBadge />
-          </div>
+          {/* GitHub Badge */}
+          <GithubBadge />
         </div>
 
         {/* Desktop Navigation Pill */}

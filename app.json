@@ -1,0 +1,55 @@
+{
+  "name": "kebo",
+  "displayName": "kebo",
+  "expo": {
+    "name": "Kebo App",
+    "slug": "kebo",
+    "scheme": "kebo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon-ios.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.kebo.app.mobile",
+      "appleTeamId": "477PL8P3CL",
+      "icon": "./assets/icon-ios.png"
+    },
+    "android": {
+      "package": "com.kebo.app.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon-android.png",
+        "backgroundColor": "#6934D2"
+      },
+      "icon": "./assets/icon-android.png"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": false,
+          "autoHide": true
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon-android.png",
+          "color": "#6934D2"
+        }
+      ],
+      "expo-font",
+      "expo-secure-store",
+      "expo-localization"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9fc2288c-b9a7-497a-b0b3-c32d98cf825d"
+      }
+    }
+  }
+}

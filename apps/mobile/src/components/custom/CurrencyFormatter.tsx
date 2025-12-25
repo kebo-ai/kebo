@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../../utils/logger";
 import React, { useMemo } from "react";
 import * as Localization from "expo-localization";
 import { useStores } from "../../models/helpers/useStores";

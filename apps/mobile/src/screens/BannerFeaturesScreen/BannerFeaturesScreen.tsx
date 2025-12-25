@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../../utils/logger";
 import React, { useEffect, useRef, useState } from "react";
 import { View, Dimensions, Text, ActivityIndicator, Image } from "react-native";
 import { observer } from "mobx-react-lite";

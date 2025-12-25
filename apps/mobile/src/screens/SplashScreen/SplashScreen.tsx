@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../../utils/logger";
 import { FC, useEffect, useRef, useState } from "react";
 import LottieView from "lottie-react-native";
 import { View, StyleSheet, BackHandler, Animated } from "react-native";

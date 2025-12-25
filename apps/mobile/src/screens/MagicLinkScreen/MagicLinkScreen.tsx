@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../../utils/logger";
 import { observer } from "mobx-react-lite";
 import { FC } from "react";
 import { Text, TouchableOpacity, View } from "react-native";

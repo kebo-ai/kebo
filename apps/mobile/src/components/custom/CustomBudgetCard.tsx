@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../../utils/logger";
 import React from "react";
 import { View, Text, TouchableOpacity, Platform } from "react-native";
 import { translate } from "../../i18n";

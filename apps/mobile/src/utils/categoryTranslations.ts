@@ -1,4 +1,4 @@
-import logger from "./utils/logger";
+import logger from "./logger";
 import { translate } from "../i18n";
 
 const ICON_URLS: { [url: string]: string } = {

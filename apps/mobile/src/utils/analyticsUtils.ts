@@ -1,4 +1,4 @@
-import logger from "./utils/logger";
+import logger from "./logger";
 import { AnalyticsService } from "../services/AnalyticsService";
 import { getUserInfo } from "./authUtils";
 import { RootStore } from "../models/RootStore";

@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../../utils/logger";
 import React, { FC, useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import tw from "twrnc";

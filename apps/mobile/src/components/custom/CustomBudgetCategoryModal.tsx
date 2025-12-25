@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../../utils/logger";
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   View,

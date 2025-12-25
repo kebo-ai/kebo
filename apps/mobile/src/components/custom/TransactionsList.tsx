@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../../utils/logger";
 import React from "react";
 import { View, Text, Pressable, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";

@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../../utils/logger";
 import React, { FC, useState, useEffect, useRef } from "react";
 import { AppStackScreenProps } from "../../navigators/AppNavigator";
 import { observer } from "mobx-react-lite";

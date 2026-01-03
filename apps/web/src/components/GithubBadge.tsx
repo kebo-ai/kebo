@@ -27,57 +27,57 @@ export function GithubBadge() {
 
   return (
     <>
-      <style jsx global>{`
-        @keyframes starGlow {
-          0%, 100% {
-            filter: drop-shadow(0 0 0.5px rgba(251, 191, 36, 0.2))
-                    drop-shadow(0 0 1px rgba(251, 191, 36, 0.1))
-                    brightness(1);
-            transform: scale(1);
+        <style>{`
+          @keyframes starGlow {
+            0%, 100% {
+              filter: drop-shadow(0 0 0.5px rgba(251, 191, 36, 0.2))
+                      drop-shadow(0 0 1px rgba(251, 191, 36, 0.1))
+                      brightness(1);
+              transform: scale(1);
+            }
+            50% {
+              filter: drop-shadow(0 0 1.5px rgba(251, 191, 36, 0.35))
+                      drop-shadow(0 0 2px rgba(251, 191, 36, 0.18))
+                      brightness(1.05);
+              transform: scale(1.02);
+            }
           }
-          50% {
-            filter: drop-shadow(0 0 1.5px rgba(251, 191, 36, 0.35))
-                    drop-shadow(0 0 2px rgba(251, 191, 36, 0.18))
-                    brightness(1.05);
-            transform: scale(1.02);
+
+          @keyframes gradientMove {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
           }
-        }
 
-        @keyframes gradientMove {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
+          .github-badge:hover .star-icon {
+            animation: starGlow 2.5s ease-in-out infinite;
+          }
 
-        .github-badge:hover .star-icon {
-          animation: starGlow 2.5s ease-in-out infinite;
-        }
+          .github-badge:hover .star-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            background: conic-gradient(
+              from 0deg,
+              transparent 0deg,
+              transparent 120deg,
+              rgba(251, 191, 36, 0.12) 150deg,
+              rgba(251, 191, 36, 0.18) 180deg,
+              rgba(251, 191, 36, 0.12) 210deg,
+              transparent 240deg,
+              transparent 360deg
+            );
+            border-radius: 50%;
+            animation: gradientMove 2.5s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(1px);
+          }
 
-        .github-badge:hover .star-wrapper::before {
-          content: '';
-          position: absolute;
-          inset: -1.5px;
-          background: conic-gradient(
-            from 0deg,
-            transparent 0deg,
-            transparent 120deg,
-            rgba(251, 191, 36, 0.12) 150deg,
-            rgba(251, 191, 36, 0.18) 180deg,
-            rgba(251, 191, 36, 0.12) 210deg,
-            transparent 240deg,
-            transparent 360deg
-          );
-          border-radius: 50%;
-          animation: gradientMove 2.5s linear infinite;
-          pointer-events: none;
-          z-index: -1;
-          filter: blur(1px);
-        }
-
-        .github-badge:active {
-          transform: scale(0.95);
-          transition: transform 0.1s ease;
-        }
-      `}</style>
+          .github-badge:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+          }
+        `}</style>
 
       <motion.a
         href="https://github.com/kebo-ai/kebo"

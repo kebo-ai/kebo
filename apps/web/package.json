@@ -25,10 +25,10 @@
     "framer-motion": "^11.15.0",
     "lucide-react": "^0.468.0",
     "negotiator": "^1.0.0",
-    "next": "15.1.11",
+    "next": "16.1.1",
     "next-themes": "^0.4.6",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-markdown": "^10.1.0",
     "react-use": "^17.5.1",
     "remark-gfm": "^4.0.1",
@@ -41,12 +41,17 @@
   "devDependencies": {
     "@types/negotiator": "^0.6.4",
     "@types/node": "^22",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
     "@types/ua-parser-js": "^0.7.39",
     "autoprefixer": "^10.4.20",
+    "babel-plugin-react-compiler": "^1.0.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3"
   }
 }

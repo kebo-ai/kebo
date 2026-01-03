@@ -70,8 +70,7 @@ Kebo is a personal finance app designed to help you take control of your money. 
 
 ### Prerequisites
 
-- Node.js 18+
-- npm or yarn
+- Bun 1.1+
 - iOS Simulator (Mac) or Android Emulator
 
 ### Installation
@@ -82,13 +81,13 @@ git clone https://github.com/kebo/kebo-mobile.git
 cd kebo-mobile
 
 # Install dependencies
-npm install
+bun install
 
 # Set up environment variables
 cp .env.example .env
 
 # Start the development server
-npm start
+bun run dev
 ```
 
 ### Running the App

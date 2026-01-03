@@ -3,8 +3,9 @@ import localFont from "next/font/local"
 import { ThemeProvider } from "next-themes"
 import "../globals.css"
 import { Analytics } from "@vercel/analytics/react"
-import { i18n, type Locale } from "@/i18n/config"
+import { i18n } from "@/i18n/config"
 import { getDictionary } from "@/i18n/get-dictionary"
+import { ReactNode } from "react"
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -25,10 +26,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ lang: Locale }>
+  params: Promise<{ lang: string }>
 }): Promise<Metadata> {
   const { lang } = await params
-  const dict = await getDictionary(lang)
+  const dict = await getDictionary(lang as typeof i18n.locales[number])
 
   return {
     title: dict.metadata.title,
@@ -95,8 +96,8 @@ export default async function RootLayout({
   children,
   params,
 }: {
-  children: React.ReactNode
-  params: Promise<{ lang: Locale }>
+  children: ReactNode
+  params: Promise<{ lang: string }>
 }) {
   const { lang } = await params
 
@@ -117,7 +118,6 @@ export default async function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {/* Dotted grid background */}
           <div
             className="pointer-events-none fixed inset-0 z-0"
             style={{

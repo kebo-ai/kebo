@@ -1,6 +1,6 @@
-interface CrafterStationLogoProps extends React.SVGProps<SVGSVGElement> {}
+import type { SVGProps } from 'react'
 
-export function CrafterStationLogo({ ...props }: CrafterStationLogoProps) {
+export function CrafterStationLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="257"
@@ -17,5 +17,5 @@ export function CrafterStationLogo({ ...props }: CrafterStationLogoProps) {
         fill="currentColor"
       />
     </svg>
-  );
+  )
 }

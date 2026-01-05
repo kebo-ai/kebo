@@ -1,6 +1,6 @@
-interface MoralejaDesignLogoProps extends React.SVGProps<SVGSVGElement> {}
+import type { SVGProps } from 'react'
 
-export function MoralejaDesignLogo({ ...props }: MoralejaDesignLogoProps) {
+export function MoralejaDesignLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 184.3 184.3"
@@ -21,4 +21,3 @@ export function MoralejaDesignLogo({ ...props }: MoralejaDesignLogoProps) {
     </svg>
   )
 }
-

@@ -56,8 +56,8 @@ export default function Footer({ lang, dict }: FooterProps) {
       { name: dict.footer.products.faqs, href: `/${lang}/faqs` },
     ],
     legal: [
-      { name: dict.footer.legal.terms, href: `/${lang}/terminos` },
-      { name: dict.footer.legal.privacy, href: `/${lang}/politica-de-privacidad` },
+      { name: dict.footer.legal.terms, href: `/${lang}/terms` },
+      { name: dict.footer.legal.privacy, href: `/${lang}/privacy-policy` },
     ],
   }
 
@@ -73,7 +73,7 @@ export default function Footer({ lang, dict }: FooterProps) {
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               Your finances under control, your future brighter.
             </p>
-            
+
             {/* Social Links */}
             <div className="mt-6 flex items-center gap-4">
               <a

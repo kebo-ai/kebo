@@ -1,0 +1,10 @@
+# Database
+DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT].supabase.co:5432/postgres
+
+# Supabase Auth
+SUPABASE_URL=https://[PROJECT].supabase.co
+SUPABASE_ANON_KEY=[ANON_KEY]
+SUPABASE_JWT_SECRET=[JWT_SECRET]
+
+# Environment
+ENVIRONMENT=development

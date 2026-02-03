@@ -1,0 +1,35 @@
+{
+  "name": "@kebo/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run --outdir=dist",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "bun run src/db/seed.ts"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^0.18.0",
+    "@kebo/shared": "workspace:*",
+    "@scalar/hono-api-reference": "^0.5.179",
+    "drizzle-orm": "^0.36.0",
+    "drizzle-seed": "^0.3.1",
+    "drizzle-zod": "^0.5.1",
+    "hono": "^4.6.0",
+    "postgres": "^3.4.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "@types/node": "^22.0.0",
+    "drizzle-kit": "^0.28.0",
+    "typescript": "^5.7.0",
+    "wrangler": "^3.91.0"
+  }
+}

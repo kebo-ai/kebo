@@ -127,7 +127,18 @@ export interface Bank {
   name: string
   country_code?: string
   bank_url?: string
+  description?: string
+  country_flag?: string
   open_finance_integrated: boolean
+}
+
+export interface CreateBankInput {
+  name: string
+  country_code?: string
+  bank_url?: string
+  description?: string
+  country_flag?: string
+  open_finance_integrated?: boolean
 }
 
 // Account Type

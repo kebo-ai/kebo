@@ -6,6 +6,9 @@ export interface Env {
   SUPABASE_ANON_KEY: string
   SUPABASE_JWT_SECRET: string
   ENVIRONMENT: "development" | "staging" | "production"
+  // AI-related variables
+  AI_GATEWAY_API_KEY: string
+  ADMIN_API_KEY: string
 }
 
 export interface Variables {

@@ -143,6 +143,63 @@ app.openapi(listRoute, async (c) => {
   return c.json({ data: result }, 200)
 })
 
+// NOTE: /with-balance must be registered BEFORE /:id to avoid route matching issues
+app.openapi(withBalanceRoute, async (c) => {
+  const userId = c.get("userId")
+  const db = c.get("db")
+
+  // Replace user_balance_by_account_vw view with explicit Drizzle query
+  // This calculates base balance + transactions total for each account
+  const result = await db
+    .select({
+      account_id: accounts.id,
+      account_name: accounts.name,
+      customized_name: accounts.customized_name,
+      account_type: accountTypes.description,
+      icon_url: accounts.icon_url,
+      base_balance: sql<string>`
+        CASE 
+          WHEN ${accounts.account_type_id} = ${CREDIT_CARD_ACCOUNT_TYPE_ID}
+          THEN ${accounts.balance} * -1
+          ELSE ${accounts.balance}
+        END
+      `,
+      transactions_total: sql<string>`COALESCE(SUM(
+        CASE 
+          WHEN ${transactions.transaction_type} = 'Expense' THEN -1 * ${transactions.amount}
+          ELSE ${transactions.amount}
+        END
+      ), 0)`,
+      total_balance: sql<string>`
+        CASE 
+          WHEN ${accounts.account_type_id} = ${CREDIT_CARD_ACCOUNT_TYPE_ID}
+          THEN ${accounts.balance} * -1
+          ELSE ${accounts.balance}
+        END
+        + COALESCE(SUM(
+          CASE 
+            WHEN ${transactions.transaction_type} = 'Expense' THEN -1 * ${transactions.amount}
+            ELSE ${transactions.amount}
+          END
+        ), 0)
+      `,
+    })
+    .from(accounts)
+    .leftJoin(
+      transactions,
+      and(
+        eq(transactions.account_id, accounts.id),
+        eq(transactions.user_id, userId),
+        eq(transactions.is_deleted, false),
+      ),
+    )
+    .leftJoin(accountTypes, eq(accounts.account_type_id, accountTypes.id))
+    .where(and(eq(accounts.user_id, userId), eq(accounts.is_deleted, false)))
+    .groupBy(accounts.id, accountTypes.description)
+
+  return c.json({ data: result }, 200)
+})
+
 app.openapi(getRoute, async (c) => {
   const userId = c.get("userId")
   const { id } = c.req.valid("param")
@@ -199,62 +256,6 @@ app.openapi(getRoute, async (c) => {
     return c.json({ error: "Account not found" }, 404)
   }
   return c.json(result, 200)
-})
-
-app.openapi(withBalanceRoute, async (c) => {
-  const userId = c.get("userId")
-  const db = c.get("db")
-
-  // Replace user_balance_by_account_vw view with explicit Drizzle query
-  // This calculates base balance + transactions total for each account
-  const result = await db
-    .select({
-      account_id: accounts.id,
-      account_name: accounts.name,
-      customized_name: accounts.customized_name,
-      account_type: accountTypes.description,
-      icon_url: accounts.icon_url,
-      base_balance: sql<string>`
-        CASE 
-          WHEN ${accounts.account_type_id} = ${CREDIT_CARD_ACCOUNT_TYPE_ID}
-          THEN ${accounts.balance} * -1
-          ELSE ${accounts.balance}
-        END
-      `,
-      transactions_total: sql<string>`COALESCE(SUM(
-        CASE 
-          WHEN ${transactions.transaction_type} = 'Expense' THEN -1 * ${transactions.amount}
-          ELSE ${transactions.amount}
-        END
-      ), 0)`,
-      total_balance: sql<string>`
-        CASE 
-          WHEN ${accounts.account_type_id} = ${CREDIT_CARD_ACCOUNT_TYPE_ID}
-          THEN ${accounts.balance} * -1
-          ELSE ${accounts.balance}
-        END
-        + COALESCE(SUM(
-          CASE 
-            WHEN ${transactions.transaction_type} = 'Expense' THEN -1 * ${transactions.amount}
-            ELSE ${transactions.amount}
-          END
-        ), 0)
-      `,
-    })
-    .from(accounts)
-    .leftJoin(
-      transactions,
-      and(
-        eq(transactions.account_id, accounts.id),
-        eq(transactions.user_id, userId),
-        eq(transactions.is_deleted, false),
-      ),
-    )
-    .leftJoin(accountTypes, eq(accounts.account_type_id, accountTypes.id))
-    .where(and(eq(accounts.user_id, userId), eq(accounts.is_deleted, false)))
-    .groupBy(accounts.id, accountTypes.description)
-
-  return c.json({ data: result }, 200)
 })
 
 app.openapi(createAccountRoute, async (c) => {

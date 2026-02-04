@@ -1,11 +1,14 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi"
 import { and, desc, eq } from "drizzle-orm"
+import { stream } from "hono/streaming"
 import { aiReports, chatConversations, chatMessages } from "@/db/schema"
 import { authMiddleware } from "@/middleware"
+import { AIService } from "@/services/ai.service"
 import type { AppEnv } from "@/types/env"
 
 const app = new OpenAPIHono<AppEnv>()
 
+// Schemas
 const CreateReportSchema = z.object({
   message: z.record(z.unknown()),
   reportMessage: z.string(),
@@ -16,7 +19,17 @@ const ChatMessageSchema = z.object({
   conversation_id: z.string().uuid().optional(),
 })
 
-// Routes
+const ChatStreamSchema = z.object({
+  message: z.string().min(1),
+  conversation_id: z.string().uuid().optional(),
+})
+
+const ConversationListSchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(50).default(20),
+})
+
+// Route definitions
 const createReportRoute = createRoute({
   method: "post",
   path: "/reports",
@@ -33,7 +46,7 @@ const chatRoute = createRoute({
   method: "post",
   path: "/chat",
   tags: ["AI"],
-  summary: "Send a chat message to Kebo Wise",
+  summary: "Send a chat message to Kebo Wise (non-streaming)",
   security: [{ Bearer: [] }],
   request: {
     body: { content: { "application/json": { schema: ChatMessageSchema } } },
@@ -44,8 +57,58 @@ const chatRoute = createRoute({
   },
 })
 
+const chatStreamRoute = createRoute({
+  method: "post",
+  path: "/chat/stream",
+  tags: ["AI"],
+  summary: "Stream a chat response from Kebo Wise",
+  description: "Returns Server-Sent Events (SSE) stream with AI response",
+  security: [{ Bearer: [] }],
+  request: {
+    body: { content: { "application/json": { schema: ChatStreamSchema } } },
+  },
+  responses: {
+    200: {
+      description: "SSE stream of chat response",
+      content: { "text/event-stream": { schema: z.any() } },
+    },
+    500: { description: "AI service error" },
+  },
+})
+
+const listConversationsRoute = createRoute({
+  method: "get",
+  path: "/conversations",
+  tags: ["AI"],
+  summary: "List user's chat conversations",
+  security: [{ Bearer: [] }],
+  request: {
+    query: ConversationListSchema,
+  },
+  responses: {
+    200: { description: "List of conversations" },
+  },
+})
+
+const getConversationRoute = createRoute({
+  method: "get",
+  path: "/conversations/{id}",
+  tags: ["AI"],
+  summary: "Get conversation with messages",
+  security: [{ Bearer: [] }],
+  request: {
+    params: z.object({ id: z.string().uuid() }),
+  },
+  responses: {
+    200: { description: "Conversation with messages" },
+    404: { description: "Conversation not found" },
+  },
+})
+
+// Apply auth middleware
 app.use("/*", authMiddleware)
 
+// Report creation (unchanged)
 app.openapi(createReportRoute, async (c) => {
   const userId = c.get("userId")
   const body = c.req.valid("json")
@@ -63,93 +126,128 @@ app.openapi(createReportRoute, async (c) => {
   return c.json(report, 201)
 })
 
+// Non-streaming chat (for backward compatibility)
 app.openapi(chatRoute, async (c) => {
   const userId = c.get("userId")
   const body = c.req.valid("json")
   const db = c.get("db")
 
-  let conversationId = body.conversation_id
-
-  // Create or get conversation
-  if (!conversationId) {
-    const [conversation] = await db
-      .insert(chatConversations)
-      .values({
-        user_id: userId,
-        title: body.message.substring(0, 50),
-      })
-      .returning()
-    conversationId = conversation.id
-  }
-
-  // Save user message
-  const [userMessage] = await db
-    .insert(chatMessages)
-    .values({
-      conversation_id: conversationId,
-      role: "user",
-      content: body.message,
+  try {
+    const { content, conversationId } = await AIService.chat({
+      db,
+      userId,
+      message: body.message,
+      conversationId: body.conversation_id,
+      apiKey: c.env.AI_GATEWAY_API_KEY,
     })
-    .returning()
 
-  // Generate AI response
-  // TODO: Integrate with actual AI service (OpenAI, Anthropic, etc.)
-  // For now, return a placeholder response
-  const aiResponse = generatePlaceholderResponse(body.message)
-
-  // Save assistant message
-  const [assistantMessage] = await db
-    .insert(chatMessages)
-    .values({
-      conversation_id: conversationId,
-      role: "assistant",
-      content: aiResponse,
-    })
-    .returning()
-
-  return c.json(
-    {
+    return c.json({
       message: {
-        id: assistantMessage.id,
-        role: assistantMessage.role,
-        content: assistantMessage.content,
-        created_at: assistantMessage.created_at,
+        role: "assistant",
+        content,
       },
       conversation_id: conversationId,
-    },
-    200,
-  )
+    })
+  } catch (error) {
+    console.error("Chat error:", error)
+    return c.json({ error: "AI service error" }, 500)
+  }
 })
 
-// Placeholder response generator until AI integration is complete
-function generatePlaceholderResponse(userMessage: string): string {
-  const lowerMessage = userMessage.toLowerCase()
+// Streaming chat endpoint
+app.openapi(chatStreamRoute, async (c) => {
+  const userId = c.get("userId")
+  const body = c.req.valid("json")
+  const db = c.get("db")
 
-  if (lowerMessage.includes("finances") || lowerMessage.includes("doing")) {
-    return "Based on your recent transactions, you're doing well! Your spending is within budget for most categories. Keep up the good financial habits!"
+  try {
+    const { result, conversationId, saveResponse } = await AIService.streamChat(
+      {
+        db,
+        userId,
+        message: body.message,
+        conversationId: body.conversation_id,
+        apiKey: c.env.AI_GATEWAY_API_KEY,
+      },
+    )
+
+    let fullResponse = ""
+
+    // Return SSE stream
+    return stream(c, async (stream) => {
+      // Set headers for SSE
+      c.header("Content-Type", "text/event-stream")
+      c.header("Cache-Control", "no-cache")
+      c.header("Connection", "keep-alive")
+
+      // Send conversation_id first
+      await stream.write(
+        `data: ${JSON.stringify({ type: "conversation_id", conversation_id: conversationId })}\n\n`,
+      )
+
+      // Stream text chunks
+      for await (const textPart of result.textStream) {
+        fullResponse += textPart
+        await stream.write(
+          `data: ${JSON.stringify({ type: "text", content: textPart })}\n\n`,
+        )
+      }
+
+      // Send done event
+      await stream.write(`data: ${JSON.stringify({ type: "done" })}\n\n`)
+
+      // Save complete response to database
+      await saveResponse(fullResponse)
+    })
+  } catch (error) {
+    console.error("Stream error:", error)
+    return c.json({ error: "AI service error" }, 500)
+  }
+})
+
+// List conversations
+app.openapi(listConversationsRoute, async (c) => {
+  const userId = c.get("userId")
+  const { page, limit } = c.req.valid("query")
+  const db = c.get("db")
+  const offset = (page - 1) * limit
+
+  const conversations = await db
+    .select()
+    .from(chatConversations)
+    .where(eq(chatConversations.user_id, userId))
+    .orderBy(desc(chatConversations.updated_at))
+    .limit(limit)
+    .offset(offset)
+
+  return c.json({ conversations, page, limit })
+})
+
+// Get conversation with messages
+app.openapi(getConversationRoute, async (c) => {
+  const userId = c.get("userId")
+  const { id } = c.req.valid("param")
+  const db = c.get("db")
+
+  const [conversation] = await db
+    .select()
+    .from(chatConversations)
+    .where(
+      and(eq(chatConversations.id, id), eq(chatConversations.user_id, userId)),
+    )
+    .limit(1)
+
+  if (!conversation) {
+    return c.json({ error: "Conversation not found" }, 404)
   }
 
-  if (lowerMessage.includes("spending") || lowerMessage.includes("category")) {
-    return "Looking at your expenses, food and dining tends to be your largest spending category. Consider meal planning or cooking more at home to reduce this expense."
-  }
+  const messages = await db
+    .select()
+    .from(chatMessages)
+    .where(eq(chatMessages.conversation_id, id))
+    .orderBy(chatMessages.created_at)
 
-  if (lowerMessage.includes("save") || lowerMessage.includes("tips")) {
-    return "Here are some tips to save more:\n\n1. Set up automatic transfers to savings\n2. Review subscriptions monthly\n3. Use the 50/30/20 budgeting rule\n4. Track every expense in Kebo\n5. Set specific savings goals"
-  }
-
-  if (lowerMessage.includes("food") || lowerMessage.includes("groceries")) {
-    return "Your food spending shows some interesting patterns. You might save by planning meals ahead and reducing dining out. Would you like me to analyze specific food categories?"
-  }
-
-  if (lowerMessage.includes("average") || lowerMessage.includes("daily")) {
-    return "To calculate your average daily spending, I'd need to analyze your transaction history. Based on typical patterns, try to keep daily discretionary spending under $50 for better savings."
-  }
-
-  if (lowerMessage.includes("reduce") || lowerMessage.includes("cut")) {
-    return "To reduce expenses, start by identifying your top 3 spending categories. Often the biggest opportunities are in dining out, subscriptions, and impulse purchases. Would you like specific suggestions?"
-  }
-
-  return "I'm here to help with your financial questions! You can ask me about your spending patterns, savings tips, budget analysis, or any other financial topic. What would you like to know?"
-}
+  return c.json({ conversation, messages })
+})
 
 export default app

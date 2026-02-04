@@ -8,8 +8,6 @@ import { Plus, Tags, ArrowDownCircle, ArrowUpCircle } from "lucide-react"
 import { useCategories } from "@/lib/api/hooks/use-categories"
 import type { Category, TransactionType } from "@/lib/api/types"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -23,20 +21,22 @@ function CategoryItem({
   return (
     <Link
       href={`/${lang}/app/categories/${category.id}`}
-      className="flex items-center gap-4 p-4 hover:bg-accent rounded-lg transition-colors"
+      className="dash-list-item"
     >
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-lg">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-dash-card-hover text-lg">
         {category.icon_emoji || (category.type === "Expense" ? "💸" : "💰")}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-medium truncate">{category.name}</p>
-        <p className="text-sm text-muted-foreground">{category.type}</p>
+        <p className="text-dash-text-secondary font-medium truncate">
+          {category.name}
+        </p>
+        <p className="text-sm text-dash-text-dim">{category.type}</p>
       </div>
       <div
         className={`px-2 py-1 text-xs rounded-full ${
           category.type === "Expense"
-            ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-            : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+            ? "bg-dash-error/10 text-dash-error"
+            : "bg-dash-success/10 text-dash-success"
         }`}
       >
         {category.type}
@@ -47,13 +47,13 @@ function CategoryItem({
 
 function CategorySkeleton() {
   return (
-    <div className="flex items-center gap-4 p-4">
-      <Skeleton className="h-10 w-10 rounded-full" />
+    <div className="flex items-center gap-4 px-3 py-3">
+      <Skeleton className="h-10 w-10 rounded-full bg-dash-card-hover" />
       <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-4 w-32 bg-dash-card-hover" />
+        <Skeleton className="h-3 w-20 bg-dash-card-hover" />
       </div>
-      <Skeleton className="h-6 w-16 rounded-full" />
+      <Skeleton className="h-6 w-16 rounded-full bg-dash-card-hover" />
     </div>
   )
 }
@@ -75,7 +75,7 @@ function CategoryList({
 
   if (isLoading) {
     return (
-      <div className="divide-y">
+      <div className="divide-y divide-dash-border">
         {[...Array(4)].map((_, i) => (
           <CategorySkeleton key={i} />
         ))}
@@ -86,22 +86,23 @@ function CategoryList({
   if (!filteredCategories || filteredCategories.length === 0) {
     return (
       <div className="text-center py-12">
-        <Tags className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <p className="text-muted-foreground mb-4">
+        <Tags className="h-12 w-12 mx-auto text-dash-text-muted mb-4" />
+        <p className="text-dash-text-muted mb-4">
           No {type.toLowerCase()} categories yet
         </p>
-        <Button asChild>
-          <Link href={`/${lang}/app/categories/new?type=${type}`}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add {type} Category
-          </Link>
-        </Button>
+        <Link
+          href={`/${lang}/app/categories/new?type=${type}`}
+          className="dash-btn-pill-primary"
+        >
+          <Plus className="h-4 w-4" />
+          Add {type} Category
+        </Link>
       </div>
     )
   }
 
   return (
-    <div className="divide-y">
+    <div className="divide-y divide-dash-border">
       {filteredCategories.map((category) => (
         <CategoryItem key={category.id} category={category} lang={lang} />
       ))}
@@ -129,69 +130,74 @@ export default function CategoriesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Categories</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-semibold text-dash-text">Categories</h1>
+          <p className="text-dash-text-muted text-sm">
             Organize your transactions with categories
           </p>
         </div>
-        <Button asChild>
-          <Link href={`/${lang}/app/categories/new?type=${activeTab}`}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Category
-          </Link>
-        </Button>
+        <Link
+          href={`/${lang}/app/categories/new?type=${activeTab}`}
+          className="dash-btn-pill-primary"
+        >
+          <Plus className="h-4 w-4" />
+          New Category
+        </Link>
       </div>
 
       {/* Categories with Tabs */}
-      <Card>
+      <div className="dash-card">
         <Tabs
           value={activeTab}
           onValueChange={(v) => setActiveTab(v as TransactionType)}
         >
-          <CardHeader className="pb-0">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="Expense" className="flex items-center gap-2">
+          <div className="p-4 border-b border-dash-border">
+            <TabsList className="grid w-full grid-cols-2 bg-dash-bg border border-dash-border rounded-lg p-1">
+              <TabsTrigger
+                value="Expense"
+                className="flex items-center gap-2 rounded-md text-sm data-[state=active]:bg-dash-card data-[state=active]:text-dash-text text-dash-text-muted"
+              >
                 <ArrowDownCircle className="h-4 w-4" />
                 Expenses
                 {!isLoading && (
-                  <span className="ml-1 text-xs text-muted-foreground">
+                  <span className="ml-1 text-xs text-dash-text-dim">
                     ({expenseCount})
                   </span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="Income" className="flex items-center gap-2">
+              <TabsTrigger
+                value="Income"
+                className="flex items-center gap-2 rounded-md text-sm data-[state=active]:bg-dash-card data-[state=active]:text-dash-text text-dash-text-muted"
+              >
                 <ArrowUpCircle className="h-4 w-4" />
                 Income
                 {!isLoading && (
-                  <span className="ml-1 text-xs text-muted-foreground">
+                  <span className="ml-1 text-xs text-dash-text-dim">
                     ({incomeCount})
                   </span>
                 )}
               </TabsTrigger>
             </TabsList>
-          </CardHeader>
-          <CardContent className="p-0 pt-4">
-            <TabsContent value="Expense" className="m-0">
-              <CategoryList
-                categories={categories}
-                isLoading={isLoading}
-                lang={lang}
-                type="Expense"
-              />
-            </TabsContent>
-            <TabsContent value="Income" className="m-0">
-              <CategoryList
-                categories={categories}
-                isLoading={isLoading}
-                lang={lang}
-                type="Income"
-              />
-            </TabsContent>
-          </CardContent>
+          </div>
+          <TabsContent value="Expense" className="m-0">
+            <CategoryList
+              categories={categories}
+              isLoading={isLoading}
+              lang={lang}
+              type="Expense"
+            />
+          </TabsContent>
+          <TabsContent value="Income" className="m-0">
+            <CategoryList
+              categories={categories}
+              isLoading={isLoading}
+              lang={lang}
+              type="Income"
+            />
+          </TabsContent>
         </Tabs>
-      </Card>
+      </div>
     </div>
   )
 }

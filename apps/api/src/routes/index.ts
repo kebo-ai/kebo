@@ -1,6 +1,7 @@
 import type { OpenAPIHono } from "@hono/zod-openapi"
 import type { AppEnv } from "@/types/env"
 import accountsRoutes from "./accounts.routes"
+import adminRoutes from "./admin.routes"
 import aiRoutes from "./ai.routes"
 import banksRoutes from "./banks.routes"
 import budgetsRoutes from "./budgets.routes"
@@ -22,4 +23,5 @@ export function registerRoutes(app: OpenAPIHono<AppEnv>) {
   app.route("/reference", referenceRoutes)
   app.route("/reviews", reviewsRoutes)
   app.route("/ai", aiRoutes)
+  app.route("/admin", adminRoutes)
 }

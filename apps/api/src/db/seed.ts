@@ -1,3 +1,7 @@
+import { config } from "dotenv"
+
+config({ path: ".dev.vars" })
+
 import { drizzle } from "drizzle-orm/postgres-js"
 import { reset, seed } from "drizzle-seed"
 import postgres from "postgres"

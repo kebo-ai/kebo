@@ -14,15 +14,26 @@ import {
 import { useAccounts } from "@/lib/api/hooks/use-accounts"
 import type { Account } from "@/lib/api/types"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
+// Avatar color palette
+const avatarColors = [
+  "dash-avatar-blue",
+  "dash-avatar-green",
+  "dash-avatar-purple",
+  "dash-avatar-orange",
+  "dash-avatar-pink",
+]
+
+function getAvatarColor(index: number) {
+  return avatarColors[index % avatarColors.length]
+}
+
 function formatCurrency(amount: number, currency: string = "USD") {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(amount)
+  const parts = amount.toFixed(2).split(".")
+  const dollars = new Intl.NumberFormat("en-US").format(parseInt(parts[0]))
+  const cents = parts[1]
+  return { dollars, cents, formatted: `$${dollars}.${cents}` }
 }
 
 function getAccountIcon(accountType?: string) {
@@ -38,13 +49,25 @@ function getAccountIcon(accountType?: string) {
   }
 }
 
-function AccountItem({ account, lang }: { account: Account; lang: string }) {
+function AccountItem({
+  account,
+  lang,
+  index,
+}: {
+  account: Account
+  lang: string
+  index: number
+}) {
+  const { dollars, cents } = formatCurrency(parseFloat(account.balance))
+
   return (
     <Link
       href={`/${lang}/app/accounts/${account.id}`}
-      className="flex items-center gap-4 p-4 hover:bg-accent rounded-lg transition-colors"
+      className="dash-list-item"
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+      <div
+        className={`h-12 w-12 rounded-full flex items-center justify-center ${getAvatarColor(index)}`}
+      >
         {account.icon_url ? (
           <img
             src={account.icon_url}
@@ -56,10 +79,10 @@ function AccountItem({ account, lang }: { account: Account; lang: string }) {
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-medium truncate">
+        <p className="text-dash-text-secondary font-medium truncate">
           {account.customized_name || account.name}
         </p>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-dash-text-dim">
           {account.bank_name && (
             <>
               <Building2 className="h-3 w-3" />
@@ -69,14 +92,15 @@ function AccountItem({ account, lang }: { account: Account; lang: string }) {
           )}
           <span>{account.account_type || "Account"}</span>
           {account.is_default && (
-            <span className="px-1.5 py-0.5 text-xs bg-primary/10 text-primary rounded">
+            <span className="px-1.5 py-0.5 text-xs bg-dash-accent/10 text-dash-accent rounded">
               Default
             </span>
           )}
         </div>
       </div>
       <div className="text-right">
-        <p className="font-semibold">{formatCurrency(parseFloat(account.balance))}</p>
+        <span className="text-dash-text font-semibold">${dollars}</span>
+        <span className="text-dash-text-muted">.{cents}</span>
       </div>
     </Link>
   )
@@ -84,13 +108,13 @@ function AccountItem({ account, lang }: { account: Account; lang: string }) {
 
 function AccountSkeleton() {
   return (
-    <div className="flex items-center gap-4 p-4">
-      <Skeleton className="h-12 w-12 rounded-full" />
+    <div className="flex items-center gap-4 px-3 py-3">
+      <Skeleton className="h-12 w-12 rounded-full bg-dash-card-hover" />
       <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-4 w-32 bg-dash-card-hover" />
+        <Skeleton className="h-3 w-24 bg-dash-card-hover" />
       </div>
-      <Skeleton className="h-4 w-20" />
+      <Skeleton className="h-4 w-20 bg-dash-card-hover" />
     </div>
   )
 }
@@ -102,74 +126,75 @@ export default function AccountsPage() {
   const { data: accounts, isLoading } = useAccounts()
 
   const totalBalance =
-    accounts?.reduce((sum, account) => sum + parseFloat(account.balance || "0"), 0) || 0
+    accounts?.reduce(
+      (sum, account) => sum + parseFloat(account.balance || "0"),
+      0
+    ) || 0
+
+  const { dollars, cents } = formatCurrency(totalBalance)
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Accounts</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-semibold text-dash-text">Accounts</h1>
+          <p className="text-dash-text-muted text-sm">
             Manage your bank accounts and cards
           </p>
         </div>
-        <Button asChild>
-          <Link href={`/${lang}/app/accounts/new`}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Account
-          </Link>
-        </Button>
+        <Link href={`/${lang}/app/accounts/new`} className="dash-btn-pill-primary">
+          <Plus className="h-4 w-4" />
+          New Account
+        </Link>
       </div>
 
       {/* Total Balance Card */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Total Balance
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <Skeleton className="h-8 w-32" />
-          ) : (
-            <p className="text-3xl font-bold">{formatCurrency(totalBalance)}</p>
-          )}
-        </CardContent>
-      </Card>
+      <div className="dash-card p-6">
+        <p className="text-dash-text-muted text-sm mb-2">Total Balance</p>
+        {isLoading ? (
+          <Skeleton className="h-10 w-40 bg-dash-card-hover" />
+        ) : (
+          <div className="flex items-baseline">
+            <span className="text-4xl font-bold text-dash-text">${dollars}</span>
+            <span className="text-xl font-bold text-dash-text-muted">.{cents}</span>
+          </div>
+        )}
+      </div>
 
       {/* Accounts List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Accounts</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="divide-y">
-              {[...Array(3)].map((_, i) => (
-                <AccountSkeleton key={i} />
-              ))}
-            </div>
-          ) : accounts && accounts.length > 0 ? (
-            <div className="divide-y">
-              {accounts.map((account) => (
-                <AccountItem key={account.id} account={account} lang={lang} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <Wallet className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-4">No accounts yet</p>
-              <Button asChild>
-                <Link href={`/${lang}/app/accounts/new`}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add your first account
-                </Link>
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <div className="dash-card">
+        <div className="p-4 border-b border-dash-border">
+          <h2 className="text-dash-text font-medium">Your Accounts</h2>
+        </div>
+        {isLoading ? (
+          <div className="divide-y divide-dash-border">
+            {[...Array(3)].map((_, i) => (
+              <AccountSkeleton key={i} />
+            ))}
+          </div>
+        ) : accounts && accounts.length > 0 ? (
+          <div className="divide-y divide-dash-border">
+            {accounts.map((account, index) => (
+              <AccountItem
+                key={account.id}
+                account={account}
+                lang={lang}
+                index={index}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Wallet className="h-12 w-12 mx-auto text-dash-text-muted mb-4" />
+            <p className="text-dash-text-muted mb-4">No accounts yet</p>
+            <Link href={`/${lang}/app/accounts/new`} className="dash-btn-pill-primary">
+              <Plus className="h-4 w-4" />
+              Add your first account
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

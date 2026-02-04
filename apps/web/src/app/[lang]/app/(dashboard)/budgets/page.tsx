@@ -8,9 +8,6 @@ import { Plus, PiggyBank, Calendar, TrendingUp } from "lucide-react"
 import { useBudgets } from "@/lib/api/hooks/use-budgets"
 import type { Budget } from "@/lib/api/types"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
 
 function formatCurrency(amount: number, currency: string = "USD") {
@@ -32,83 +29,73 @@ function BudgetItem({ budget, lang }: { budget: Budget; lang: string }) {
   return (
     <Link
       href={`/${lang}/app/budgets/${budget.id}`}
-      className="block hover:bg-accent/50 rounded-lg transition-colors"
+      className={`block dash-card p-6 hover:bg-dash-card-hover transition-colors ${!isActive ? "opacity-60" : ""}`}
     >
-      <Card className={!isActive ? "opacity-60" : ""}>
-        <CardContent className="pt-6">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="font-semibold text-lg">
-                {budget.custom_name || "Monthly Budget"}
-              </h3>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                <Calendar className="h-3.5 w-3.5" />
-                <span>
-                  {format(new Date(budget.start_date), "MMM d")} -{" "}
-                  {format(new Date(budget.end_date), "MMM d, yyyy")}
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold">
-                {formatCurrency(budgetAmount)}
-              </p>
-              {budget.is_recurrent && (
-                <span className="text-xs text-muted-foreground">Recurring</span>
-              )}
-            </div>
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h3 className="font-semibold text-lg text-dash-text">
+            {budget.custom_name || "Monthly Budget"}
+          </h3>
+          <div className="flex items-center gap-2 text-sm text-dash-text-muted mt-1">
+            <Calendar className="h-3.5 w-3.5" />
+            <span>
+              {format(new Date(budget.start_date), "MMM d")} -{" "}
+              {format(new Date(budget.end_date), "MMM d, yyyy")}
+            </span>
           </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
-                {formatCurrency(spent)} spent
-              </span>
-              <span
-                className={
-                  isOverBudget ? "text-red-500" : "text-muted-foreground"
-                }
-              >
-                {formatCurrency(remaining)} remaining
-              </span>
-            </div>
-            <Progress
-              value={Math.min(progress, 100)}
-              className={isOverBudget ? "[&>div]:bg-red-500" : ""}
-            />
-          </div>
-
-          {!isActive && (
-            <div className="mt-3 text-xs text-muted-foreground">
-              Inactive budget
-            </div>
+        </div>
+        <div className="text-right">
+          <p className="text-2xl font-bold text-dash-text">
+            {formatCurrency(budgetAmount)}
+          </p>
+          {budget.is_recurrent && (
+            <span className="text-xs text-dash-text-dim">Recurring</span>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-dash-text-muted">
+            {formatCurrency(spent)} spent
+          </span>
+          <span className={isOverBudget ? "text-dash-error" : "text-dash-text-muted"}>
+            {formatCurrency(remaining)} remaining
+          </span>
+        </div>
+        <div className="h-2 bg-dash-border rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all ${isOverBudget ? "bg-dash-error" : "bg-dash-accent"}`}
+            style={{ width: `${Math.min(progress, 100)}%` }}
+          />
+        </div>
+      </div>
+
+      {!isActive && (
+        <div className="mt-3 text-xs text-dash-text-dim">Inactive budget</div>
+      )}
     </Link>
   )
 }
 
 function BudgetSkeleton() {
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="space-y-2">
-            <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-4 w-40" />
-          </div>
-          <Skeleton className="h-8 w-24" />
-        </div>
+    <div className="dash-card p-6">
+      <div className="flex items-start justify-between mb-4">
         <div className="space-y-2">
-          <div className="flex justify-between">
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-4 w-24" />
-          </div>
-          <Skeleton className="h-2 w-full" />
+          <Skeleton className="h-5 w-32 bg-dash-card-hover" />
+          <Skeleton className="h-4 w-40 bg-dash-card-hover" />
         </div>
-      </CardContent>
-    </Card>
+        <Skeleton className="h-8 w-24 bg-dash-card-hover" />
+      </div>
+      <div className="space-y-2">
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-20 bg-dash-card-hover" />
+          <Skeleton className="h-4 w-24 bg-dash-card-hover" />
+        </div>
+        <Skeleton className="h-2 w-full bg-dash-card-hover" />
+      </div>
+    </div>
   )
 }
 
@@ -124,19 +111,17 @@ export default function BudgetsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Budgets</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-semibold text-dash-text">Budgets</h1>
+          <p className="text-dash-text-muted text-sm">
             Track your spending with monthly budgets
           </p>
         </div>
-        <Button asChild>
-          <Link href={`/${lang}/app/budgets/new`}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Budget
-          </Link>
-        </Button>
+        <Link href={`/${lang}/app/budgets/new`} className="dash-btn-pill-primary">
+          <Plus className="h-4 w-4" />
+          New Budget
+        </Link>
       </div>
 
       {/* Budgets List */}
@@ -147,12 +132,12 @@ export default function BudgetsPage() {
           ))}
         </div>
       ) : budgets && budgets.length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Active Budgets */}
           {activeBudgets.length > 0 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-500" />
+              <h2 className="text-lg font-medium text-dash-text flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-dash-success" />
                 Active Budgets
               </h2>
               <div className="space-y-4">
@@ -166,7 +151,7 @@ export default function BudgetsPage() {
           {/* Inactive Budgets */}
           {inactiveBudgets.length > 0 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-muted-foreground">
+              <h2 className="text-lg font-medium text-dash-text-muted">
                 Past Budgets
               </h2>
               <div className="space-y-4">
@@ -178,21 +163,19 @@ export default function BudgetsPage() {
           )}
         </div>
       ) : (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <PiggyBank className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No budgets yet</h3>
-            <p className="text-muted-foreground mb-4">
-              Create your first budget to start tracking your spending
-            </p>
-            <Button asChild>
-              <Link href={`/${lang}/app/budgets/new`}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Budget
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="dash-card py-12 text-center">
+          <PiggyBank className="h-12 w-12 mx-auto text-dash-text-muted mb-4" />
+          <h3 className="text-lg font-medium text-dash-text mb-2">
+            No budgets yet
+          </h3>
+          <p className="text-dash-text-muted mb-4">
+            Create your first budget to start tracking your spending
+          </p>
+          <Link href={`/${lang}/app/budgets/new`} className="dash-btn-pill-primary">
+            <Plus className="h-4 w-4" />
+            Create Budget
+          </Link>
+        </div>
       )}
     </div>
   )

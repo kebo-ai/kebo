@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import type { User } from "@supabase/supabase-js"
 import {
   Home,
   ArrowLeftRight,
@@ -10,9 +11,11 @@ import {
   MessageCircle,
   Wallet,
   Tags,
+  Building2,
   Settings,
   LogOut,
   ChevronLeft,
+  ChevronRight,
   Menu,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -25,23 +28,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+} from "@/components/ui/sheet"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAuth } from "@/lib/auth/hooks"
 import { useState } from "react"
 
 interface SidebarProps {
   lang: string
+  user?: User
 }
 
 const navItems = [
-  { href: "", icon: Home, label: "Dashboard" },
+  { href: "", icon: Home, label: "Home" },
   { href: "/transactions", icon: ArrowLeftRight, label: "Transactions" },
   { href: "/budgets", icon: PiggyBank, label: "Budgets" },
   { href: "/reports", icon: BarChart3, label: "Reports" },
   { href: "/chat", icon: MessageCircle, label: "Kebo Wise" },
   { href: "/accounts", icon: Wallet, label: "Accounts" },
   { href: "/categories", icon: Tags, label: "Categories" },
+  { href: "/banks", icon: Building2, label: "Banks" },
 ]
 
 function NavItem({
@@ -61,10 +71,10 @@ function NavItem({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
         isActive
-          ? "bg-primary text-primary-foreground"
-          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+          ? "bg-dash-accent text-white"
+          : "text-dash-text-muted hover:bg-dash-card hover:text-dash-text",
         collapsed && "justify-center px-2"
       )}
     >
@@ -78,13 +88,18 @@ function SidebarContent({
   lang,
   collapsed,
   onCollapse,
+  serverUser,
 }: {
   lang: string
   collapsed: boolean
   onCollapse?: () => void
+  serverUser?: User
 }) {
   const pathname = usePathname()
-  const { user, signOut } = useAuth()
+  const { user: clientUser, signOut } = useAuth()
+
+  // Use server user if available, fallback to client user
+  const user = serverUser || clientUser
 
   const basePath = `/${lang}/app`
 
@@ -104,30 +119,45 @@ function SidebarContent({
   }
 
   return (
-    <div className="flex h-full flex-col">
-      {/* Logo */}
+    <div className="flex h-full flex-col bg-dash-bg">
+      {/* Logo Header */}
       <div
         className={cn(
-          "flex h-14 items-center border-b px-4",
+          "flex h-16 items-center border-b border-dash-border px-4",
           collapsed ? "justify-center" : "justify-between"
         )}
       >
         {!collapsed && (
-          <Link href={basePath} className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
+          <Link href={basePath} className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-kebo-500 to-kebo-600 text-white font-bold text-lg shadow-lg shadow-kebo-500/20">
               K
             </div>
-            <span className="text-lg font-semibold">Kebo</span>
+            <span className="text-lg font-semibold text-dash-text">Kebo</span>
           </Link>
         )}
         {collapsed && (
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-kebo-500 to-kebo-600 text-white font-bold text-lg shadow-lg shadow-kebo-500/20">
             K
           </div>
         )}
         {onCollapse && !collapsed && (
-          <Button variant="ghost" size="icon" onClick={onCollapse}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onCollapse}
+            className="text-dash-text-muted hover:text-dash-text hover:bg-dash-card"
+          >
             <ChevronLeft className="h-4 w-4" />
+          </Button>
+        )}
+        {onCollapse && collapsed && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onCollapse}
+            className="text-dash-text-muted hover:text-dash-text hover:bg-dash-card absolute -right-3 top-5 h-6 w-6 rounded-full border border-dash-border bg-dash-bg"
+          >
+            <ChevronRight className="h-3 w-3" />
           </Button>
         )}
       </div>
@@ -157,50 +187,51 @@ function SidebarContent({
       </ScrollArea>
 
       {/* User Menu */}
-      <div className="border-t p-3">
+      <div className="border-t border-dash-border p-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
               className={cn(
-                "w-full justify-start gap-3",
+                "w-full justify-start gap-3 hover:bg-dash-card",
                 collapsed && "justify-center px-2"
               )}
             >
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-9 w-9 border-2 border-dash-border">
                 <AvatarImage src={user?.user_metadata?.avatar_url} />
-                <AvatarFallback>
-                  {getInitials(
-                    user?.user_metadata?.full_name,
-                    user?.email
-                  )}
+                <AvatarFallback className="bg-dash-card text-dash-text text-sm font-medium">
+                  {getInitials(user?.user_metadata?.full_name, user?.email)}
                 </AvatarFallback>
               </Avatar>
               {!collapsed && (
                 <div className="flex flex-col items-start text-left">
-                  <span className="text-sm font-medium truncate max-w-[140px]">
-                    {user?.user_metadata?.full_name || user?.email}
+                  <span className="text-sm font-medium text-dash-text truncate max-w-[140px]">
+                    {user?.user_metadata?.full_name || "User"}
                   </span>
-                  {user?.user_metadata?.full_name && (
-                    <span className="text-xs text-muted-foreground truncate max-w-[140px]">
-                      {user?.email}
-                    </span>
-                  )}
+                  <span className="text-xs text-dash-text-muted truncate max-w-[140px]">
+                    {user?.email}
+                  </span>
                 </div>
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem asChild>
+          <DropdownMenuContent
+            align="end"
+            className="w-56 bg-dash-card border-dash-border"
+          >
+            <DropdownMenuItem
+              asChild
+              className="text-dash-text-secondary hover:bg-dash-card-hover hover:text-dash-text focus:bg-dash-card-hover focus:text-dash-text"
+            >
               <Link href={`${basePath}/settings`}>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="bg-dash-border" />
             <DropdownMenuItem
               onClick={signOut}
-              className="text-destructive focus:text-destructive"
+              className="text-dash-error hover:bg-dash-card-hover focus:bg-dash-card-hover focus:text-dash-error"
             >
               <LogOut className="mr-2 h-4 w-4" />
               Log out
@@ -212,7 +243,7 @@ function SidebarContent({
   )
 }
 
-export function Sidebar({ lang }: SidebarProps) {
+export function Sidebar({ lang, user }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
@@ -220,7 +251,7 @@ export function Sidebar({ lang }: SidebarProps) {
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col border-r bg-background transition-all duration-300",
+          "hidden lg:flex flex-col border-r border-dash-border bg-dash-bg transition-all duration-300 relative",
           collapsed ? "w-16" : "w-64"
         )}
       >
@@ -228,6 +259,7 @@ export function Sidebar({ lang }: SidebarProps) {
           lang={lang}
           collapsed={collapsed}
           onCollapse={() => setCollapsed(!collapsed)}
+          serverUser={user}
         />
       </aside>
 
@@ -237,14 +269,17 @@ export function Sidebar({ lang }: SidebarProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden fixed top-3 left-3 z-40"
+            className="lg:hidden fixed top-4 left-4 z-40 bg-dash-card border border-dash-border text-dash-text hover:bg-dash-card-hover"
           >
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent
+          side="left"
+          className="w-64 p-0 bg-dash-bg border-dash-border"
+        >
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-          <SidebarContent lang={lang} collapsed={false} />
+          <SidebarContent lang={lang} collapsed={false} serverUser={user} />
         </SheetContent>
       </Sheet>
     </>

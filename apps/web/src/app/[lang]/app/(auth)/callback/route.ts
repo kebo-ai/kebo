@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/auth/server"
+import { createServerClient } from "@supabase/ssr"
+import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
@@ -11,9 +12,40 @@ export async function GET(request: Request) {
   const langMatch = pathname.match(/^\/([a-z]{2})\//)
   const lang = langMatch ? langMatch[1] : "es"
 
+  console.log("[Auth Callback] Received request:", {
+    pathname,
+    code: code ? `${code.substring(0, 8)}...` : null,
+    origin,
+    lang,
+  })
+
   if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const cookieStore = await cookies()
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options)
+            })
+          },
+        },
+      }
+    )
+
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
+    console.log("[Auth Callback] Exchange result:", {
+      success: !error,
+      error: error?.message,
+      userId: data?.user?.id,
+    })
 
     if (!error) {
       const forwardedHost = request.headers.get("x-forwarded-host")
@@ -30,5 +62,5 @@ export async function GET(request: Request) {
   }
 
   // Return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/${lang}/app/auth/login?error=auth_error`)
+  return NextResponse.redirect(`${origin}/${lang}/app/login?error=auth_error`)
 }

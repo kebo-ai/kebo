@@ -11,6 +11,7 @@ export * from "./budgets"
 export * from "./categories"
 export * from "./chat"
 export * from "./colors"
+export * from "./embeddings"
 // Export all enums
 export * from "./enums"
 export * from "./global-categories"

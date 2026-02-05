@@ -3,8 +3,8 @@ import { I18nManager } from "react-native";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import "intl-pluralrules";
-import { LanguageService } from "../services/LanguageService";
-import logger from "../utils/logger";
+import { LanguageService } from "@/services/LanguageService";
+import logger from "@/utils/logger";
 
 import en, { Translations } from "./en";
 import es from "./es";

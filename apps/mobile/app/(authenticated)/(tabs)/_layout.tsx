@@ -38,18 +38,18 @@ export default function TabsLayout() {
   const [currentTab, setCurrentTab] = React.useState<string>("home");
 
   const getTabBarHeight = () => {
-    const baseHeight = 83;
+    const baseHeight = 60;
     if (Platform.OS === "android") {
-      return baseHeight + bottom + (bottom > 0 ? 10 : 20);
+      return baseHeight + bottom + (bottom > 0 ? 5 : 10);
     }
     return baseHeight + bottom;
   };
 
   const getTabBarPaddingBottom = () => {
     if (Platform.OS === "android") {
-      return bottom + (bottom > 0 ? 15 : 25);
+      return bottom + (bottom > 0 ? 8 : 12);
     }
-    return bottom + 17.55;
+    return bottom + 8;
   };
 
   useEffect(() => {
@@ -253,7 +253,6 @@ export default function TabsLayout() {
               />
             );
           },
-          tabBarStyle: { display: "none" },
         }}
       />
       <Tabs.Screen

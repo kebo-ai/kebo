@@ -89,14 +89,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      inputRef.current?.focus();
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, []);
-
-  useEffect(() => {
     if (!inputValue) {
       setInputHeight(40);
     }

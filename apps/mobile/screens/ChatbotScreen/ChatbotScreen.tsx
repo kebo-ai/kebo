@@ -10,7 +10,6 @@ import {
   Alert,
   TextInput,
   TouchableOpacity,
-  InteractionManager,
   PanResponder,
 } from "react-native";
 import {
@@ -18,7 +17,6 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useFocusEffect } from "expo-router";
 import tw from "twrnc";
 import moment from "moment";
 import * as Haptics from "expo-haptics";
@@ -61,11 +59,8 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
     const [inputValue, setInputValue] = useState("");
     const inputRef = useRef<TextInput | null>(null);
 
-    // Default tab bar height (fixed value since we're not using useBottomTabBarHeight)
-    const tabBarHeight = 60;
-
-    // Calculate bottom padding for content
-    const contentBottomPadding = tabBarHeight + 60;
+    // Constant bottom padding to keep content above the absolutely-positioned tab bar
+    const contentBottomPadding = 60;
 
     const [showScrollToEnd, setShowScrollToEnd] = useState(false);
 
@@ -100,40 +95,6 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       }
     }, [params.initialQuestion]);
 
-    // Auto-focus on mount if there are no messages or text in input
-    useEffect(() => {
-      if (messages.length === 0 && !inputValue) {
-        setTimeout(() => {
-          inputRef.current?.focus();
-        }, 400);
-      }
-    }, []);
-
-    useFocusEffect(
-      React.useCallback(() => {
-        const task = InteractionManager.runAfterInteractions(() => {
-          // Small delay to ensure the screen is ready
-          setTimeout(() => {
-            if (inputRef.current) {
-              inputRef.current.focus();
-            }
-          }, 500);
-        });
-
-        return () => task.cancel();
-      }, [])
-    );
-
-    // Add an additional effect for the first mount
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    }, []);
 
     // Configure PanResponder for swipe gesture
     const panResponder = useRef(
@@ -154,16 +115,6 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       })
     ).current;
 
-    // Optimize keyboard behavior
-    useEffect(() => {
-      const showKeyboard = () => {
-        setTimeout(() => {
-          inputRef.current?.focus();
-        }, 100);
-      };
-
-      showKeyboard();
-    }, []);
 
     // Handle sending a message
     const handleSendMessage = async (content: string) => {
@@ -296,14 +247,14 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={tw`flex-1`}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+          keyboardVerticalOffset={Platform.OS === "ios" ? -contentBottomPadding : 0}
         >
           <View style={tw`flex-1`}>
             <ChatHeader
               onNewChat={messages.length > 0 ? handleNewChat : undefined}
             />
 
-            <View style={[tw`flex-1 mb-3`]}>
+            <View style={[tw`flex-1`, { paddingBottom: contentBottomPadding }]}>
               {messages.length === 0 && !inputValue ? (
                 <ChatEmpty onSampleQuestionPress={handleSampleQuestionPress} />
               ) : (

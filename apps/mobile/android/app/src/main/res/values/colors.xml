@@ -3,4 +3,5 @@
   <color name="iconBackground">#6934D2</color>
   <color name="colorPrimary">#023c69</color>
   <color name="colorPrimaryDark">#ffffff</color>
+  <color name="notification_icon_color">#6934D2</color>
 </resources>

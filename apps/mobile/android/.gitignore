@@ -12,10 +12,5 @@ local.properties
 *.hprof
 .cxx/
 
-# Signing
-*.keystore
-*.jks
-key.properties
-
 # Bundle artifacts
 *.jsbundle

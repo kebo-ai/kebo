@@ -12,5 +12,11 @@ local.properties
 *.hprof
 .cxx/
 
+# Debug keystore
+app/debug.keystore
+
+# Build variants
+app/src/debugOptimized/
+
 # Bundle artifacts
 *.jsbundle

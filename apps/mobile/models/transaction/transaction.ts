@@ -9,11 +9,11 @@ import {
   IAnyModelType,
   applySnapshot,
 } from "mobx-state-tree";
-import { TransactionService } from "../../services/TransactionService";
-import { RootStore } from "../RootStore";
-import { CategoryStoreModel } from "../category-store/category-store";
-import { translate } from "../../i18n/translate";
-import logger from "../../utils/logger";
+import { TransactionService } from "@/services/TransactionService";
+import { RootStore } from "@/models/RootStore";
+import { CategoryStoreModel } from "@/models/category-store/category-store";
+import { translate } from "@/i18n/translate";
+import logger from "@/utils/logger";
 
 /**
  * Transaction types enum

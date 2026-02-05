@@ -10,9 +10,9 @@
  * @refresh reset
  */
 import { applySnapshot, IDisposer, onSnapshot } from "mobx-state-tree"
-import { RootStore, RootStoreSnapshot } from "../RootStore"
-import * as storage from "../../utils/storage"
-import logger from "../../utils/logger"
+import { RootStore, RootStoreSnapshot } from "@/models/RootStore"
+import * as storage from "@/utils/storage"
+import logger from "@/utils/logger"
 
 const ROOT_STATE_STORAGE_KEY = "root-v1"
 

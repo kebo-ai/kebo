@@ -1,5 +1,5 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
-import { translate } from "../../i18n";
+import { translate } from "@/i18n";
 
 /**
  * Modelo de Banco en MST

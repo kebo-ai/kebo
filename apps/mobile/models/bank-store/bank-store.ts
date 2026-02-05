@@ -1,7 +1,7 @@
 import { cast, getRoot, flow, Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
-import { BankModel, BankSnapshotOut } from "../bank/bank";
-import { getBanks, getBanksByCountry, searchBanksService, searchBanksByCountryService } from "../../services/BankService";
-import logger from "../../utils/logger";
+import { BankModel, BankSnapshotOut } from "@/models/bank/bank";
+import { getBanks, getBanksByCountry, searchBanksService, searchBanksByCountryService } from "@/services/BankService";
+import logger from "@/utils/logger";
 
 /**
  * Model description here for TypeScript hints.

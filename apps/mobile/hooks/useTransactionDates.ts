@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import moment from 'moment';
-import { RecurrenceType, RecurrenceCadenceEnum, recurrenceDisplayMap } from '../types/transaction';
-import i18n from '../i18n/i18n';
-import logger from '../utils/logger';
+import { RecurrenceType, RecurrenceCadenceEnum, recurrenceDisplayMap } from '@/types/transaction';
+import i18n from '@/i18n/i18n';
+import logger from '@/utils/logger';
 
 export const useTransactionDates = (formik: any) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);

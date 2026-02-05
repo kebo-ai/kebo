@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useStores } from '../models/helpers/useStores';
+import { useStores } from '@/models/helpers/useStores';
 import { FormikProps } from 'formik';
-import { TransactionFormValues, TransactionType } from '../types/transaction';
-import { ITransaction } from '../models/transaction/transaction';
-import { Account } from '../models/account/account';
-import { Category } from '../models/category/category';
+import { TransactionFormValues, TransactionType } from '@/types/transaction';
+import { ITransaction } from '@/models/transaction/transaction';
+import { Account } from '@/models/account/account';
+import { Category } from '@/models/category/category';
 
 interface TransactionModalsProps {
   transaction_type: TransactionType;

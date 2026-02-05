@@ -1,9 +1,9 @@
 import * as Notifications from "expo-notifications";
 import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
-import { translate } from "../i18n/translate";
-import { TxKeyPath } from "../i18n/i18n";
-import logger from "../utils/logger";
+import { translate } from "@/i18n/translate";
+import { TxKeyPath } from "@/i18n/i18n";
+import logger from "@/utils/logger";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({

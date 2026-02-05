@@ -2,11 +2,11 @@ import { useState, useCallback } from "react";
 import {
   ReviewService,
   RatingModalEligibilityResponse,
-} from "../services/ReviewService";
-import { translate } from "../i18n";
-import { loadString, saveString } from "../utils/storage/storage";
-import { REVIEW_MODAL_SHOULD_SHOW } from "../utils/storage/storage-keys";
-import logger from "../utils/logger";
+} from "@/services/ReviewService";
+import { translate } from "@/i18n";
+import { loadString, saveString } from "@/utils/storage/storage";
+import { REVIEW_MODAL_SHOULD_SHOW } from "@/utils/storage/storage-keys";
+import logger from "@/utils/logger";
 
 export const useReviewModal = () => {
   const [isVisible, setIsVisible] = useState(false);

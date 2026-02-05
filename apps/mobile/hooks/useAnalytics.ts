@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import { AnalyticsService } from "../services/AnalyticsService";
+import { AnalyticsService } from "@/services/AnalyticsService";
 import { useMemo } from "react";
 
 export const useAnalytics = (): AnalyticsService => {

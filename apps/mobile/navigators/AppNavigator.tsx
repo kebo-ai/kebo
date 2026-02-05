@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "@/utils/logger";
 import React from "react";
 import {
   NavigationContainer,
@@ -6,9 +6,9 @@ import {
   RouteProp,
 } from "@react-navigation/native";
 import { observer } from "mobx-react-lite";
-import * as Screens from "../screens";
-import Config from "../config";
-import { navigationRef, useBackButtonHandler } from "./navigationUtilities";
+import * as Screens from "@/screens";
+import Config from "@/config";
+import { navigationRef, useBackButtonHandler } from "@/navigators/navigationUtilities";
 import { ComponentProps, useEffect, useState } from "react";
 import {
   createNativeStackNavigator,
@@ -18,16 +18,16 @@ import {
 import {
   DashboardNavigator,
   DashboardTabParamList,
-} from "./DashboardNavigator";
-import { colors } from "../theme/colors";
-import { supabase } from "../config/supabase";
+} from "@/navigators/DashboardNavigator";
+import { colors } from "@/theme/colors";
+import { supabase } from "@/config/supabase";
 import { Animated } from "react-native";
-import { WebViewScreen } from "../screens/WebViewScreen/WebViewScreen";
-import { LanguageScreen } from "../screens/LanguageScreen/LanguageScreen";
-import { CountryScreen } from "../screens/CountryScreen/CountryScreen";
+import { WebViewScreen } from "@/screens/WebViewScreen/WebViewScreen";
+import { LanguageScreen } from "@/screens/LanguageScreen/LanguageScreen";
+import { CountryScreen } from "@/screens/CountryScreen/CountryScreen";
 import { StatusBar } from "expo-status-bar";
-import { BannerFeaturesScreen } from "../screens/BannerFeaturesScreen/BannerFeaturesScreen";
-import { Category } from "../models/category/category";
+import { BannerFeaturesScreen } from "@/screens/BannerFeaturesScreen/BannerFeaturesScreen";
+import { Category } from "@/models/category/category";
 
 interface BankOption {
   id: string;

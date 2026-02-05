@@ -5,13 +5,13 @@ import {
   PartialState,
   createNavigationContainerRef,
 } from "@react-navigation/native"
-import Config from "../config"
-import type { PersistNavigationConfig } from "../config/config.base"
-import { useIsMounted } from "../utils/useIsMounted"
-import type { AppStackParamList, NavigationProps } from "./AppNavigator"
-import logger from "../utils/logger"
+import Config from "@/config"
+import type { PersistNavigationConfig } from "@/config/config.base"
+import { useIsMounted } from "@/hooks/useIsMounted"
+import type { AppStackParamList, NavigationProps } from "@/navigators/AppNavigator"
+import logger from "@/utils/logger"
 
-import * as storage from "../utils/storage"
+import * as storage from "@/utils/storage"
 
 let analyticsService: any = null
 

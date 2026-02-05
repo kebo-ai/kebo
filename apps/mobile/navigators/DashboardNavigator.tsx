@@ -13,30 +13,30 @@ import {
   Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AppStackParamList, AppStackScreenProps } from "./AppNavigator";
-import { TransactionType } from "../types/transaction";
+import { AppStackParamList, AppStackScreenProps } from "@/navigators/AppNavigator";
+import { TransactionType } from "@/types/transaction";
 import {
   BudgetsScreen,
   HomeScreen,
   ReportsScreen,
   ChatbotScreen,
-} from "../screens";
-import { colors } from "../theme/colors";
-import { HomeIconSvg } from "../components/svg/HomeSvg";
-import { BudgetIconSvg } from "../components/svg/BudgetSvg";
-import { PlusIconSvg } from "../components/svg/PlusSvg";
-import { ReportsIconSvg } from "../components/svg/ReportsSvg";
-import { translate } from "../i18n";
-import { ChatbotIconSvg } from "../components/svg/ChatBotSvg";
-import tw from "../utils/useTailwind";
-import { TransactionScreen } from "../screens/TransactionScreen/TransactionScreen";
-import { useStores } from "../models/helpers/useStores";
+} from "@/screens";
+import { colors } from "@/theme/colors";
+import { HomeIconSvg } from "@/components/icons/HomeSvg";
+import { BudgetIconSvg } from "@/components/icons/BudgetSvg";
+import { PlusIconSvg } from "@/components/icons/PlusSvg";
+import { ReportsIconSvg } from "@/components/icons/ReportsSvg";
+import { translate } from "@/i18n";
+import { ChatbotIconSvg } from "@/components/icons/ChatBotSvg";
+import tw from "@/hooks/useTailwind";
+import { TransactionScreen } from "@/screens/TransactionScreen/TransactionScreen";
+import { useStores } from "@/models/helpers/useStores";
 import { useCallback, useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import React from "react";
-import { useAnalytics } from "../hooks/useAnalytics";
-import { registerAnalyticsService } from "./navigationUtilities";
-import logger from "../utils/logger";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { registerAnalyticsService } from "@/navigators/navigationUtilities";
+import logger from "@/utils/logger";
 
 export type DashboardTabParamList = {
   Home: undefined;

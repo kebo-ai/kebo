@@ -1,5 +1,5 @@
-import { supabase } from "../config/supabase";
-import { RootStore } from "../models/RootStore";
+import { supabase } from "@/config/supabase";
+import { RootStore } from "@/models/RootStore";
 import logger from "./logger";
 
 export const isUserAuthenticated = async (): Promise<boolean> => {

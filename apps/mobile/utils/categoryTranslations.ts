@@ -1,5 +1,5 @@
 import logger from "./logger";
-import { translate } from "../i18n";
+import { translate } from "@/i18n";
 
 const ICON_URLS: { [url: string]: string } = {
   "/storage/v1/object/public/categories/category__ahorro.svg": "savings",

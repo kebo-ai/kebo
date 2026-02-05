@@ -1,6 +1,6 @@
-import { supabase } from "../config/supabase";
-import { AccountSnapshotIn } from "../models/account/account";
-import logger from "../utils/logger";
+import { supabase } from "@/config/supabase";
+import { AccountSnapshotIn } from "@/models/account/account";
+import logger from "@/utils/logger";
 
 export const createAccountUser = async (account: AccountSnapshotIn) => {
   try {

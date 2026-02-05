@@ -1,5 +1,5 @@
-import { supabase } from "../config/supabase";
-import logger from "../utils/logger";
+import { supabase } from "@/config/supabase";
+import logger from "@/utils/logger";
 
 export const getAccountsType = async () => {
   const { data, error } = await supabase

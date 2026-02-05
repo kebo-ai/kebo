@@ -1,6 +1,6 @@
-import { supabase } from "../config/supabase";
-import { BudgetResponse } from "../types/transaction";
-import logger from "../utils/logger";
+import { supabase } from "@/config/supabase";
+import { BudgetResponse } from "@/types/transaction";
+import logger from "@/utils/logger";
 
 interface Budget {
   budget_amount: number | null;

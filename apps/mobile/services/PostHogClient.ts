@@ -1,5 +1,5 @@
 import { PostHog } from "posthog-react-native";
-import logger from "../utils/logger";
+import logger from "@/utils/logger";
 
 class PostHogClient {
   private static instance: PostHogClient;

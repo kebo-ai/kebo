@@ -1,6 +1,6 @@
-import { save, load } from "../utils/storage/storage";
-import { Currency } from "../data/currencies";
-import logger from "../utils/logger";
+import { save, load } from "@/utils/storage/storage";
+import { Currency } from "@/data/currencies";
+import logger from "@/utils/logger";
 
 const CURRENCY_STORAGE_KEY = "user-selected-currency";
 

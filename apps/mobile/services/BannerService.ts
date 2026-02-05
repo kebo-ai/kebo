@@ -1,12 +1,12 @@
-import { supabase } from "../config/supabase";
-import { APP_VERSION } from "../config/config.base";
-import { load, save } from "../utils/storage";
+import { supabase } from "@/config/supabase";
+import { APP_VERSION } from "@/config/config.base";
+import { load, save } from "@/utils/storage";
 import {
   HAS_SEEN_BANNER,
   LAST_APP_VERSION,
-} from "../utils/storage/storage-keys";
+} from "@/utils/storage/storage-keys";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import logger from "../utils/logger";
+import logger from "@/utils/logger";
 
 interface BannerAsset {
   url: string;

@@ -1,5 +1,5 @@
-import { save, load } from "../utils/storage/storage";
-import logger from "../utils/logger";
+import { save, load } from "@/utils/storage/storage";
+import logger from "@/utils/logger";
 
 const LANGUAGE_STORAGE_KEY = "user-selected-language";
 

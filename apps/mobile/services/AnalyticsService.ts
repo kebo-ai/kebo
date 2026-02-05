@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 import { postHogClient } from "./PostHogClient";
-import logger from "../utils/logger";
+import logger from "@/utils/logger";
 
 export const AUTH_EVENTS = {
   AUTH_STARTED: "auth_started",

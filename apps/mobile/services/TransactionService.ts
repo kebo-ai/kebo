@@ -1,7 +1,7 @@
-import { supabase } from "../config/supabase";
-import { TransactionSnapshotIn } from "../models/transaction/transaction";
+import { supabase } from "@/config/supabase";
+import { TransactionSnapshotIn } from "@/models/transaction/transaction";
 import moment from "moment";
-import logger from "../utils/logger";
+import logger from "@/utils/logger";
 
 export class TransactionService {
   static async createTransaction(transaction: TransactionSnapshotIn) {

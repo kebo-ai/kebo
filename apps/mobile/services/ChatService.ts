@@ -1,6 +1,6 @@
-import { supabase } from "../config/supabase";
-import { translate } from "../i18n";
-import logger from "../utils/logger";
+import { supabase } from "@/config/supabase";
+import { translate } from "@/i18n";
+import logger from "@/utils/logger";
 
 interface ChatResponse {
   content: string;

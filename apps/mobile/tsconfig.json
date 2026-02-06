@@ -3,6 +3,9 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
+      "@/*": [
+        "./*"
+      ],
       "@kebo/shared": [
         "../../packages/shared/src"
       ],

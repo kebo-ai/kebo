@@ -1,8 +1,8 @@
 if (__DEV__) {
   require("./ReactotronConfig");
 }
-import { AppNavigator } from "./src/navigators";
-import { ErrorBoundary } from "./src/screens/ErrorScreen/ErrorBoundary";
+import { AppNavigator } from "@/navigators";
+import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary";
 import moment from "moment";
 
 import "moment/locale/es";
@@ -15,18 +15,18 @@ import {
   initialWindowMetrics,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
-import Config from "./src/config";
-import { customFontsToLoad } from "./src/theme";
+import Config from "@/config";
+import { customFontsToLoad } from "@/theme";
 import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
-import { initI18n } from "./src/i18n";
-import { loadDateFnsLocale } from "./src/utils/formatDate";
-import CustomToast from "./src/components/ui/CustomToast";
-import Loader from "./src/components/ui/CustomLoader";
-import i18n from "./src/i18n/i18n";
-import { useNotifications } from "./src/hooks/useNotifications";
+import { initI18n } from "@/i18n";
+import { loadDateFnsLocale } from "@/utils/formatDate";
+import CustomToast from "@/components/ui/CustomToast";
+import Loader from "@/components/ui/CustomLoader";
+import i18n from "@/i18n/i18n";
+import { useNotifications } from "@/hooks/useNotifications";
 import * as Notifications from "expo-notifications";
-import { postHogClient } from "./src/services/PostHogClient";
+import { postHogClient } from "@/services/PostHogClient";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({

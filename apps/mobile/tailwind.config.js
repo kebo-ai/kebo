@@ -1,5 +1,5 @@
 import { colors as defaultColors } from "tailwindcss/defaultTheme";
-import { colors as customColors } from "./src/theme/colors";
+import { colors as customColors } from "./theme/colors";
 import { screens as defaultScreens } from "tailwindcss/defaultTheme";
 
 module.exports = {

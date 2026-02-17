@@ -4,7 +4,7 @@ import { screens as defaultScreens } from "tailwindcss/defaultTheme";
 
 module.exports = {
   presets: [],
-  darkMode: false, // or 'media' or 'class'
+  darkMode: "media",
   theme: {
     extend: {
       space: {

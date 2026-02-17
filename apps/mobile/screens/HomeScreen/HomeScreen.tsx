@@ -9,14 +9,23 @@ import {
   Image,
   Keyboard,
   Pressable,
+  Alert,
 } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
-import { Text } from "@/components/ui";
+import Animated, {
+  FadeIn,
+  Easing,
+  Keyframe,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { Text, Icon } from "@/components/ui";
 import { TransactionService } from "@/services/TransactionService";
 import tw from "twrnc";
 import moment from "moment";
 import "moment/locale/es";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 import { Stack, useRouter } from "expo-router";
 import { useFocusEffect } from "expo-router";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
@@ -29,12 +38,10 @@ import { KebitoWiseBudgetSvg } from "@/components/icons/KebitoWiseBudgetSvg";
 import { KebitoWiseSuggestsSvg } from "@/components/icons/KebitoWiseSuggestsSvg";
 import { KebitoWiseProjectSvg } from "@/components/icons/KebitoWiseProjectSvg";
 import { SvgUri } from "react-native-svg";
-import CustomAlert from "@/components/common/CustomAlert";
 import { useStores } from "@/models";
 import { translate } from "@/i18n";
 import i18n from "@/i18n/i18n";
 import { RowMap } from "react-native-swipe-list-view";
-import { MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { InteractionManager } from "react-native";
 import { TransactionType } from "@/types/transaction";
@@ -79,6 +86,7 @@ const TransactionItem = memo(
     onPress: (transaction: Transaction) => void;
     formatAmount: (amount: number) => string;
   }) => {
+    const { theme } = useTheme();
     const isExpense = transaction.transaction_type === "Expense";
     const currentLocale = i18n.language.split("-")[0];
 
@@ -133,8 +141,8 @@ const TransactionItem = memo(
       (isExpense ? "- " : "") + formatAmount(Math.abs(transaction.amount));
 
     return (
-      <Pressable onPress={handlePress} style={tw`bg-[#FAFAFA]`}>
-        <View style={tw`py-4 bg-white border-b border-[#EBEBEF] pl-4`}>
+      <Pressable onPress={handlePress} style={tw`bg-[#FAFAFA] dark:bg-black`}>
+        <View style={tw`py-4 bg-white dark:bg-[#1C1C1E] border-b border-[#EBEBEF] dark:border-[#3A3A3C] pl-4`}>
           <View style={tw`flex-row justify-between items-center`}>
             <View style={tw`flex-row items-center`}>
               <View
@@ -165,7 +173,7 @@ const TransactionItem = memo(
                 </View>
                 <View
                   style={[
-                    tw`absolute -bottom-1 -right-1 bg-white rounded-full`,
+                    tw`absolute -bottom-1 -right-1 bg-white dark:bg-[#1C1C1E] rounded-full`,
                     {
                       borderWidth: 1.3,
                       borderColor: isExpense ? colors.bgGray : colors.primary,
@@ -187,7 +195,7 @@ const TransactionItem = memo(
               </View>
               <View>
                 <View style={tw`flex-row items-center`}>
-                  <Text weight="medium" color="#110627">
+                  <Text weight="medium" color={theme.textPrimary}>
                     {categoryText}
                   </Text>
                   {transaction.metadata?.auto_generated && (
@@ -196,22 +204,147 @@ const TransactionItem = memo(
                     </View>
                   )}
                 </View>
-                <Text type="xs" weight="light" color="#606A84">
+                <Text type="xs" weight="light" color={theme.textSecondary}>
                   {descriptionText}
                 </Text>
               </View>
             </View>
             <View style={tw`items-end pr-4`}>
-              <Text weight="bold" color={isExpense ? "#606A84" : "#6934D2"}>
+              <Text weight="bold" color={isExpense ? theme.textSecondary : "#6934D2"}>
                 {amountText}
               </Text>
-              <Text type="xs" weight="normal" color="#606A84" style={tw`mt-0.5`}>
+              <Text type="xs" weight="normal" color={theme.textSecondary} style={tw`mt-0.5`}>
                 {dateText}
               </Text>
             </View>
           </View>
         </View>
       </Pressable>
+    );
+  }
+);
+
+// Animated balance toggle — inspired by Fuse's 3D flip pattern
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const BALANCE_DURATION = 175;
+const BALANCE_EASING = Easing.out(Easing.ease);
+const LONG_PRESS_DELAY = 500;
+
+const TRANSFORM_SECURE = [
+  { translateY: -35 },
+  { translateX: -4 },
+  { skewX: "45deg" },
+  { rotateX: "90deg" },
+  { rotateY: "3deg" },
+];
+const TRANSFORM_INSECURE = [
+  { translateY: 30 },
+  { translateX: 4 },
+  { skewX: "45deg" },
+  { rotateX: "90deg" },
+  { rotateY: "3deg" },
+];
+const TRANSFORM_ZERO = [
+  { translateY: 0 },
+  { translateX: 0 },
+  { skewX: "0deg" },
+  { rotateX: "0deg" },
+  { rotateY: "0deg" },
+];
+
+const secureEntering = new Keyframe({
+  0: { opacity: 0, transform: TRANSFORM_SECURE },
+  100: { opacity: 1, transform: TRANSFORM_ZERO, easing: BALANCE_EASING },
+});
+const secureExiting = new Keyframe({
+  0: { opacity: 1, transform: TRANSFORM_ZERO },
+  100: { opacity: 0, transform: TRANSFORM_SECURE, easing: BALANCE_EASING },
+});
+const insecureEntering = new Keyframe({
+  0: { opacity: 0, transform: TRANSFORM_INSECURE },
+  100: { opacity: 1, transform: TRANSFORM_ZERO, easing: BALANCE_EASING },
+});
+const insecureExiting = new Keyframe({
+  0: { opacity: 1, transform: TRANSFORM_ZERO },
+  100: { opacity: 0, transform: TRANSFORM_INSECURE, easing: BALANCE_EASING },
+});
+
+const BalanceDisplay = memo(
+  ({
+    isVisible,
+    onToggle,
+    formattedBalance,
+  }: {
+    isVisible: boolean;
+    onToggle: () => void;
+    formattedBalance: string;
+  }) => {
+    const isTouched = useSharedValue(false);
+
+    const rStyle = useAnimatedStyle(() => ({
+      transform: [
+        {
+          translateY: withTiming(isTouched.get() ? (isVisible ? 5 : -4) : 0, {
+            duration: LONG_PRESS_DELAY,
+            easing: BALANCE_EASING,
+          }),
+        },
+        {
+          scale: withTiming(isTouched.get() ? 0.97 : 1, {
+            duration: LONG_PRESS_DELAY,
+            easing: BALANCE_EASING,
+          }),
+        },
+        {
+          rotateX: withTiming(isTouched.get() ? "5deg" : "0deg", {
+            duration: LONG_PRESS_DELAY,
+            easing: BALANCE_EASING,
+          }),
+        },
+      ],
+    }));
+
+    const handleLongPress = () => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onToggle();
+    };
+
+    return (
+      <Animated.View style={rStyle}>
+        {isVisible ? (
+          <AnimatedPressable
+            key="balance-visible"
+            entering={insecureEntering.duration(BALANCE_DURATION)}
+            exiting={insecureExiting.duration(BALANCE_DURATION)}
+            onTouchStart={() => isTouched.set(true)}
+            onTouchEnd={() => isTouched.set(false)}
+            onLayout={() => isTouched.set(false)}
+            onLongPress={handleLongPress}
+            delayLongPress={LONG_PRESS_DELAY}
+            style={tw`flex-row justify-center items-center`}
+          >
+            <Text type="2xl" weight="medium" style={tw`text-center`}>
+              {formattedBalance}
+            </Text>
+          </AnimatedPressable>
+        ) : (
+          <AnimatedPressable
+            key="balance-hidden"
+            entering={secureEntering.duration(BALANCE_DURATION)}
+            exiting={secureExiting.duration(BALANCE_DURATION)}
+            onTouchStart={() => isTouched.set(true)}
+            onTouchEnd={() => isTouched.set(false)}
+            onLayout={() => isTouched.set(false)}
+            onLongPress={handleLongPress}
+            delayLongPress={LONG_PRESS_DELAY}
+            style={tw`flex-row justify-center items-center`}
+          >
+            <Text type="2xl" weight="medium" color="#606A84" style={tw`text-center`}>
+              {"••••••••"}
+            </Text>
+          </AnimatedPressable>
+        )}
+      </Animated.View>
     );
   }
 );
@@ -242,13 +375,10 @@ const keboWiseOptions = [
 
 export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [user, setUser] = useState<any>(null);
   const [userBalance, setUserBalance] = useState<any>(null);
-  const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
-  const [transactionToDelete, setTransactionToDelete] = useState<string | null>(
-    null
-  );
   const [openRow, setOpenRow] = useState<string | null>(null);
   const { formatAmount } = useCurrencyFormatter();
   const rootStore = useStores();
@@ -347,57 +477,26 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
 
   const handleDelete = useCallback((transactionId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    try {
-      // analytics.trackEvent("home_transaction_delete_initiated", {
-      //   screen_name: "HomeScreen",
-      //   action_type: "delete",
-      //   interaction_type: "swipe",
-      //   transaction_id: transactionId,
-      // });
-    } catch (error) {
-      logger.debug("Error tracking delete:", error);
-    }
-    setTransactionToDelete(transactionId);
-    setIsDeleteAlertVisible(true);
-  }, []);
-
-  const handleConfirmDelete = useCallback(async () => {
-    if (transactionToDelete) {
-      try {
-        await TransactionService.deleteTransaction(transactionToDelete);
-        try {
-          // analytics.trackEvent("home_transaction_delete_confirmed", {
-          //   screen_name: "HomeScreen",
-          //   action_type: "confirm",
-          //   interaction_type: "modal",
-          //   transaction_id: transactionToDelete,
-          //   success: true,
-          // });
-        } catch (error) {
-          logger.debug("Analytics error:", error);
-        }
-
-        fetchTransactions();
-      } catch (error) {
-        logger.error("Error deleting transaction:", error);
-        try {
-          // analytics.trackEvent("home_transaction_delete_failed", {
-          //   screen_name: "HomeScreen",
-          //   action_type: "confirm",
-          //   interaction_type: "modal",
-          //   transaction_id: transactionToDelete,
-          //   success: false,
-          //   error_message:
-          //     error instanceof Error ? error.message : "Unknown error",
-          // });
-        } catch (analyticsError) {
-          logger.debug("Analytics error:", analyticsError);
-        }
-      }
-    }
-    setIsDeleteAlertVisible(false);
-    setTransactionToDelete(null);
-  }, [transactionToDelete, fetchTransactions, analytics]);
+    Alert.alert(
+      translate("homeScreen:titleAlert"),
+      translate("homeScreen:messageAlert"),
+      [
+        { text: translate("homeScreen:cancel"), style: "cancel" },
+        {
+          text: translate("homeScreen:delete"),
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await TransactionService.deleteTransaction(transactionId);
+              fetchTransactions();
+            } catch (error) {
+              logger.error("Error deleting transaction:", error);
+            }
+          },
+        },
+      ]
+    );
+  }, [fetchTransactions]);
 
   const handleTransactionPress = useCallback(
     (transaction: Transaction) => {
@@ -451,7 +550,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
             }, 100);
           }}
         >
-          <MaterialIcons name="delete" size={28} color={colors.white} />
+          <Icon symbol="trash" size={24} color={colors.white} />
           <Text type="xs" weight="medium" color={colors.white} style={tw`mt-1`}>
             {translate("homeScreen:delete")}
           </Text>
@@ -529,32 +628,24 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
   const renderBudgetCard = useCallback(() => {
     return (
       <View
-        style={tw`bg-[#6934D226] px-[17px] pt-[19px] pb-[15px] rounded-[18px] mb-6 relative`}
+        style={tw`bg-[#6934D226] dark:bg-[#6934D240] px-[17px] pt-[19px] pb-[15px] rounded-[18px] mb-6`}
       >
-        <TouchableOpacity
-          onPress={handleBalanceVisibilityToggle}
-          style={tw`absolute top-3 right-3 p-1`}
-        >
-          <MaterialIcons
-            name={isBalanceVisible ? "visibility" : "visibility-off"}
-            size={20}
-            color="#6934D2"
-          />
-        </TouchableOpacity>
         <View style={tw`flex-row items-center justify-center`}>
-          <Text type="sm" weight="light" color="#110627" style={tw`text-center`}>
+          <Text type="sm" weight="light" color={theme.textPrimary} style={tw`text-center`}>
             {translate("homeScreen:balance")}
           </Text>
         </View>
 
-        <View style={tw`flex-row justify-center items-center mt-2`}>
-          <Text type="2xl" weight="medium" style={tw`text-center`}>
-            {isBalanceVisible
-              ? userBalance
+        <View style={tw`mt-2 overflow-hidden`}>
+          <BalanceDisplay
+            isVisible={isBalanceVisible}
+            onToggle={handleBalanceVisibilityToggle}
+            formattedBalance={
+              userBalance
                 ? formatAmount(userBalance.total_balance)
                 : formatAmount(0)
-              : "••••••••"}
-          </Text>
+            }
+          />
         </View>
         <View style={tw`flex-row justify-between mt-4`}>
           {[
@@ -598,7 +689,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
               >
                 {item.icon}
               </View>
-              <Text type="xs" weight="semibold" color="#110627" style={tw`mt-1`} numberOfLines={1}>
+              <Text type="xs" weight="semibold" color={theme.textPrimary} style={tw`mt-1`} numberOfLines={1}>
                 {item.label}
               </Text>
             </TouchableOpacity>
@@ -613,6 +704,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     navigateToSelectBank,
     handleBalanceVisibilityToggle,
     isBalanceVisible,
+    theme,
   ]);
 
   const navigateToChatbot = useCallback(
@@ -657,11 +749,6 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
   const keyExtractorSwipe = useCallback((item: Transaction) => item.id, []);
 
   const onRowClose = useCallback(() => setOpenRow(null), []);
-
-  const handleCloseDeleteAlert = useCallback(() => {
-    setIsDeleteAlertVisible(false);
-    setTransactionToDelete(null);
-  }, []);
 
   const avatarSource =
     user?.profile?.avatar_url || user?.user?.user_metadata?.avatar_url
@@ -711,16 +798,16 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
           </View>
           {transactions.length === 0 ? (
             <View
-              style={tw`border border-[#EBEBEF] bg-white p-6 rounded-[18px] items-center justify-center`}
+              style={tw`border border-[#EBEBEF] dark:border-[#3A3A3C] bg-white dark:bg-[#1C1C1E] p-6 rounded-[18px] items-center justify-center`}
             >
               <KeboSadIconSvg width={60} height={60} />
-              <Text color="#606A84" style={tw`text-center`}>
+              <Text color={theme.textSecondary} style={tw`text-center`}>
                 {translate("homeScreen:noTransactions")}
               </Text>
             </View>
           ) : (
             <View
-              style={tw`border border-[#EBEBEF] bg-white rounded-[18px] overflow-hidden`}
+              style={tw`border border-[#EBEBEF] dark:border-[#3A3A3C] bg-white dark:bg-[#1C1C1E] rounded-[18px] overflow-hidden`}
             >
               <SwipeableListWrapper
                 data={transactions.slice(0, 5)}
@@ -757,7 +844,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
               (option: { id: number; icon: JSX.Element; text: KeboWiseKeys }) => (
                 <TouchableOpacity
                   key={option.id}
-                  style={tw`items-center flex-col p-4 rounded-[20px] bg-[#606A84]/5 w-[30%] mb-3`}
+                  style={tw`items-center flex-col p-4 rounded-[20px] bg-[#606A84]/5 dark:bg-[#1C1C1E] w-[30%] mb-3`}
                   onPress={() => navigateToChatbot(option.text)}
                 >
                   <View style={tw``}>{option.icon}</View>
@@ -776,16 +863,6 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
           </View>
         </Animated.View>
       </ScrollView>
-      <CustomAlert
-        visible={isDeleteAlertVisible}
-        title={translate("homeScreen:titleAlert")}
-        message={translate("homeScreen:messageAlert")}
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCloseDeleteAlert}
-        type="danger"
-        confirmText={translate("homeScreen:delete")}
-        cancelText={translate("homeScreen:cancel")}
-      />
       <CustomModalReview
         visible={isReviewModalVisible}
         title={getModalTexts().title}

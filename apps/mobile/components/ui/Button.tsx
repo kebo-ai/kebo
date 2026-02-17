@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { PressableScale } from "pressto";
 import React, { useEffect, useMemo, useRef } from "react";
-import { Animated, StyleSheet, type ViewStyle } from "react-native";
+import { Animated, StyleSheet, useColorScheme, type ViewStyle } from "react-native";
 import { colors } from "@/theme/colors";
 import { Icon } from "./Icon";
 import { Text } from "./Text";
@@ -14,18 +14,22 @@ import {
   RADIUS_VALUES,
 } from "./types";
 
-const COLOR_MAP: Record<ButtonColor, string> = {
-  primary: colors.primary,
-  secondary: colors.gray,
-  danger: "#EF4444",
-  neutral: colors.black,
-};
+function getColorMap(isDark: boolean): Record<ButtonColor, string> {
+  return {
+    primary: colors.primary,
+    secondary: colors.gray,
+    danger: "#EF4444",
+    neutral: isDark ? "#FFFFFF" : colors.black,
+  };
+}
 
 function getVariantConfig(
   color: ButtonColor,
   variant: ButtonVariant,
+  isDark: boolean,
 ): ColorConfig {
-  const baseColor = COLOR_MAP[color];
+  const colorMap = getColorMap(isDark);
+  const baseColor = colorMap[color];
 
   switch (variant) {
     case "solid":
@@ -109,9 +113,12 @@ export function Button({
     outputRange: ["0deg", "360deg"],
   });
 
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
   const variantConfig = useMemo(
-    () => getVariantConfig(color, variant),
-    [color, variant],
+    () => getVariantConfig(color, variant, isDark),
+    [color, variant, isDark],
   );
 
   const isDisabled = disabled || loading;

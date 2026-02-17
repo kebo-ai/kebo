@@ -3,6 +3,7 @@ import {
   Text as RNText,
   StyleSheet,
   type TextProps as RNTextProps,
+  useColorScheme,
 } from "react-native";
 import { colors } from "@/theme/colors";
 
@@ -47,7 +48,8 @@ export function Text({
   color,
   ...rest
 }: TextProps) {
-  const textColor = color ?? colors.black;
+  const colorScheme = useColorScheme();
+  const textColor = color ?? (colorScheme === "dark" ? "#FFFFFF" : colors.black);
   const sizeStyle = sizeStyles[type];
   const fontFamilyStyle = weight
     ? { fontFamily: FONT_FAMILY_MAP[weight] }

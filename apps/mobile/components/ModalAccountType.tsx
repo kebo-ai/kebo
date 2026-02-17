@@ -2,12 +2,12 @@ import React from "react";
 import {
   Modal,
   View,
-  Text,
   TouchableOpacity,
   FlatList,
   TouchableWithoutFeedback,
   Pressable,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
@@ -88,17 +88,12 @@ const ModalAccountType: React.FC<ModalAccountTypeProps> = ({
                 >
                   {({ pressed }) => (
                     <Text
+                      weight={pressed ? "semibold" : "light"}
                       style={[
                         tw`text-base text-[${colors.textGray}] px-2`,
                         pressed
-                          ? [
-                              tw`text-[${colors.primary}]`,
-                              { fontFamily: "SFUIDisplaySemiBold" },
-                            ]
-                          : [
-                              tw`text-[${colors.textGray}]`,
-                              { fontFamily: "SFUIDisplayLight" },
-                            ],
+                          ? tw`text-[${colors.primary}]`
+                          : tw`text-[${colors.textGray}]`,
                       ]}
                     >
                       {translateType(item.type_name)}

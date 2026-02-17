@@ -438,6 +438,7 @@ const fr: Translations = {
     budget: "Budget",
     chatbot: "Chatbot",
     reports: "Rapports",
+    newTransaction: "Nouveau",
     functions: "Fonctions",
     community: "Communauté",
   },

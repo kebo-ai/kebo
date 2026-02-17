@@ -4,10 +4,10 @@ import { Screen } from "@/components/Screen";
 import {
   View,
   TouchableOpacity,
-  Text,
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import tw from "@/hooks/useTailwind";
 import { Ionicons } from "@expo/vector-icons";
@@ -292,10 +292,9 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
           >
             <MaterialIcons name="delete" size={28} color={colors.white} />
             <Text
-              style={[
-                tw`text-xs mt-1 text-white`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              style={tw`text-xs mt-1 text-white`}
+              weight="medium"
+              color="white"
             >
               {translate("common:delete")}
             </Text>
@@ -367,10 +366,9 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
               <Ionicons name="add" size={24} color="white" />
             </View>
             <Text
-              style={[
-                tw`text-[${colors.primary}] ml-2 text-sm ml-4`,
-                { fontFamily: "SFUIDisplaySemiBold" },
-              ]}
+              style={tw`text-[${colors.primary}] ml-2 text-sm ml-4`}
+              weight="semibold"
+              color={colors.primary}
             >
               {translate("budgetScreen:addBudget")}
             </Text>

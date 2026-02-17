@@ -2,13 +2,13 @@ import logger from "@/utils/logger";
 import React, { FC, useState } from "react";
 import {
   View,
-  Text,
   ActivityIndicator,
   Linking,
   SafeAreaView,
   Platform,
   StatusBar as RNStatusBar,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { WebView } from "react-native-webview";
 import { Screen } from "@/components";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -52,10 +52,8 @@ export const WebViewScreen: FC<WebViewScreenProps> = observer(
 
           <View style={tw`flex-1 items-center`}>
             <Text
-              style={[
-                tw`text-black text-lg text-center font-medium`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              style={tw`text-black text-lg text-center font-medium`}
+              weight="medium"
             >
               {}
             </Text>

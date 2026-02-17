@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
   Modal,
   TouchableOpacity,
   TouchableWithoutFeedback,
   TextInput,
 } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { colors } from "@/theme/colors";
@@ -99,10 +99,8 @@ const CustomFilterModal: React.FC<CustomFilterModalProps> = ({
             <View style={tw`bg-white p-5 rounded-t-3xl h-[80%]`}>
               <View style={tw`relative items-center justify-center mb-4`}>
                 <Text
-                  style={[
-                    tw`text-lg text-[#150627]`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
+                  weight="medium"
+                  style={tw`text-lg text-[#150627]`}
                 >
                   Filtros
                 </Text>
@@ -117,20 +115,16 @@ const CustomFilterModal: React.FC<CustomFilterModalProps> = ({
 
               <View style={tw`px-4`}>
                 <Text
-                  style={[
-                    tw`text-sm mb-2`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
+                  weight="medium"
+                  style={tw`text-sm mb-2`}
                 >
                   Rango de fecha
                 </Text>
                 <View style={tw`flex-row justify-between mb-4`}>
                   <View style={tw`flex-1 mr-2`}>
                     <Text
-                      style={[
-                        tw`text-xs mb-1 text-[#606A84]/30 ml-3`,
-                        { fontFamily: "SFUIDisplayLight" },
-                      ]}
+                      weight="light"
+                      style={tw`text-xs mb-1 text-[#606A84]/30 ml-3`}
                     >
                       Desde
                     </Text>
@@ -150,10 +144,8 @@ const CustomFilterModal: React.FC<CustomFilterModalProps> = ({
                   </View>
                   <View style={tw`flex-1 ml-2`}>
                     <Text
-                      style={[
-                        tw`text-xs mb-1 text-[#606A84]/30 ml-3`,
-                        { fontFamily: "SFUIDisplayLight" },
-                      ]}
+                      weight="light"
+                      style={tw`text-xs mb-1 text-[#606A84]/30 ml-3`}
                     >
                       Hasta
                     </Text>
@@ -174,10 +166,8 @@ const CustomFilterModal: React.FC<CustomFilterModalProps> = ({
                 </View>
 
                 <Text
-                  style={[
-                    tw`text-xs text-[#606A84]/30 mb-1 ml-3`,
-                    { fontFamily: "SFUIDisplayLight" },
-                  ]}
+                  weight="light"
+                  style={tw`text-xs text-[#606A84]/30 mb-1 ml-3`}
                 >
                   Categorías
                 </Text>
@@ -196,10 +186,8 @@ const CustomFilterModal: React.FC<CustomFilterModalProps> = ({
                 </TouchableOpacity>
 
                 <Text
-                  style={[
-                    tw`text-xs text-[#606A84]/30 mb-1 ml-3`,
-                    { fontFamily: "SFUIDisplayLight" },
-                  ]}
+                  weight="light"
+                  style={tw`text-xs text-[#606A84]/30 mb-1 ml-3`}
                 >
                   Cuenta
                 </Text>
@@ -218,10 +206,8 @@ const CustomFilterModal: React.FC<CustomFilterModalProps> = ({
                 </TouchableOpacity>
 
                 <Text
-                  style={[
-                    tw`text-xs text-[#606A84]/30 mb-1 ml-3`,
-                    { fontFamily: "SFUIDisplayLight" },
-                  ]}
+                  weight="light"
+                  style={tw`text-xs text-[#606A84]/30 mb-1 ml-3`}
                 >
                   Tipo
                 </Text>
@@ -240,10 +226,8 @@ const CustomFilterModal: React.FC<CustomFilterModalProps> = ({
                 </TouchableOpacity>
 
                 <Text
-                  style={[
-                    tw`text-xs mb-1 text-[#606A84]/30 ml-3`,
-                    { fontFamily: "SFUIDisplayLight" },
-                  ]}
+                  weight="light"
+                  style={tw`text-xs mb-1 text-[#606A84]/30 ml-3`}
                 >
                   Monto
                 </Text>

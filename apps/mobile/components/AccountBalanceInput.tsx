@@ -7,8 +7,8 @@ import {
   TextInputProps,
   Keyboard,
   Pressable,
-  Text,
 } from "react-native";
+import { Text } from "@/components/ui";
 import * as Localization from "expo-localization";
 import tw from "@/hooks/useTailwind";
 import { colors } from "@/theme/colors";
@@ -354,10 +354,8 @@ export const AccountBalanceInput = forwardRef<
     >
       {label && (
         <Text
-          style={[
-            tw`text-textGray text-sm flex-row items-center mb-2`,
-            { fontFamily: "SFUIDisplayLight" },
-          ]}
+          weight="light"
+          style={tw`text-textGray text-sm flex-row items-center mb-2`}
         >
           {label}
         </Text>
@@ -388,12 +386,10 @@ export const AccountBalanceInput = forwardRef<
           {...restProps}
         />
         <Text
+          weight="light"
+          color="rgba(96, 106, 132, 1)"
           style={[
             tw`text-4xl`,
-            {
-              fontFamily: "SFUIDisplayLight",
-              color: "rgba(96, 106, 132, 1)",
-            },
             style,
           ]}
         >

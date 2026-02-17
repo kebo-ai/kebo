@@ -2,10 +2,10 @@ import React, { useCallback } from "react";
 import {
   Modal,
   View,
-  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
@@ -99,10 +99,8 @@ const CustomModalReview: React.FC<CustomModalReviewProps> = ({
           <View style={tw`flex-row justify-between items-center mb-2`}>
             <View style={tw`w-6`} />
             <Text
-              style={[
-                tw`text-lg text-center flex-1`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              weight="medium"
+              style={tw`text-lg text-center flex-1`}
               numberOfLines={2}
             >
               {title}
@@ -120,10 +118,8 @@ const CustomModalReview: React.FC<CustomModalReviewProps> = ({
           </View>
 
           <Text
-            style={[
-              tw`text-base text-[${colors.textGray}] text-center mb-2`,
-              { fontFamily: "SFUIDisplayLight" },
-            ]}
+            weight="light"
+            style={tw`text-base text-[${colors.textGray}] text-center mb-2`}
             numberOfLines={4}
           >
             {message}
@@ -137,10 +133,8 @@ const CustomModalReview: React.FC<CustomModalReviewProps> = ({
               ]}
             >
               <Text
-                style={[
-                  tw`text-white text-base text-center`,
-                  { fontFamily: "SFUIDisplayMedium" },
-                ]}
+                weight="medium"
+                style={tw`text-white text-base text-center`}
               >
                 {confirmText}
               </Text>
@@ -152,10 +146,8 @@ const CustomModalReview: React.FC<CustomModalReviewProps> = ({
               ]}
             >
               <Text
-                style={[
-                  tw`text-[${colors.primary}] text-base text-center`,
-                  { fontFamily: "SFUIDisplayMedium" },
-                ]}
+                weight="medium"
+                style={tw`text-[${colors.primary}] text-base text-center`}
               >
                 {cancelText}
               </Text>

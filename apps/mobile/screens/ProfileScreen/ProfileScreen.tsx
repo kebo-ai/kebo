@@ -2,7 +2,6 @@ import React, { FC, useState, useEffect, useRef, useCallback, useMemo } from "re
 import { useFocusEffect, useRouter } from "expo-router";
 import {
   View,
-  Text,
   TouchableOpacity,
   Image,
   TextInput,
@@ -18,7 +17,7 @@ import { BackBlackSvg } from "@/components/icons/BackBlackSvg";
 import { supabase } from "@/config/supabase";
 import { getUserInfo } from "@/utils/authUtils";
 import { showToast } from "@/components/ui/CustomToast";
-import CustomButton from "@/components/common/CustomButton";
+import { Text, Button } from "@/components/ui";
 import { DocumentIconSvg } from "@/components/icons/DocumentIcon";
 import { ChatHelpIconSvg } from "@/components/icons/ChatHelpIcon";
 import { ChevronRightIconSvg } from "@/components/icons/ChevronRightIconSvg";
@@ -282,12 +281,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
             <BackBlackSvg width={15} height={15} />
           </TouchableOpacity>
 
-          <Text
-            style={[
-              tw`text-black text-lg text-center font-medium`,
-              { fontFamily: "SFUIDisplayMedium" },
-            ]}
-          >
+          <Text type="lg" weight="medium">
             {translate("profileScreen:profile")}
           </Text>
           <TouchableOpacity>
@@ -305,46 +299,21 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
           >
             <View style={tw`p-4 my-1 flex-row justify-between items-center`}>
               <View>
-                <Text
-                  style={[
-                    tw`text-[${colors.primary}] font-medium text-xs`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
-                >
+                <Text type="xs" weight="medium" color={colors.primary}>
                   {translate("profileScreen:keboPlan")}
                 </Text>
-                <Text
-                  style={[
-                    tw`text-black font-bold text-2xl`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
-                >
+                <Text type="2xl" weight="medium">
                   {translate("profileScreen:kebo")}
                 </Text>
-                <Text
-                  style={[
-                    tw`text-black font-bold text-2xl`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
-                >
+                <Text type="2xl" weight="medium">
                   {translate("profileScreen:free")}
                 </Text>
               </View>
               <View style={tw`flex-1 ml-6`}>
-                <Text
-                  style={[
-                    tw`text-[##110627] text-xs text-left`,
-                    { fontFamily: "SFUIDisplayLight" },
-                  ]}
-                >
+                <Text type="xs" weight="light" color="#110627">
                   {translate("profileScreen:keboBody")}
                 </Text>
-                <Text
-                  style={[
-                    tw`text-[#110627] text-xs text-left`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
-                >
+                <Text type="xs" weight="medium" color="#110627">
                   {translate("profileScreen:keboBody2")}
                 </Text>
               </View>
@@ -353,12 +322,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
           <View style={tw`bg-[#6934D2] rounded-b-2xl px-4`}>
             <View style={tw`p-4 my-1 flex-row justify-between items-center`}>
               <View>
-                <Text
-                  style={[
-                    tw`text-white text-xs text-left`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
-                >
+                <Text type="xs" weight="medium" color={colors.white}>
                   {translate("profileScreen:keboPro")}
                 </Text>
               </View>
@@ -374,12 +338,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
                   showToast("warning", translate("alertMessage:comminSoon"));
                 }}
               >
-                <Text
-                  style={[
-                    tw`text-[#110627] text-sm`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
-                >
+                <Text type="sm" weight="medium" color="#110627">
                   {translate("profileScreen:keboChange")}
                 </Text>
               </TouchableOpacity>
@@ -595,10 +554,10 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
                 </TouchableOpacity> */}
                 </View>
                 <View style={tw`flex-1 justify-center self-center`}>
-                  <Text style={tw`text-[#110627] text-base font-medium`}>
+                  <Text weight="medium" color="#110627">
                     {displayName || translate("profileScreen:noName")}
                   </Text>
-                  <Text style={tw`text-xs text-[#606A84]/50`}>
+                  <Text type="xs" color="rgba(96, 106, 132, 0.5)">
                     {user?.profile?.email ||
                       user?.user?.email ||
                       translate("profileScreen:noMail")}
@@ -622,12 +581,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
                       onPress={onPress}
                     >
                       <View style={tw`items-start`}>{icon}</View>
-                      <Text
-                        style={[
-                          tw`ml-2 text-xs text-[#110627] text-center`,
-                          { fontFamily: "SFUIDisplayLight" },
-                        ]}
-                      >
+                      <Text type="xs" weight="light" color="#110627" style={tw`ml-2 text-center`}>
                         {text}
                       </Text>
                     </TouchableOpacity>
@@ -635,9 +589,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
                 </View>
               </View>
               <View style={tw`mt-6`}>
-                <Text
-                  style={[tw`text-base`, { fontFamily: "SFUIDisplayMedium" }]}
-                >
+                <Text weight="medium">
                   {translate("profileScreen:settings")}
                 </Text>
                 <View style={tw`mt-4 px-4`}>
@@ -649,12 +601,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
                     >
                       <View style={tw`flex-row items-center`}>
                         <View style={tw`mr-2.5`}>{option.icon}</View>
-                        <Text
-                          style={[
-                            tw`text-base text-[#110627]`,
-                            { fontFamily: "SFUIDisplayMedium" },
-                          ]}
-                        >
+                        <Text weight="medium" color="#110627">
                           {option.text}
                         </Text>
                       </View>
@@ -665,9 +612,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
               </View>
 
               <View style={tw`mt-6`}>
-                <Text
-                  style={[tw`text-base`, { fontFamily: "SFUIDisplayMedium" }]}
-                >
+                <Text weight="medium">
                   {translate("profileScreen:functions")}
                 </Text>
                 <View style={tw`mt-4 px-4`}>
@@ -679,12 +624,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
                     >
                       <View style={tw`flex-row items-center`}>
                         <View style={tw`mr-2.5`}>{option.icon}</View>
-                        <Text
-                          style={[
-                            tw`text-base text-[#110627]`,
-                            { fontFamily: "SFUIDisplayMedium" },
-                          ]}
-                        >
+                        <Text weight="medium" color="#110627">
                           {option.text}
                         </Text>
                       </View>
@@ -695,9 +635,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
               </View>
 
               <View style={tw`mt-6`}>
-                <Text
-                  style={[tw`text-base`, { fontFamily: "SFUIDisplayMedium" }]}
-                >
+                <Text weight="medium">
                   {translate("profileScreen:community")}
                 </Text>
                 <View style={tw`mt-4 px-4`}>
@@ -709,12 +647,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
                     >
                       <View style={tw`flex-row items-center`}>
                         <View style={tw`mr-2.5`}>{option.icon}</View>
-                        <Text
-                          style={[
-                            tw`text-base text-[#110627]`,
-                            { fontFamily: "SFUIDisplayMedium" },
-                          ]}
-                        >
+                        <Text weight="medium" color="#110627">
                           {option.text}
                         </Text>
                       </View>
@@ -739,14 +672,15 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
             </Screen>
           </ScrollView>
           <View style={tw`mt-7 px-4 mb-2`}>
-            <CustomButton
-              variant="primary"
-              isEnabled={true}
+            <Button
+              variant="solid"
+              color="primary"
               onPress={() => handleLogout()}
               title={translate("profileScreen:logOut")}
+              radius="lg"
             />
 
-            <Text style={tw`text-xs text-[#606A84] text-center my-2`}>
+            <Text type="xs" color={colors.textGray} style={tw`text-center my-2`}>
               {translate("profileScreen:version")} {APP_VERSION}
             </Text>
           </View>

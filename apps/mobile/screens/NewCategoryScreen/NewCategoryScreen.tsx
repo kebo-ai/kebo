@@ -2,7 +2,6 @@ import logger from "@/utils/logger";
 import React, { useEffect, useRef, useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -11,6 +10,7 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -313,10 +313,9 @@ export const NewCategoryScreen: React.FC = () => {
           <View style={tw`flex-1 px-6 py-3 justify-center`}>
             <View style={tw`items-center`}>
               <Text
-                style={[
-                  tw`mt-6 text-base text-center text-[#110627]`,
-                  { fontFamily: "SFUIDisplaySemiBold" },
-                ]}
+                style={tw`mt-6 text-base text-center`}
+                weight="semibold"
+                color="#110627"
               >
                 {params?.isEditing
                   ? translate("components:newCategory.editCategory")

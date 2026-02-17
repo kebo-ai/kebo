@@ -14,11 +14,11 @@ import { Screen } from "@/components/Screen";
 import {
   View,
   TouchableOpacity,
-  Text,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
 } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "@/hooks/useTailwind";
 import { translate } from "@/i18n";
 import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
@@ -292,10 +292,8 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
             <View style={tw`mt-6`}>
               <View style={tw`flex-row justify-between items-center mb-4`}>
                 <Text
-                  style={[
-                    tw`text-black text-base`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
+                  style={tw`text-black text-base`}
+                  weight="medium"
                 >
                   {translate("createBudgetCategoryScreen:selectedCategory")}
                 </Text>
@@ -308,13 +306,9 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
                 >
                   <EditIconSvg width={16} height={16} color={colors.primary} />
                   <Text
-                    style={[
-                      tw`ml-1 text-sm`,
-                      {
-                        color: colors.primary,
-                        fontFamily: "SFUIDisplayMedium",
-                      },
-                    ]}
+                    style={tw`ml-1 text-sm`}
+                    weight="medium"
+                    color={colors.primary}
                   >
                     {translate("components:categoryModal.edit")}
                   </Text>

@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { translate } from "@/i18n";
 import { SvgUri } from "react-native-svg";
@@ -144,10 +145,8 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
                   </View>
                   <View>
                     <Text
-                      style={[
-                        tw`text-base text-[#110627]`,
-                        { fontFamily: "SFUIDisplayMedium" },
-                      ]}
+                      weight="medium"
+                      style={tw`text-base text-[#110627]`}
                     >
                       {descriptionText}
                     </Text>
@@ -161,10 +160,9 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
                 </View>
                 <View style={tw`items-end pr-4`}>
                   <Text
-                    style={[
-                      tw`text-base`,
-                      { color: amountColor, fontFamily: "SFUIDisplayBold" },
-                    ]}
+                    weight="bold"
+                    color={amountColor}
+                    style={tw`text-base`}
                   >
                     {amountText}
                   </Text>
@@ -172,10 +170,8 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
                   {currentScreen === "ReportsCategoryScreen" &&
                     item.percentage !== undefined && (
                       <Text
-                        style={[
-                          tw`text-xs text-[#606A84] mt-0.5`,
-                          { fontFamily: "SFUIDisplayRegular" },
-                        ]}
+                        weight="normal"
+                        style={tw`text-xs text-[#606A84] mt-0.5`}
                       >
                         {item.percentage.toFixed(1)}%
                       </Text>

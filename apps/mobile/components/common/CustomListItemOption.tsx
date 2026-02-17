@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
   TouchableOpacity,
-  Text,
   View,
   Image,
   TextInput,
   ReturnKeyTypeOptions,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { observer } from "mobx-react-lite";
 import tw from "twrnc";
 import { CategoryIconSvg } from "@/components/icons/CategoryIcon";
@@ -190,28 +190,21 @@ const CustomListItemOption: React.FC<CustomListItemOptionProps> = observer(
           ) : (
             <View style={tw`flex-row flex-1`}>
               <Text
-                style={[
-                  tw`text-[${colors.textGray}] text-base`,
-                  {
-                    fontFamily:
-                      icon === "calendar" ||
-                      icon === "endDate" ||
-                      (icon === "recurrence" && recurrenceSelected)
-                        ? "SFUIDisplayMedium"
-                        : "SFUIDisplayLight",
-                  },
-                ]}
+                weight={
+                  icon === "calendar" ||
+                  icon === "endDate" ||
+                  (icon === "recurrence" && recurrenceSelected)
+                    ? "medium"
+                    : "light"
+                }
+                style={tw`text-[${colors.textGray}] text-base`}
               >
                 {renderLabel()}
               </Text>
               {translatedLabelSelected && (
                 <Text
-                  style={[
-                    tw`text-[${colors.textGray}] text-base flex-1`,
-                    {
-                      fontFamily: "SFUIDisplaySemiBold",
-                    },
-                  ]}
+                  weight="semibold"
+                  style={tw`text-[${colors.textGray}] text-base flex-1`}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >

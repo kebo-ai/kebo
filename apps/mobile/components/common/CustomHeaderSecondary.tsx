@@ -1,4 +1,5 @@
-import { TouchableOpacity, View, Text } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "@/hooks/useTailwind";
 import { ArrowDownSimpleIcon } from "@/components/icons/ArrowDownSimpleIcon";
 import { BackIconSvg } from "@/components/icons/BackSvg";
@@ -40,10 +41,8 @@ export default function CustomHeaderSecondary({
       </View>
       {title && (
         <Text
-          style={[
-            tw`absolute self-center text-black text-lg`,
-            { fontFamily: "SFUIDisplayMedium" },
-          ]}
+          weight="medium"
+          style={tw`absolute self-center text-black text-lg`}
         >
           {title}
         </Text>

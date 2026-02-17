@@ -1,6 +1,7 @@
 import logger from "@/utils/logger";
 import React, { useEffect, useRef, useState } from "react";
-import { View, Dimensions, Text, ActivityIndicator, Image } from "react-native";
+import { View, Dimensions, ActivityIndicator, Image } from "react-native";
+import { Text } from "@/components/ui";
 import { observer } from "mobx-react-lite";
 import { BannerService } from "@/services/BannerService";
 import CustomButton from "@/components/common/CustomButton";
@@ -133,20 +134,16 @@ export const BannerFeaturesScreen = observer(function BannerFeaturesScreen() {
           )}
           {item.subtitle && (
             <Text
-              style={[
-                tw`text-black text-center text-lg mt-1 px-2`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              style={tw`text-black text-center text-lg mt-1 px-2`}
+              weight="medium"
             >
               {item.subtitle}
             </Text>
           )}
           {item.description && (
             <Text
-              style={[
-                tw`text-black text-center text-base mt-4 px-2`,
-                { fontFamily: "SFUIDisplayLight" },
-              ]}
+              style={tw`text-black text-center text-base mt-4 px-2`}
+              weight="light"
             >
               {item.description}
             </Text>

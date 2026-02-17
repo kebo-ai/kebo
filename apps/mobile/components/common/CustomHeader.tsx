@@ -1,9 +1,9 @@
 import {
   View,
   TouchableOpacity,
-  Text,
   StatusBar,
 } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { IconTypes } from "@/components/assets/Icon";
 import { colors } from "@/theme";
@@ -43,10 +43,8 @@ export default function CustomHeader({
         )}
         {title && (
           <Text
-            style={[
-              tw`text-white text-lg`,
-              { fontFamily: "SFUIDisplayMedium" },
-            ]}
+            weight="medium"
+            style={tw`text-white text-lg`}
           >
             {title}
           </Text>

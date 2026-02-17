@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
+import { Text } from "@/components/ui";
 import { useNavigation } from "@react-navigation/native";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
@@ -26,7 +27,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ onNewChat }) => {
       </TouchableOpacity>
 
       <Text
-        style={[tw`text-lg text-center`, { fontFamily: "SFUIDisplayMedium" }]}
+        weight="medium"
+        style={tw`text-lg text-center`}
       >
         Kebo Wise
       </Text>

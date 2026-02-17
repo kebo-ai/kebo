@@ -1,7 +1,8 @@
 import logger from "@/utils/logger";
 import { observer } from "mobx-react-lite";
 import { FC } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import { Text } from "@/components/ui";
 import { useRouter } from "expo-router";
 import { Screen } from "@/components/Screen";
 import tw from "@/hooks/useTailwind";
@@ -91,10 +92,8 @@ export const MagicLinkScreen: FC<MagicLinkScreenProps> = observer(
           </TouchableOpacity>
 
           <Text
-            style={[
-              tw`text-black text-lg text-center font-medium`,
-              { fontFamily: "SFUIDisplayMedium" },
-            ]}
+            style={tw`text-black text-lg text-center font-medium`}
+            weight="medium"
           ></Text>
           <TouchableOpacity>
             <View style={tw`w-4 h-4`}></View>
@@ -119,10 +118,9 @@ export const MagicLinkScreen: FC<MagicLinkScreenProps> = observer(
           </View>
           <View style={tw`mt-12`}>
             <Text
-              style={[
-                tw`text-[32px] text-[${colors.secondary}]`,
-                { fontFamily: "SFUIDisplayBold" },
-              ]}
+              style={tw`text-[32px]`}
+              weight="bold"
+              color={colors.secondary}
             >
               {translate("magicLinkScreen:loginMagic")}
             </Text>

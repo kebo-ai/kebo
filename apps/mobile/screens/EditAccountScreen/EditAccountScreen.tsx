@@ -3,7 +3,8 @@ import React, { FC, useState, useEffect, useRef } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { observer } from "mobx-react-lite";
 import tw from "@/hooks/useTailwind";
-import { View, Text, Image, Platform, TextInput, Keyboard } from "react-native";
+import { View, Image, Platform, TextInput, Keyboard } from "react-native";
+import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import CustomHeader from "@/components/common/CustomHeader";
 import { FixedScreen } from "@/components/FixedScreen";
@@ -291,13 +292,9 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
                   style={tw`w-[22px] h-[22px] border border-[#6934D2]/15 rounded-full`}
                 />
                 <Text
-                  style={[
-                    tw`text-base`,
-                    {
-                      color: "rgba(96, 106, 132, 1)",
-                      fontFamily: "SFUIDisplaySemiBold",
-                    },
-                  ]}
+                  style={tw`text-base`}
+                  weight="semibold"
+                  color="rgba(96, 106, 132, 1)"
                 >
                   {accountData.name || ""}
                 </Text>

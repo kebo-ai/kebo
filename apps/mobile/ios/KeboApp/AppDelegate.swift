@@ -29,6 +29,9 @@ public class AppDelegate: ExpoAppDelegate {
       launchOptions: launchOptions)
 #endif
 
+    // Set unselected tab bar icon/label color (not exposed by react-native-screens)
+    UITabBar.appearance().unselectedItemTintColor = UIColor(red: 183/255, green: 187/255, blue: 199/255, alpha: 1) // #B7BBC7
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 

@@ -2,11 +2,11 @@ import logger from "@/utils/logger";
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import {
   View,
-  Text,
   Platform,
   KeyboardAvoidingView,
   TouchableOpacity,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Screen } from "@/components/Screen";
 import { colors } from "@/theme/colors";
@@ -201,20 +201,16 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
           <View style={tw`flex-1 px-6`}>
             <View style={tw`pt-10`}>
               <Text
-                style={[
-                  tw`text-2xl text-black`,
-                  { fontFamily: "SFUIDisplayBold" },
-                ]}
+                style={tw`text-2xl text-black`}
+                weight="bold"
               >
                 {isEditing
                   ? translate("newBudgetScreen:editBudget")
                   : translate("newBudgetScreen:title")}
               </Text>
               <Text
-                style={[
-                  tw`text-sm text-black pt-2`,
-                  { fontFamily: "SFUIDisplayLight" },
-                ]}
+                style={tw`text-sm text-black pt-2`}
+                weight="light"
               >
                 {translate("newBudgetScreen:description")}
               </Text>

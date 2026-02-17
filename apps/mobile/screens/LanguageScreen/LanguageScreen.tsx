@@ -1,6 +1,7 @@
 import logger from "@/utils/logger";
 import React, { FC } from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, TouchableOpacity, Image } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { Screen } from "@/components";
 import { useRouter } from "expo-router";
@@ -70,10 +71,8 @@ export const LanguageScreen: FC<LanguageScreenProps> = observer(
         </TouchableOpacity>
 
         <Text
-          style={[
-            tw`text-black text-lg text-center font-medium`,
-            { fontFamily: "SFUIDisplayMedium" },
-          ]}
+          style={tw`text-black text-lg text-center font-medium`}
+          weight="medium"
         >
           {translate("languageScreen:selectLanguage")}
         </Text>
@@ -99,18 +98,16 @@ export const LanguageScreen: FC<LanguageScreenProps> = observer(
               <Text style={tw`text-3xl mr-4`}>{lang.flag}</Text>
               <View>
                 <Text
-                  style={[
-                    tw`text-base text-[#110627]`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
+                  style={tw`text-base`}
+                  weight="medium"
+                  color="#110627"
                 >
                   {lang.name}
                 </Text>
                 <Text
-                  style={[
-                    tw`text-sm text-[#606A84]`,
-                    { fontFamily: "SFUIDisplayLight" },
-                  ]}
+                  style={tw`text-sm`}
+                  weight="light"
+                  color="#606A84"
                 >
                   {lang.nativeName}
                 </Text>

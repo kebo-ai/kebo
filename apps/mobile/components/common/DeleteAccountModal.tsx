@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import {
   Modal,
   View,
-  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   TextInput,
@@ -12,6 +11,7 @@ import {
   ScrollView,
   Keyboard,
 } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -142,27 +142,21 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                   showsVerticalScrollIndicator={false}
                 >
                   <Text
-                    style={[
-                      tw`text-xl mb-2 text-center text-red-500`,
-                      { fontFamily: "SFUIDisplayMedium" },
-                    ]}
+                    weight="medium"
+                    style={tw`text-xl mb-2 text-center text-red-500`}
                   >
                     {translate("components:deleteAccountModal.deleteAccount")}
                   </Text>
                   <Text
-                    style={[
-                      tw`text-base text-[${colors.textGray}] text-center mb-6`,
-                      { fontFamily: "SFUIDisplayLight" },
-                    ]}
+                    weight="light"
+                    style={tw`text-base text-[${colors.textGray}] text-center mb-6`}
                   >
                     {translate("components:deleteAccountModal.deleteAccountBody")}
                   </Text>
 
                   <Text
-                    style={[
-                      tw`text-base text-[${colors.textGray}] text-center mb-4`,
-                      { fontFamily: "SFUIDisplayMedium" },
-                    ]}
+                    weight="medium"
+                    style={tw`text-base text-[${colors.textGray}] text-center mb-4`}
                   >
                     {translate("components:deleteAccountModal.deleteAccountBody2")}
                   </Text>
@@ -187,10 +181,8 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                       style={tw`py-3 px-5 rounded-[10px] bg-gray-100`}
                     >
                       <Text
-                        style={[
-                          tw`text-[${colors.textGray}]`,
-                          { fontFamily: "SFUIDisplayMedium" },
-                        ]}
+                        weight="medium"
+                        style={tw`text-[${colors.textGray}]`}
                       >
                         {translate("components:deleteAccountModal.cancel")}
                       </Text>
@@ -204,10 +196,8 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                       }`}
                     >
                       <Text
-                        style={[
-                          tw`text-white`,
-                          { fontFamily: "SFUIDisplayMedium" },
-                        ]}
+                        weight="medium"
+                        style={tw`text-white`}
                       >
                         {isLoading
                           ? translate("components:deleteAccountModal.delete")

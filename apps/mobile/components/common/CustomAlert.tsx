@@ -2,10 +2,10 @@ import React from "react";
 import {
   Modal,
   View,
-  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { translate } from "@/i18n";
@@ -51,18 +51,14 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
           <TouchableWithoutFeedback>
             <View style={tw`bg-white w-[80%] rounded-3xl p-6`}>
               <Text
-                style={[
-                  tw`text-lg mb-4 text-center`,
-                  { fontFamily: "SFUIDisplayMedium" },
-                ]}
+                weight="medium"
+                style={tw`text-lg mb-4 text-center`}
               >
                 {title}
               </Text>
               <Text
-                style={[
-                  tw`text-base text-[${colors.textGray}] text-center mb-6`,
-                  { fontFamily: "SFUIDisplayLight" },
-                ]}
+                weight="light"
+                style={tw`text-base text-[${colors.textGray}] text-center mb-6`}
               >
                 {message}
               </Text>
@@ -72,10 +68,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                   style={tw`border-2 border-[${colors.primary}] px-6 py-2 rounded-full`}
                 >
                   <Text
-                    style={[
-                      tw`text-[${colors.primary}] text-base`,
-                      { fontFamily: "SFUIDisplayMedium" },
-                    ]}
+                    weight="medium"
+                    style={tw`text-[${colors.primary}] text-base`}
                   >
                     {cancelText}
                   </Text>
@@ -85,10 +79,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                   style={tw`bg-[${colors.primary}] border-2 border-[${colors.primary}] px-6 py-2 rounded-full`}
                 >
                   <Text
-                    style={[
-                      tw`text-white text-base`,
-                      { fontFamily: "SFUIDisplayMedium" },
-                    ]}
+                    weight="medium"
+                    style={tw`text-white text-base`}
                   >
                     {confirmText}
                   </Text>

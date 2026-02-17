@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Modal,
   View,
-  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Pressable,
@@ -11,6 +10,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { SwipeListView, RowMap } from "react-native-swipe-list-view";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
@@ -300,9 +300,9 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
             <View style={tw`flex-1`}>
               <View style={tw`flex-row items-center`}>
                 <Text
+                  weight="medium"
                   style={[
                     {
-                      fontFamily: "SFUIDisplay-Medium",
                       fontWeight: "500",
                       fontSize: 16,
                       lineHeight: 20,
@@ -330,9 +330,9 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
               </View>
 
               <Text
+                weight="light"
                 style={[
                   {
-                    fontFamily: "SFUIDisplay-Light",
                     fontSize: 12,
                     color: "rgba(96, 106, 132, 0.5)",
                     marginTop: 2,

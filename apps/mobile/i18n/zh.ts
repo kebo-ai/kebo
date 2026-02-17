@@ -418,6 +418,7 @@ const zh: Translations = {
     budget: "预算",
     chatbot: "聊天机器人",
     reports: "报告",
+    newTransaction: "新建",
     functions: "功能",
     community: "社区",
   },

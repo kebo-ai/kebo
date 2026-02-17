@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "@/hooks/useTailwind";
 import { translate } from "@/i18n";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
@@ -80,18 +81,14 @@ export const CategoriesListBudget: React.FC<CategoriesListBudgetProps> = ({
           <View style={tw`flex-1`}>
             <View style={tw`flex-row justify-between items-center`}>
               <Text
-                style={[
-                  tw`text-base text-[#606A84]`,
-                  { fontFamily: "SFUIDisplayLight" },
-                ]}
+                weight="light"
+                style={tw`text-base text-[#606A84]`}
               >
                 {item.category_name}
               </Text>
               <Text
-                style={[
-                  tw`text-[#110627] text-sm`,
-                  { fontFamily: "SFUIDisplayMedium" },
-                ]}
+                weight="medium"
+                style={tw`text-[#110627] text-sm`}
               >
                 {formatAmount(item.amount)}
               </Text>
@@ -166,10 +163,8 @@ export const CategoriesListBudget: React.FC<CategoriesListBudgetProps> = ({
       >
         <MaterialIcons name="delete" size={28} color={colors.white} />
         <Text
-          style={[
-            tw`text-xs mt-1 text-white`,
-            { fontFamily: "SFUIDisplayMedium" },
-          ]}
+          weight="medium"
+          style={tw`text-xs mt-1 text-white`}
         >
           {translate("common:delete")}
         </Text>

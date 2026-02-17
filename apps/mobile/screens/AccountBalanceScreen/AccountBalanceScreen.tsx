@@ -5,7 +5,6 @@ import { observer } from "mobx-react-lite";
 import tw from "@/hooks/useTailwind";
 import {
   View,
-  Text,
   Image,
   Platform,
   TextInput,
@@ -13,6 +12,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import CustomHeader from "@/components/common/CustomHeader";
 import { FixedScreen } from "@/components/FixedScreen";
@@ -483,13 +483,9 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
                     resizeMode="contain"
                   />
                   <Text
-                    style={[
-                      tw`text-base`,
-                      {
-                        color: "rgba(96, 106, 132, 1)",
-                        fontFamily: "SFUIDisplaySemiBold",
-                      },
-                    ]}
+                    style={tw`text-base`}
+                    weight="semibold"
+                    color="rgba(96, 106, 132, 1)"
                   >
                     {selectedBank.name === "Banco Personalizado"
                       ? translate("components:bankModal.customBank")

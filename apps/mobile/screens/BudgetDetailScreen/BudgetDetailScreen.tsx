@@ -5,10 +5,10 @@ import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { Screen } from "@/components/Screen";
 import {
   View,
-  Text,
   ScrollView,
   InteractionManager,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import tw from "@/hooks/useTailwind";
 import { translate } from "@/i18n";
@@ -279,7 +279,8 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
 
             <View style={tw`px-6 mt-2`}>
               <Text
-                style={[tw`text-base`, { fontFamily: "SFUIDisplaySemiBold" }]}
+                style={tw`text-base`}
+                weight="semibold"
               >
                 {translate("homeScreen:titleTransaction")}
                 <Text style={tw`text-base`}>💸👀</Text>

@@ -5,12 +5,12 @@ import { useStores } from "@/models/helpers/useStores";
 import tw from "@/hooks/useTailwind";
 import {
   View,
-  Text,
   TextInput,
   Image,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import CustomHeader from "@/components/common/CustomHeader";
 import { SearchIconSvg } from "@/components/icons/SearchSvg";
@@ -79,18 +79,16 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
         <View style={tw`flex-1`}>
           <View style={tw`px-6`}>
             <Text
-              style={[
-                tw`text-base text-[${colors.textGray}] mt-4`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              style={tw`text-base mt-4`}
+              weight="medium"
+              color={colors.textGray}
             >
               {translate("components:bankModal.chooseBank")}
             </Text>
             <Text
-              style={[
-                tw`text-[14px] text-[#606A8480]`,
-                { fontFamily: "SFUIDisplayLight" },
-              ]}
+              style={tw`text-[14px]`}
+              weight="light"
+              color="#606A8480"
             >
               {translate("components:bankModal.selectBank")}
             </Text>
@@ -143,10 +141,9 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
                   resizeMode="contain"
                 />
                 <Text
-                  style={[
-                    tw`text-base text-[${colors.textGray}]`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
+                  style={tw`text-base`}
+                  weight="medium"
+                  color={colors.textGray}
                 >
                   {bank.name === "Banco Personalizado"
                     ? translate("components:bankModal.customBank")

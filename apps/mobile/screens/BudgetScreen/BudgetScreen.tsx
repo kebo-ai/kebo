@@ -5,10 +5,10 @@ import { Screen } from "@/components/Screen";
 import {
   View,
   TouchableOpacity,
-  Text,
   ActivityIndicator,
   ScrollView,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import tw from "@/hooks/useTailwind";
 import { translate } from "@/i18n";
@@ -337,10 +337,8 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
             />
             <View style={tw`mt-4`}>
               <Text
-                style={[
-                  tw`text-black text-base`,
-                  { fontFamily: "SFUIDisplayMedium" },
-                ]}
+                style={tw`text-black text-base`}
+                weight="medium"
               >
                 {translate("budgetScreen:subtitle")}
               </Text>

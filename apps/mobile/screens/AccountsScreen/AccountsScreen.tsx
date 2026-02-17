@@ -3,13 +3,13 @@ import logger from "@/utils/logger";
 import React, { FC, useCallback, useState } from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
   ActivityIndicator,
   TouchableWithoutFeedback,
   Pressable,
   Image,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { RowMap } from "react-native-swipe-list-view";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -320,19 +320,17 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
             <View style={tw`flex-1`}>
               <View style={tw`flex-col items-start`}>
                 <Text
-                  style={[
-                    {
-                      fontFamily: "SFUIDisplay-Medium",
-                      fontWeight: "500",
-                      fontSize: 16,
-                      lineHeight: 20,
-                      letterSpacing: 0,
-                      color: isSelected
-                        ? colors.primary
-                        : "rgba(96, 106, 132, 1)",
-                      flex: 1,
-                    },
-                  ]}
+                  style={{
+                    fontWeight: "500",
+                    fontSize: 16,
+                    lineHeight: 20,
+                    letterSpacing: 0,
+                    flex: 1,
+                  }}
+                  weight="medium"
+                  color={isSelected
+                    ? colors.primary
+                    : "rgba(96, 106, 132, 1)"}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
@@ -341,10 +339,9 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
                     : data.item.name}
                 </Text>
                 <Text
-                  style={[
-                    tw`text-[#606A84] text-xs`,
-                    { fontFamily: "SFUIDisplay-Light" },
-                  ]}
+                  style={tw`text-xs`}
+                  weight="light"
+                  color="#606A84"
                 >
                   {data.item.description}
                 </Text>
@@ -352,25 +349,23 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
             </View>
             <View style={tw`flex-col items-end`}>
               <Text
-                style={[
-                  tw`text-base ${
-                    getAccountType(data.item.id) ===
-                    translate("accountTypes:creditCardAccount")
-                      ? "text-[#606A84]"
-                      : `text-[${colors.primary}]`
-                  }`,
-                  { fontFamily: "SFUIDisplayBold" },
-                ]}
+                style={tw`text-base`}
+                weight="bold"
+                color={
+                  getAccountType(data.item.id) ===
+                  translate("accountTypes:creditCardAccount")
+                    ? "#606A84"
+                    : colors.primary
+                }
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
                 {formatAmount(getTotalBalance(data.item.id), true)}
               </Text>
               <Text
-                style={[
-                  tw`text-xs text-[#606A84] mt-0.5`,
-                  { fontFamily: "SFUIDisplayRegular" },
-                ]}
+                style={tw`text-xs mt-0.5`}
+                weight="normal"
+                color="#606A84"
               >
                 {getAccountType(data.item.id)}
               </Text>
@@ -458,10 +453,9 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
                   <BackIconSvg width={15} height={15} color={colors.black} />
                 </TouchableOpacity>
                 <Text
-                  style={[
-                    tw`text-[#110627] text-lg align-center text-center`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
+                  style={tw`text-lg align-center text-center`}
+                  weight="medium"
+                  color="#110627"
                 >
                   {translate("accountScreen:myAccounts")}
                 </Text>
@@ -562,10 +556,9 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
             style={tw`h-[44px] bg-white gap-[3px] rounded-[40px] justify-center border border-[${colors.primary}] items-center mt-2 mb-10`}
           >
             <Text
-              style={[
-                tw`text-[${colors.primary}] text-center text-sm`,
-                { fontFamily: "SFUIDisplay-SemiBold" },
-              ]}
+              style={tw`text-center text-sm`}
+              weight="semibold"
+              color={colors.primary}
             >
               {translate("components:bankModal.addAccount")}
             </Text>

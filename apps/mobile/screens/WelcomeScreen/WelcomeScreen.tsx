@@ -1,4 +1,5 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui";
 import * as WebBrowser from "expo-web-browser";
 import { observer } from "mobx-react-lite";
 import { FC } from "react";
@@ -35,19 +36,16 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(
           </View>
           <View style={tw`mt-[111px]`}>
             <Text
-              style={[
-                tw`text-[32px] text-[${colors.secondary}]`,
-                { fontFamily: "SFUIDisplayBold" },
-              ]}
+              style={tw`text-[32px]`}
+              weight="bold"
+              color={colors.secondary}
             >
               {translate("welcomeScreen:title")}
             </Text>
             <View style={tw`h-4`} />
             <Text
-              style={[
-                tw`text-base text-black`,
-                { fontFamily: "SFUIDisplayLight" },
-              ]}
+              style={tw`text-base text-black`}
+              weight="light"
             >
               {translate("welcomeScreen:subtitle")}
             </Text>

@@ -1,12 +1,12 @@
 import React, { useRef } from "react";
 import {
   View,
-  Text,
   Image,
   useWindowDimensions,
   StyleSheet,
   Platform,
 } from "react-native";
+import { Text } from "@/components/ui";
 import AppIntroSlider from "react-native-app-intro-slider";
 import { colors } from "@/theme/colors";
 import CustomButton from "./CustomButton";
@@ -36,7 +36,7 @@ const BudgetIntroSlider: React.FC<BudgetIntroSliderProps> = ({
   const renderItem = ({ item }: { item: Slide }) => (
     <View style={styles.slide}>
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>
+        <Text weight="bold" style={styles.title}>
           {translate("budgetOnboarding:welcome", {
             name: name?.trim() ? name.trim().split(" ")[0] : "",
           })}
@@ -46,7 +46,7 @@ const BudgetIntroSlider: React.FC<BudgetIntroSliderProps> = ({
           style={[styles.image, { width: width * 0.8, height: width * 0.8 }]}
           resizeMode="contain"
         />
-        <Text style={styles.text}>{item.text}</Text>
+        <Text weight="light" style={styles.text}>{item.text}</Text>
       </View>
     </View>
   );
@@ -102,14 +102,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   title: {
-    fontFamily: "SFUIDisplayBold",
     fontSize: 20,
     marginBottom: 2,
     color: colors.black,
     textAlign: "center",
   },
   text: {
-    fontFamily: "SFUIDisplayLight",
     fontSize: 14,
     textAlign: "center",
     color: colors.black,

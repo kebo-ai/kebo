@@ -437,6 +437,7 @@ const pt = {
     budget: "Orçamento",
     chatbot: "Chatbot",
     reports: "Relatórios",
+    newTransaction: "Novo",
     functions: "Funções",
     community: "Comunidade",
   },

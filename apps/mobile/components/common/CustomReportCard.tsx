@@ -1,11 +1,11 @@
 import React from "react";
 import {
   View,
-  Text,
   Image,
   TouchableOpacity,
   useWindowDimensions,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { LinearGradient } from "expo-linear-gradient";
 import tw from "twrnc";
 
@@ -37,18 +37,14 @@ const CustomReportCard = ({
           style={[tw`flex-1 justify-between py-4 pl-3`, { width: width * 0.8 }]}
         >
           <Text
-            style={[
-              tw`text-[15px] text-[#110627]`,
-              { fontFamily: "SFUIDisplayMedium" },
-            ]}
+            weight="medium"
+            style={tw`text-[15px] text-[#110627]`}
           >
             {title}
           </Text>
           <Text
-            style={[
-              tw`text-[14px] text-[#110627]`,
-              { fontFamily: "SFUIDisplayLight" },
-            ]}
+            weight="light"
+            style={tw`text-[14px] text-[#110627]`}
           >
             {subtitle}
           </Text>

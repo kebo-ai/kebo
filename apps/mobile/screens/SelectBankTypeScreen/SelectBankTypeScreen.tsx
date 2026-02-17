@@ -2,7 +2,8 @@ import React, { FC } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { observer } from "mobx-react-lite";
 import tw from "@/hooks/useTailwind";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Image, TouchableOpacity } from "react-native";
+import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import CustomHeader from "@/components/common/CustomHeader";
 import { FixedScreen } from "@/components/FixedScreen";
@@ -61,19 +62,17 @@ export const SelectBankTypeScreen: FC<SelectBankTypeScreenProps> = observer(
                   style={tw`w-[22px] h-[22px] border border-[#6934D2]/15 rounded-full`}
                 />
                 <Text
-                  style={[
-                    tw`text-base text-[${colors.textGray}]`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
+                  style={tw`text-base`}
+                  weight="medium"
+                  color={colors.textGray}
                 >
                   {selectedBank.name}
                 </Text>
               </TouchableOpacity>
               <Text
-                style={[
-                  tw`text-base text-[${colors.textGray}] mt-5`,
-                  { fontFamily: "SFUIDisplaySemiBold" },
-                ]}
+                style={tw`text-base mt-5`}
+                weight="semibold"
+                color={colors.textGray}
               >
                 {translate("selectBankScreen:titleText")}
               </Text>
@@ -83,19 +82,17 @@ export const SelectBankTypeScreen: FC<SelectBankTypeScreenProps> = observer(
                 <View style={tw`flex-row items-center`}>
                   <ManualSvg />
                   <Text
-                    style={[
-                      tw`text-base ml-2 text-[${colors.primary}]`,
-                      { fontFamily: "SFUIDisplaySemiBold" },
-                    ]}
+                    style={tw`text-base ml-2`}
+                    weight="semibold"
+                    color={colors.primary}
                   >
                    {translate("selectBankScreen:manualText")}
                   </Text>
                 </View>
                 <Text
-                  style={[
-                    tw`text-[14px] text-[${colors.primary}]`,
-                    { fontFamily: "SFUIDisplayLight" },
-                  ]}
+                  style={tw`text-[14px]`}
+                  weight="light"
+                  color={colors.primary}
                 >
                   {translate("selectBankScreen:bodyText")}
                 </Text>
@@ -109,10 +106,9 @@ export const SelectBankTypeScreen: FC<SelectBankTypeScreenProps> = observer(
                   <View style={tw`flex-row items-center gap-[8px]`}>
                     <UserSvg />
                     <Text
-                      style={[
-                        tw`text-[16px] font-semibold text-[rgba(96,106,132,1)]`,
-                        { fontFamily: "SFUIDisplay" },
-                      ]}
+                      style={tw`text-[16px] font-semibold`}
+                      weight="normal"
+                      color="rgba(96,106,132,1)"
                     >
                       {translate("selectBankScreen:automaticText")}
                     </Text>
@@ -127,10 +123,9 @@ export const SelectBankTypeScreen: FC<SelectBankTypeScreenProps> = observer(
                     </View>
                   </View>
                   <Text
-                    style={[
-                      tw`text-[14px] leading-[18px] font-light text-[rgba(96,106,132,1)] mt-[8px]`,
-                      { fontFamily: "SFUIDisplay" },
-                    ]}
+                    style={tw`text-[14px] leading-[18px] font-light mt-[8px]`}
+                    weight="normal"
+                    color="rgba(96,106,132,1)"
                   >
                      {translate("selectBankScreen:alertText")}
                   </Text>

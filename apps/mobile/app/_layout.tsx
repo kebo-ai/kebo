@@ -30,6 +30,9 @@ import * as Notifications from "expo-notifications";
 import { postHogClient } from "@/services/PostHogClient";
 import { StatusBar } from "expo-status-bar";
 import { colors } from "@/theme/colors";
+import * as Haptics from "expo-haptics";
+import { PressablesConfig } from "pressto";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -73,25 +76,36 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ErrorBoundary catchErrors={Config.catchErrors}>
-        <StatusBar style="dark" backgroundColor="transparent" translucent />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            navigationBarColor: colors.white,
-            contentStyle: {
-              backgroundColor: colors.white,
-            },
-            animation: "slide_from_right",
-            gestureEnabled: true,
-            gestureDirection: "horizontal",
-            animationDuration: 200,
-          }}
-        />
-        <CustomToast />
-        <Loader />
-      </ErrorBoundary>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <ErrorBoundary catchErrors={Config.catchErrors}>
+          <PressablesConfig
+            globalHandlers={{
+              onPress: () => {
+                Haptics.selectionAsync();
+              },
+            }}
+            config={{ minScale: 0.97 }}
+          >
+            <StatusBar style="dark" backgroundColor="transparent" translucent />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                navigationBarColor: colors.white,
+                contentStyle: {
+                  backgroundColor: colors.white,
+                },
+                animation: "slide_from_right",
+                gestureEnabled: true,
+                gestureDirection: "horizontal",
+                animationDuration: 200,
+              }}
+            />
+            <CustomToast />
+            <Loader />
+          </PressablesConfig>
+        </ErrorBoundary>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

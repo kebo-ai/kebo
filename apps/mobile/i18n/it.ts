@@ -440,6 +440,7 @@ const it: Translations = {
     budget: "Budget",
     chatbot: "Chatbot",
     reports: "Report",
+    newTransaction: "Nuovo",
     functions: "Funzioni",
     community: "Comunità",
   },

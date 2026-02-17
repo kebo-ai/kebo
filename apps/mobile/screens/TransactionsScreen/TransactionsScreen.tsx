@@ -4,12 +4,12 @@ import React, { FC, useEffect, useState, useRef, useCallback, useMemo } from "re
 import { useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
-  Text,
   RefreshControl,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { Screen } from "@/components/Screen";
 import { TransactionService } from "@/services/TransactionService";
 import tw from "twrnc";
@@ -653,10 +653,9 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
           >
             <MaterialIcons name="delete" size={28} color={colors.white} />
             <Text
-              style={[
-                tw`text-xs mt-1 text-white`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              style={tw`text-xs mt-1 text-white`}
+              weight="medium"
+              color="white"
             >
               {translate("common:delete")}
             </Text>
@@ -677,10 +676,9 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
         <View style={tw`mb-2`}>
           <View style={tw`px-4 py-2`}>
             <Text
-              style={[
-                tw`text-base text-[#606A84]/70`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              style={tw`text-base text-[#606A84]/70`}
+              weight="medium"
+              color="#606A84"
             >
               {item.name}
             </Text>
@@ -771,10 +769,9 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
                 <BackIconSvg width={15} height={15} color={colors.black} />
               </TouchableOpacity>
               <Text
-                style={[
-                  tw`text-[#110627] text-lg align-center`,
-                  { fontFamily: "SFUIDisplayMedium" },
-                ]}
+                style={tw`text-[#110627] text-lg align-center`}
+                weight="medium"
+                color="#110627"
               >
                 {translate("transactionScreen:transactionTitle")}
               </Text>

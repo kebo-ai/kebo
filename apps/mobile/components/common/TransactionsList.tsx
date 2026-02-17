@@ -1,6 +1,7 @@
 import logger from "@/utils/logger";
 import React from "react";
-import { View, Text, Pressable, Image } from "react-native";
+import { View, Pressable, Image } from "react-native";
+import { Text } from "@/components/ui";
 import { MaterialIcons } from "@expo/vector-icons";
 import moment from "moment";
 import i18n from "@/i18n/i18n";
@@ -126,10 +127,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             <View style={tw`flex-1`}>
               <View style={tw`flex-row items-center`}>
                 <Text
-                  style={[
-                    tw`text-base text-[#110627]`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
+                  weight="medium"
+                  style={tw`text-base text-[#110627]`}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
@@ -142,10 +141,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 )}
               </View>
               <Text
-                style={[
-                  tw`text-xs text-[#606A84]`,
-                  { fontFamily: "SFUIDisplayLight" },
-                ]}
+                weight="light"
+                style={tw`text-xs text-[#606A84]`}
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
@@ -155,21 +152,17 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </View>
           <View style={tw`items-end min-w-[100px]`}>
             <Text
-              style={[
-                tw`text-base ${
-                  isExpense ? "text-[#606A84]" : "text-[#6934D2]"
-                }`,
-                { fontFamily: "SFUIDisplayBold" },
-              ]}
+              weight="bold"
+              style={tw`text-base ${
+                isExpense ? "text-[#606A84]" : "text-[#6934D2]"
+              }`}
             >
               {isExpense ? "- " : ""}
               {formatAmount(Math.abs(transaction.amount))}
             </Text>
             <Text
-              style={[
-                tw`text-xs text-[#606A84] mt-0.5`,
-                { fontFamily: "SFUIDisplayRegular" },
-              ]}
+              weight="normal"
+              style={tw`text-xs text-[#606A84] mt-0.5`}
             >
               {formatDate(transaction.date)}
             </Text>

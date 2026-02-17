@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
+import { Text } from "@/components/ui";
 import { translate } from "@/i18n";
 import tw from "@/hooks/useTailwind";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
@@ -50,10 +51,8 @@ const CustomBudgetCategoryCard: React.FC<CustomBudgetCategoryCardProps> = ({
               {category_metrics.icon_url}
             </Text>
             <Text
-              style={[
-                tw`text-[#606A84] text-base ml-2`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              weight="medium"
+              style={tw`text-[#606A84] text-base ml-2`}
             >
               {category_metrics.category_name}
             </Text>
@@ -65,18 +64,14 @@ const CustomBudgetCategoryCard: React.FC<CustomBudgetCategoryCardProps> = ({
         <View style={tw`mt-2`}>
           <View style={tw`flex-row justify-between items-center mb-2`}>
             <Text
-              style={[
-                tw`text-black text-xl`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              weight="medium"
+              style={tw`text-black text-xl`}
             >
               {formatAmount(category_metrics.budgeted_amount)}{" "}
             </Text>
             <Text
-              style={[
-                tw`text-[#606A84] text-xs`,
-                { fontFamily: "SFUIDisplayLight" },
-              ]}
+              weight="light"
+              style={tw`text-[#606A84] text-xs`}
             >
               {category_metrics.progress_percentage.toFixed(0)}%
             </Text>
@@ -100,19 +95,15 @@ const CustomBudgetCategoryCard: React.FC<CustomBudgetCategoryCardProps> = ({
           </View>
           <View style={tw`flex-row justify-between mt-1`}>
             <Text
-              style={[
-                tw`text-[#5C6784] text-xs`,
-                { fontFamily: "SFUIDisplayLight" },
-              ]}
+              weight="light"
+              style={tw`text-[#5C6784] text-xs`}
             >
               {formatAmount(category_metrics.spent_amount)}{" "}
               {translate("budgetScreen:spent")}
             </Text>
             <Text
-              style={[
-                tw`text-[#5C6784] text-xs`,
-                { fontFamily: "SFUIDisplayLight" },
-              ]}
+              weight="light"
+              style={tw`text-[#5C6784] text-xs`}
             >
               {formatAmount(category_metrics.remaining_amount)}{" "}
               {translate("budgetScreen:toSpend")}

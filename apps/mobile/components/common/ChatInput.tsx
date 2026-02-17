@@ -6,8 +6,8 @@ import {
   ActivityIndicator,
   Platform,
   Animated,
-  Text,
 } from "react-native";
+import { Text } from "@/components/ui";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import tw from "twrnc";

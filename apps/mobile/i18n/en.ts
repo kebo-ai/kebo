@@ -432,6 +432,7 @@ const en = {
     budget: "Budget",
     chatbot: "Chatbot",
     reports: "Reports",
+    newTransaction: "New",
     functions: "Functions",
     community: "Community",
   },

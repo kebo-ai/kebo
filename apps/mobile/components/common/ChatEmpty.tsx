@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, Animated } from "react-native";
+import { View, TouchableOpacity, Animated } from "react-native";
+import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { Svg, Path, Circle } from "react-native-svg";
@@ -72,10 +73,8 @@ export const ChatEmpty: React.FC<ChatEmptyProps> = ({
               onPress={question.onPress}
             >
               <Text
-                style={[
-                  tw`text-sm text-[#606A84] text-center`,
-                  { fontFamily: "SFUIDisplayLight" },
-                ]}
+                weight="light"
+                style={tw`text-sm text-[#606A84] text-center`}
               >
                 {question.text}
               </Text>

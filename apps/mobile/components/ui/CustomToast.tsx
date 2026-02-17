@@ -1,5 +1,6 @@
 import React from "react";
-import { Text, View, Image, Pressable } from "react-native";
+import { View, Image, Pressable } from "react-native";
+import { Text } from "@/components/ui";
 import Toast, { ToastConfig } from "react-native-toast-message";
 import tw from "twrnc";
 import { ImageCustom } from "@/components/assets/Image";
@@ -17,9 +18,10 @@ const toastConfig: ToastConfig = {
         style={tw`rounded-full`}
       />
       <Text
+        weight="semibold"
         style={[
           tw`text-white text-[15px] flex-1 ml-[10px]`,
-          { fontFamily: "SFUIDisplaySemiBold", lineHeight: 18 },
+          { lineHeight: 18 },
         ]}
       >
         {text1}
@@ -37,9 +39,10 @@ const toastConfig: ToastConfig = {
     >
       <ImageCustom icon="warningToast" size={{ width: 35, height: 33 }} style={tw`rounded-full`} />
       <Text
+        weight="semibold"
         style={[
           tw`text-white text-[15px] flex-1 ml-[10px]`,
-          { fontFamily: "SFUIDisplaySemiBold", lineHeight: 18 },
+          { lineHeight: 18 },
         ]}
       >
         {text1}
@@ -57,9 +60,10 @@ const toastConfig: ToastConfig = {
     >
       <ImageCustom icon="errorToast" size={{ width: 35, height: 33 }} style={tw`rounded-full`} />
       <Text
+        weight="semibold"
         style={[
           tw`text-white text-[15px] flex-1 ml-[10px]`,
-          { fontFamily: "SFUIDisplaySemiBold", lineHeight: 18 },
+          { lineHeight: 18 },
         ]}
       >
         {text1}

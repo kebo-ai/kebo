@@ -1,6 +1,7 @@
 import logger from "@/utils/logger";
 import React from "react";
-import { View, Text, TouchableOpacity, Platform } from "react-native";
+import { View, TouchableOpacity, Platform } from "react-native";
+import { Text } from "@/components/ui";
 import { translate } from "@/i18n";
 import { colors } from "@/theme";
 import tw from "@/hooks/useTailwind";
@@ -96,18 +97,14 @@ const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
         <View style={tw`flex-row justify-between items-start`}>
           <View>
             <Text
-              style={[
-                tw`text-black text-base`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              weight="medium"
+              style={tw`text-black text-base`}
             >
               {budget.budget.custom_name}
             </Text>
             <Text
-              style={[
-                tw`text-[${colors.primary}] text-xs mt-1`,
-                { fontFamily: "SFUIDisplayLight" },
-              ]}
+              weight="light"
+              style={tw`text-[${colors.primary}] text-xs mt-1`}
             >
               {(() => {
                 try {
@@ -149,19 +146,15 @@ const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
         <View style={tw`flex-row items-center justify-between mt-2`}>
           <View style={tw`flex-row items-end`}>
             <Text
-              style={[
-                tw`text-black text-xl`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              weight="medium"
+              style={tw`text-black text-xl`}
             >
               {formatAmount(total_metrics.total_budget)}
             </Text>
           </View>
           <Text
-            style={[
-              tw`text-[#606A84] text-xs`,
-              { fontFamily: "SFUIDisplayLight" },
-            ]}
+            weight="light"
+            style={tw`text-[#606A84] text-xs`}
           >
             {Math.min(total_metrics.overall_progress_percentage, 100).toFixed(
               0
@@ -187,9 +180,9 @@ const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
         </View>
         <View style={tw`flex-row justify-between mt-2`}>
           <Text
+            weight="light"
             style={[
               tw`text-xs`,
-              { fontFamily: "SFUIDisplayLight" },
               total_metrics.total_spent > total_metrics.total_budget
                 ? tw`text-[#ED706B]`
                 : tw`text-[#5C6784]`,
@@ -199,10 +192,8 @@ const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
             {translate("budgetScreen:spent")}
           </Text>
           <Text
-            style={[
-              tw`text-[#5C6784] text-xs`,
-              { fontFamily: "SFUIDisplayLight" },
-            ]}
+            weight="light"
+            style={tw`text-[#5C6784] text-xs`}
           >
             {formatAmount(total_metrics.total_remaining)}{" "}
             {translate("budgetScreen:toSpend")}

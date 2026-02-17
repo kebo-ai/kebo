@@ -2,7 +2,8 @@ import { observer } from "mobx-react-lite";
 import { FC } from "react";
 import { useRouter } from "expo-router";
 import { Screen } from "@/components/Screen";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
+import { Text } from "@/components/ui";
 import { showToast } from "@/components/ui/CustomToast";
 import tw from "@/hooks/useTailwind";
 import { translate } from "@/i18n";
@@ -34,10 +35,8 @@ export const ReportsScreen: FC<ReportsScreenProps> = observer(
       <Screen safeAreaEdges={["top"]} preset="scroll" statusBarStyle={"dark"}>
           <View style={tw`flex-1 min-h-screen px-6 pb-24`}>
             <Text
-              style={[
-                tw`text-center text-sm pb-6 mt-4`,
-                { fontFamily: "SFUIDisplaySemiBold" },
-              ]}
+              style={tw`text-center text-sm pb-6 mt-4`}
+              weight="semibold"
             >
               {translate("reportsScreen:title")}
             </Text>

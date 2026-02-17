@@ -1,26 +1,26 @@
 import { observer } from "mobx-react-lite";
 import logger from "@/utils/logger";
 import React, { FC, useEffect, useState, useCallback, memo } from "react";
-import { Screen } from "@/components/Screen";
 import {
   View,
-  Text,
-  FlatList,
+  ScrollView,
+  RefreshControl,
   TouchableOpacity,
   Image,
   Keyboard,
   Pressable,
 } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { Text } from "@/components/ui";
 import { TransactionService } from "@/services/TransactionService";
 import tw from "twrnc";
 import moment from "moment";
 import "moment/locale/es";
 import { colors } from "@/theme/colors";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useFocusEffect } from "expo-router";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
 import { getUserInfo } from "@/utils/authUtils";
-import { SettingsSvg } from "@/components/icons/SettingsSvg";
 import { SpentSvg } from "@/components/icons/SpentSvg";
 import { TranferSvg } from "@/components/icons/TranferSvg";
 import { IncomeSvg } from "@/components/icons/IncomeSvg";
@@ -48,7 +48,6 @@ import { loadString, saveString } from "@/utils/storage/storage";
 import { BALANCE_VISIBILITY } from "@/utils/storage/storage-keys";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { initializeUserAnalytics } from "@/utils/analyticsUtils";
-// import CustomModalReview from "@/components/common/CustomModalReview";
 
 interface HomeScreenProps {}
 
@@ -188,12 +187,7 @@ const TransactionItem = memo(
               </View>
               <View>
                 <View style={tw`flex-row items-center`}>
-                  <Text
-                    style={[
-                      tw`text-base text-[#110627]`,
-                      { fontFamily: "SFUIDisplayMedium" },
-                    ]}
-                  >
+                  <Text weight="medium" color="#110627">
                     {categoryText}
                   </Text>
                   {transaction.metadata?.auto_generated && (
@@ -202,33 +196,16 @@ const TransactionItem = memo(
                     </View>
                   )}
                 </View>
-                <Text
-                  style={[
-                    tw`text-xs text-[#606A84]`,
-                    { fontFamily: "SFUIDisplayLight" },
-                  ]}
-                >
+                <Text type="xs" weight="light" color="#606A84">
                   {descriptionText}
                 </Text>
               </View>
             </View>
             <View style={tw`items-end pr-4`}>
-              <Text
-                style={[
-                  tw`text-base ${
-                    isExpense ? "text-[#606A84]" : "text-[#6934D2]"
-                  }`,
-                  { fontFamily: "SFUIDisplayBold" },
-                ]}
-              >
+              <Text weight="bold" color={isExpense ? "#606A84" : "#6934D2"}>
                 {amountText}
               </Text>
-              <Text
-                style={[
-                  tw`text-xs text-[#606A84] mt-0.5`,
-                  { fontFamily: "SFUIDisplayRegular" },
-                ]}
-              >
+              <Text type="xs" weight="normal" color="#606A84" style={tw`mt-0.5`}>
                 {dateText}
               </Text>
             </View>
@@ -276,6 +253,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
   const { formatAmount } = useCurrencyFormatter();
   const rootStore = useStores();
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const analytics = useAnalytics();
 
   const {
@@ -358,6 +336,14 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
       fetchTransactions();
     }, [fetchTransactions])
   );
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await fetchTransactions();
+    setIsRefreshing(false);
+  }, [fetchTransactions]);
+
+  const firstName = (full_name || "").split(" ")[0];
 
   const handleDelete = useCallback((transactionId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -466,12 +452,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
           }}
         >
           <MaterialIcons name="delete" size={28} color={colors.white} />
-          <Text
-            style={[
-              tw`text-xs mt-1 text-white`,
-              { fontFamily: "SFUIDisplayMedium" },
-            ]}
-          >
+          <Text type="xs" weight="medium" color={colors.white} style={tw`mt-1`}>
             {translate("homeScreen:delete")}
           </Text>
         </TouchableOpacity>
@@ -492,54 +473,6 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     }
     router.push("/(authenticated)/profile");
   }, [router]);
-
-  const renderHeader = useCallback(() => {
-    return (
-      <View
-        style={tw`px-4 py-6 flex-row justify-between items-center bg-[#FAFAFA]`}
-      >
-        <View style={tw`flex-row items-center gap-4`}>
-          <View
-            style={tw`w-16 h-16 rounded-full overflow-hidden bg-[${colors.primary}]`}
-          >
-            <Image
-              source={
-                user?.profile?.avatar_url ||
-                user?.user?.user_metadata?.avatar_url
-                  ? {
-                      uri:
-                        user?.profile?.avatar_url ||
-                        user?.user?.user_metadata?.avatar_url,
-                    }
-                  : require("@/assets/icons/kebo-profile.png")
-              }
-              style={tw`w-full h-full`}
-            />
-          </View>
-          <View>
-            <Text
-              style={[
-                tw`text-lg text-[rgba(17, 6, 39, 1)]`,
-                { fontFamily: "SFUIDisplayBold" },
-              ]}
-            >
-              {translate("homeScreen:greetings", {
-                full_name: (full_name || "").split(" ")[0],
-              })}
-            </Text>
-            <Text style={tw`text-sm text-[rgba(17, 6, 39, 1)]`}>
-              {translate("homeScreen:slogan")}
-            </Text>
-          </View>
-        </View>
-        <TouchableOpacity style={tw`p-2`} onPress={handleProfileNavigation}>
-          <View style={tw`w-8 h-8 items-center justify-center rounded-full`}>
-            <SettingsSvg />
-          </View>
-        </TouchableOpacity>
-      </View>
-    );
-  }, [user, full_name, handleProfileNavigation]);
 
   const navigateToTransaction = useCallback(
     (type: TransactionType) => {
@@ -609,23 +542,13 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
           />
         </TouchableOpacity>
         <View style={tw`flex-row items-center justify-center`}>
-          <Text
-            style={[
-              tw`text-center text-[#110627] text-sm`,
-              { fontFamily: "SFUIDisplayLight" },
-            ]}
-          >
+          <Text type="sm" weight="light" color="#110627" style={tw`text-center`}>
             {translate("homeScreen:balance")}
           </Text>
         </View>
 
         <View style={tw`flex-row justify-center items-center mt-2`}>
-          <Text
-            style={[
-              tw`text-center text-3xl text-black`,
-              { fontFamily: "SFUIDisplayMedium" },
-            ]}
-          >
+          <Text type="2xl" weight="medium" style={tw`text-center`}>
             {isBalanceVisible
               ? userBalance
                 ? formatAmount(userBalance.total_balance)
@@ -675,12 +598,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
               >
                 {item.icon}
               </View>
-              <Text
-                style={[
-                  tw`text-[10px] text-[#110627] mt-1`,
-                  { fontFamily: "SFUIDisplaySemiBold" },
-                ]}
-              >
+              <Text type="xs" weight="semibold" color="#110627" style={tw`mt-1`} numberOfLines={1}>
                 {item.label}
               </Text>
             </TouchableOpacity>
@@ -736,138 +654,128 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     });
   }, [router]);
 
-  const keyExtractorMain = useCallback(() => "main-content", []);
-
   const keyExtractorSwipe = useCallback((item: Transaction) => item.id, []);
 
   const onRowClose = useCallback(() => setOpenRow(null), []);
-
-  const renderMainContent = useCallback(
-    () => (
-      <View style={tw`px-4 py-4 bg-[#FAFAFA]`}>
-        {renderBudgetCard()}
-        <View style={tw`flex-row justify-between items-center mb-4`}>
-          <Text style={[tw`text-base`, { fontFamily: "SFUIDisplaySemiBold" }]}>
-            {translate("homeScreen:titleTransaction")}
-            <Text>💸👀</Text>
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              handleSeeMoreTransactions();
-            }}
-          >
-            <Text
-              style={[
-                tw`text-[${colors.primary}] text-xs bg-[#6934D21A] px-2 py-1 rounded-2xl`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
-            >
-              {translate("homeScreen:seeMore")}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        {transactions.length === 0 ? (
-          <View
-            style={tw`border border-[#EBEBEF] bg-white p-6 rounded-[18px] items-center justify-center`}
-          >
-            <KeboSadIconSvg width={60} height={60} />
-            <Text style={tw`text-[#606A84] text-center`}>
-              {translate("homeScreen:noTransactions")}
-            </Text>
-          </View>
-        ) : (
-          <View
-            style={tw`border border-[#EBEBEF] bg-white rounded-[18px] overflow-hidden`}
-          >
-            <SwipeableListWrapper
-              data={transactions.slice(0, 5)}
-              renderItem={renderTransactionItemWrapper}
-              renderHiddenItem={renderHiddenItem}
-              rightOpenValue={-80}
-              disableRightSwipe
-              keyExtractor={keyExtractorSwipe}
-              onRowOpen={(rowKey) => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                setOpenRow(rowKey);
-              }}
-              onRowClose={onRowClose}
-              useNativeDriver={true}
-              onSwipeStart={() => {
-                InteractionManager.runAfterInteractions(() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                });
-              }}
-              onSwipeEnd={() => {}}
-              onDelete={handleDelete}
-              rightThreshold={70}
-              deleteButtonStyle={`bg-[${colors.secondary}]`}
-            />
-          </View>
-        )}
-        <View style={tw`flex-row justify-between items-center mb-4 mt-6`}>
-          <Text style={[tw`text-base`, { fontFamily: "SFUIDisplaySemiBold" }]}>
-            Kebo Wise <Text>🐨🔎</Text>
-          </Text>
-        </View>
-        <View style={tw`flex-row flex-wrap justify-between gap-3 mb-18`}>
-          {keboWiseOptions.map(
-            (option: { id: number; icon: JSX.Element; text: KeboWiseKeys }) => (
-              <TouchableOpacity
-                key={option.id}
-                style={tw`items-center flex-col p-4 rounded-[20px] bg-[#606A84]/5 w-[30%] mb-3`}
-                onPress={() => navigateToChatbot(option.text)}
-              >
-                <View style={tw``}>{option.icon}</View>
-                <Text
-                  style={[
-                    tw`mt-2 text-center text-[10px]`,
-                    { fontFamily: "SFUIDisplayMedium" },
-                  ]}
-                  numberOfLines={2}
-                  ellipsizeMode="tail"
-                >
-                  {translate(option.text)}
-                </Text>
-              </TouchableOpacity>
-            )
-          )}
-        </View>
-      </View>
-    ),
-    [
-      renderBudgetCard,
-      handleSeeMoreTransactions,
-      transactions,
-      renderTransactionItemWrapper,
-      renderHiddenItem,
-      keyExtractorSwipe,
-      onRowClose,
-      navigateToChatbot,
-      handleDelete,
-    ]
-  );
 
   const handleCloseDeleteAlert = useCallback(() => {
     setIsDeleteAlertVisible(false);
     setTransactionToDelete(null);
   }, []);
 
-  return (
-    <Screen
-      safeAreaEdges={["top", "bottom"]}
-      preset="fixed"
-      statusBarStyle={"dark"}
-      header={renderHeader()}
-      backgroundColor="#FAFAFA"
-    >
-      <FlatList
-        data={[1]}
-        renderItem={renderMainContent}
-        keyExtractor={keyExtractorMain}
-        showsVerticalScrollIndicator={false}
-      />
+  const avatarSource =
+    user?.profile?.avatar_url || user?.user?.user_metadata?.avatar_url
+      ? { uri: user?.profile?.avatar_url || user?.user?.user_metadata?.avatar_url }
+      : require("@/assets/icons/kebo-profile.png");
 
+  return (
+    <>
+      <Stack.Screen
+        options={{
+          title: translate("homeScreen:greetings", { full_name: firstName }),
+          headerRight: () => (
+            <TouchableOpacity onPress={handleProfileNavigation}>
+              <Image
+                source={avatarSource}
+                style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary }}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+        }
+      >
+        <Animated.View entering={FadeIn.duration(600).delay(100)} style={tw`px-4 py-4`}>
+          {renderBudgetCard()}
+          <View style={tw`flex-row justify-between items-center mb-4`}>
+            <Text weight="semibold">
+              {translate("homeScreen:titleTransaction")}
+              <Text>💸👀</Text>
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                handleSeeMoreTransactions();
+              }}
+            >
+              <Text type="xs" weight="medium" color={colors.primary} style={tw`bg-[#6934D21A] px-2 py-1 rounded-2xl`}>
+                {translate("homeScreen:seeMore")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {transactions.length === 0 ? (
+            <View
+              style={tw`border border-[#EBEBEF] bg-white p-6 rounded-[18px] items-center justify-center`}
+            >
+              <KeboSadIconSvg width={60} height={60} />
+              <Text color="#606A84" style={tw`text-center`}>
+                {translate("homeScreen:noTransactions")}
+              </Text>
+            </View>
+          ) : (
+            <View
+              style={tw`border border-[#EBEBEF] bg-white rounded-[18px] overflow-hidden`}
+            >
+              <SwipeableListWrapper
+                data={transactions.slice(0, 5)}
+                renderItem={renderTransactionItemWrapper}
+                renderHiddenItem={renderHiddenItem}
+                rightOpenValue={-80}
+                disableRightSwipe
+                keyExtractor={keyExtractorSwipe}
+                onRowOpen={(rowKey) => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  setOpenRow(rowKey);
+                }}
+                onRowClose={onRowClose}
+                useNativeDriver={true}
+                onSwipeStart={() => {
+                  InteractionManager.runAfterInteractions(() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  });
+                }}
+                onSwipeEnd={() => {}}
+                onDelete={handleDelete}
+                rightThreshold={70}
+                deleteButtonStyle={`bg-[${colors.secondary}]`}
+              />
+            </View>
+          )}
+          <View style={tw`flex-row justify-between items-center mb-4 mt-6`}>
+            <Text weight="semibold">
+              Kebo Wise <Text>🐨🔎</Text>
+            </Text>
+          </View>
+          <View style={tw`flex-row flex-wrap justify-between gap-3 mb-18`}>
+            {keboWiseOptions.map(
+              (option: { id: number; icon: JSX.Element; text: KeboWiseKeys }) => (
+                <TouchableOpacity
+                  key={option.id}
+                  style={tw`items-center flex-col p-4 rounded-[20px] bg-[#606A84]/5 w-[30%] mb-3`}
+                  onPress={() => navigateToChatbot(option.text)}
+                >
+                  <View style={tw``}>{option.icon}</View>
+                  <Text
+                    type="xs"
+                    weight="medium"
+                    style={tw`mt-2 text-center text-[10px]`}
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                  >
+                    {translate(option.text)}
+                  </Text>
+                </TouchableOpacity>
+              )
+            )}
+          </View>
+        </Animated.View>
+      </ScrollView>
       <CustomAlert
         visible={isDeleteAlertVisible}
         title={translate("homeScreen:titleAlert")}
@@ -887,6 +795,6 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
         confirmText={getModalTexts().confirmText}
         cancelText={getModalTexts().cancelText}
       />
-    </Screen>
+    </>
   );
 });

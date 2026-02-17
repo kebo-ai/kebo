@@ -7,6 +7,7 @@ export const UiStoreModel = types
   .model("UiStore")
   .props({
     isLoading: types.optional(types.boolean, false),
+    sheetSelections: types.optional(types.map(types.string), {}),
   })
   .actions((self) => {
     const showLoader = flow(function* () {
@@ -15,7 +16,22 @@ export const UiStoreModel = types
     const hideLoader = flow(function* () {
       self.isLoading = false;
     });
-    return { showLoader, hideLoader };
+    const setSheetSelection = (key: string, value: string) => {
+      self.sheetSelections.set(key, value);
+    };
+    const getSheetSelection = (key: string): string | undefined => {
+      return self.sheetSelections.get(key);
+    };
+    const clearSheetSelection = (key: string) => {
+      self.sheetSelections.delete(key);
+    };
+    return {
+      showLoader,
+      hideLoader,
+      setSheetSelection,
+      getSheetSelection,
+      clearSheetSelection,
+    };
   });
 
 export interface UiStore extends Instance<typeof UiStoreModel> { }

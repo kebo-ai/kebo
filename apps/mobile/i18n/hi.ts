@@ -433,6 +433,7 @@ const hi: Translations = {
     budget: "बजट",
     chatbot: "चैटबोट",
     reports: "रिपोर्ट्स",
+    newTransaction: "नया",
     functions: "फंक्शन्स",
     community: "कम्युनिटी",
   },

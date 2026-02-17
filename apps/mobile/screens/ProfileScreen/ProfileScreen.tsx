@@ -1,26 +1,23 @@
 import React, { FC, useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useRouter, Stack } from "expo-router";
 import {
   View,
   TouchableOpacity,
   Image,
   TextInput,
   Linking,
-  SafeAreaView,
   ScrollView,
+  RefreshControl,
+  Share,
 } from "react-native";
 import tw from "twrnc";
-import { Screen } from "@/components";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
-import { BackBlackSvg } from "@/components/icons/BackBlackSvg";
+import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/config/supabase";
 import { getUserInfo } from "@/utils/authUtils";
 import { showToast } from "@/components/ui/CustomToast";
-import { Text, Button } from "@/components/ui";
-import { DocumentIconSvg } from "@/components/icons/DocumentIcon";
-import { ChatHelpIconSvg } from "@/components/icons/ChatHelpIcon";
-import { ChevronRightIconSvg } from "@/components/icons/ChevronRightIconSvg";
+import { Text, Button, Icon } from "@/components/ui";
 import DeleteAccountModal from "@/components/common/DeleteAccountModal";
 import CustomCategoryModal from "@/components/common/CustomCategoryModal";
 import { useStores } from "@/models/helpers/useStores";
@@ -39,17 +36,8 @@ import { updateUserAnalyticsProperties } from "@/utils/analyticsUtils";
 import { useNotifications } from "@/hooks/useNotifications";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { PencilSvg } from "@/components/icons/PencilSvg";
-import { InstagramIconSvg } from "@/components/icons/InstagramIconSvg";
-import { DiscordIconSvg } from "@/components/icons/DiscordIconSvg";
-import { LanguageIconSvg } from "@/components/icons/LanguageIconSvg";
-import { CurrenceIconSvg } from "@/components/icons/CurrenceIconSvg";
-import { AccountsIconSvg } from "@/components/icons/AccountsIconSvg";
-import { CategoryIconSvg } from "@/components/icons/CategoryIcon";
 import { LanguageService } from "@/services/LanguageService";
-import { CoinIconSvg } from "@/components/icons/CoinsSvg";
-import { CategoriesIconSvg } from "@/components/icons/CategoriesIconSvg";
-import { OpinionsIconSvg } from "@/components/icons/OpinionsIconSvg";
-import { CommentsIconSvg } from "@/components/icons/CommentsIconSvg";
+import * as StoreReview from "expo-store-review";
 
 let DeviceInfo: any = null;
 if (__DEV__) {
@@ -65,12 +53,14 @@ interface ProfileScreenProps {}
 export const ProfileScreen: FC<ProfileScreenProps> = observer(
   function ProfileScreen() {
     const router = useRouter();
+    const { theme } = useTheme();
     const [user, setUser] = useState<any>(null);
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
     const [tempName, setTempName] = useState("");
     const [displayName, setDisplayName] = useState("");
+    const [refreshing, setRefreshing] = useState(false);
     const nameInputRef = useRef<TextInput>(null);
     const {
       uiStoreModel: { showLoader, hideLoader },
@@ -90,27 +80,6 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
       },
       [analytics]
     );
-
-    // const trackButtonClick = useCallback(
-    //   (
-    //     eventName: ProfileEventName,
-    //     section: string,
-    //     interactionType: "button" | "link" = "button",
-    //     externalUrl?: string
-    //   ) => {
-    //     try {
-    //       analytics.trackProfileButtonClick(
-    //         eventName,
-    //         section,
-    //         interactionType,
-    //         externalUrl
-    //       );
-    //     } catch (error) {
-    //       console.log(`Analytics error in ${eventName}:`, error);
-    //     }
-    //   },
-    //   [analytics]
-    // );
 
     useEffect(() => {
       analytics.trackProfileScreenView();
@@ -141,12 +110,6 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
     useEffect(() => {
       if (user?.user?.id) {
         try {
-          // updateUserAnalyticsProperties(analytics, {
-          //   push_notifications_enabled: permissionsGranted,
-          //   email_notifications_enabled:
-          //     user?.profile?.email_notifications || false,
-          // });
-
           trackProfileEvent(PROFILE_EVENTS.PROFILE_SCREEN_VIEWED, {
             [EVENT_PROPERTIES.ACTION_TYPE]: "view",
             [EVENT_PROPERTIES.PROFILE_SECTION]: "notifications",
@@ -154,14 +117,6 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
             [EVENT_PROPERTIES.EMAIL_NOTIFICATIONS_ENABLED]:
               user?.profile?.email_notifications || false,
           });
-
-          // trackProfileEvent(PROFILE_EVENTS.NOTIFICATION_STATUS_CHECKED, {
-          //   [EVENT_PROPERTIES.ACTION_TYPE]: "check",
-          //   [EVENT_PROPERTIES.PROFILE_SECTION]: "notifications",
-          //   [EVENT_PROPERTIES.PUSH_NOTIFICATIONS_ENABLED]: permissionsGranted,
-          //   [EVENT_PROPERTIES.EMAIL_NOTIFICATIONS_ENABLED]:
-          //     user?.profile?.email_notifications || false,
-          // });
 
           logger.debug("Notification status captured:", {
             push_notifications_enabled: permissionsGranted,
@@ -200,12 +155,6 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
     }, [analytics, trackProfileEvent]);
 
     const handleStartEditing = useCallback(() => {
-      // trackProfileEvent(PROFILE_EVENTS.PROFILE_NAME_EDIT_STARTED, {
-      //   [EVENT_PROPERTIES.ACTION_TYPE]: "edit",
-      //   [EVENT_PROPERTIES.PROFILE_SECTION]: "personal_info",
-      //   [EVENT_PROPERTIES.INTERACTION_TYPE]: "button",
-      // });
-
       setIsEditingName(true);
       setTimeout(() => {
         nameInputRef.current?.focus();
@@ -241,7 +190,6 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
               full_name: newName,
               email: userInfo?.user?.email,
             });
-            // analytics.trackProfileNameEdit(oldName, newName, true);
           } catch (error) {
             logger.debug("Analytics error in handleSaveName success:", error);
           }
@@ -249,228 +197,23 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
           setDisplayName(oldName);
           setTempName(oldName);
           showToast("error", translate("profileScreen:errorUpdatingName"));
-
-          try {
-            // analytics.trackProfileNameEdit(oldName, newName, false);
-          } catch (error) {
-            logger.debug("Analytics error in handleSaveName failure:", error);
-          }
         }
       } catch (error) {
         setDisplayName(oldName);
         setTempName(oldName);
         showToast("error", translate("profileScreen:errorUpdatingName"));
-
-        try {
-          // analytics.trackProfileNameEdit(oldName, newName, false);
-        } catch (error) {
-          logger.debug("Analytics error in handleSaveName catch:", error);
-        }
       } finally {
         hideLoader();
       }
     }, [tempName, user, analytics, rootStore, showLoader, hideLoader]);
 
-    const renderHeader = () => {
-      return (
-        <View style={tw`justify-between flex-row items-center`}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={tw`w-12 h-12 flex justify-center items-center shadow-md`}
-          >
-            <BackBlackSvg width={15} height={15} />
-          </TouchableOpacity>
+    const onRefresh = useCallback(async () => {
+      setRefreshing(true);
+      await loadUserInfo();
+      setRefreshing(false);
+    }, [loadUserInfo]);
 
-          <Text type="lg" weight="medium">
-            {translate("profileScreen:profile")}
-          </Text>
-          <TouchableOpacity>
-            <View style={tw`w-12 h-12`}></View>
-          </TouchableOpacity>
-        </View>
-      );
-    };
-
-    const renderKeboPlan = () => {
-      return (
-        <View>
-          <View
-            style={tw`bg-[${colors.primary}]/10 rounded-t-2xl shadow-lg px-4`}
-          >
-            <View style={tw`p-4 my-1 flex-row justify-between items-center`}>
-              <View>
-                <Text type="xs" weight="medium" color={colors.primary}>
-                  {translate("profileScreen:keboPlan")}
-                </Text>
-                <Text type="2xl" weight="medium">
-                  {translate("profileScreen:kebo")}
-                </Text>
-                <Text type="2xl" weight="medium">
-                  {translate("profileScreen:free")}
-                </Text>
-              </View>
-              <View style={tw`flex-1 ml-6`}>
-                <Text type="xs" weight="light" color="#110627">
-                  {translate("profileScreen:keboBody")}
-                </Text>
-                <Text type="xs" weight="medium" color="#110627">
-                  {translate("profileScreen:keboBody2")}
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View style={tw`bg-[#6934D2] rounded-b-2xl px-4`}>
-            <View style={tw`p-4 my-1 flex-row justify-between items-center`}>
-              <View>
-                <Text type="xs" weight="medium" color={colors.white}>
-                  {translate("profileScreen:keboPro")}
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={tw`bg-white px-4 py-3 rounded-full`}
-                onPress={() => {
-                  // trackButtonClick(
-                  //   PROFILE_EVENTS.KEBO_PRO_UPGRADE_CLICKED,
-                  //   "subscription",
-                  //   "button"
-                  // );
-
-                  showToast("warning", translate("alertMessage:comminSoon"));
-                }}
-              >
-                <Text type="sm" weight="medium" color="#110627">
-                  {translate("profileScreen:keboChange")}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      );
-    };
-
-    const options = [
-      {
-        id: 1,
-        icon: <DocumentIconSvg />,
-        text: translate("profileScreen:termsConditions"),
-        onPress: () => {
-          router.push({
-            pathname: "/(authenticated)/webview",
-            params: { url: EXTERNAL_URLS.TERMS_CONDITIONS, title: "Términos y Condiciones" },
-          });
-        },
-      },
-      {
-        id: 2,
-        icon: <ChatHelpIconSvg />,
-        text: translate("profileScreen:help"),
-        onPress: () => {
-          Linking.openURL(EXTERNAL_URLS.WHATSAPP_SUPPORT);
-        },
-      },
-      {
-        id: 3,
-        icon: <DocumentIconSvg />,
-        text: translate("profileScreen:privacyPolicy"),
-        onPress: () => {
-          router.push({
-            pathname: "/(authenticated)/webview",
-            params: { url: EXTERNAL_URLS.PRIVACY_POLICY, title: "Políticas" },
-          });
-        },
-      },
-    ];
-
-    const settingsOptions = [
-      {
-        id: 1,
-        icon: <LanguageIconSvg />,
-        text: translate("profileScreen:language"),
-        onPress: () => {
-          router.push("/(authenticated)/language");
-        },
-      },
-      // {
-      //   id: 2,
-      //   icon: <CurrenceIconSvg />,
-      //   text: translate("profileScreen:country"),
-      //   onPress: () => {
-      //     router.push("/(authenticated)/country");
-      //   },
-      // },
-      {
-        id: 3,
-        icon: <CoinIconSvg />,
-        text: translate("profileScreen:currency"),
-        onPress: () => {
-          router.push("/(authenticated)/country");
-        },
-      },
-      {
-        id: 4,
-        icon: <AccountsIconSvg />,
-        text: translate("accountScreen:myAccounts"),
-        onPress: () => {
-          router.push("/(authenticated)/accounts");
-        },
-      },
-      {
-        id: 5,
-        icon: <CategoriesIconSvg />,
-        text: translate("profileScreen:myCategories"),
-        onPress: () => {
-          handleOpenCategoryModal();
-        },
-      },
-    ];
-
-    const functionsOptions = [
-      {
-        id: 1,
-        icon: <OpinionsIconSvg />,
-        text: translate("profileScreen:comment"),
-        onPress: () => {
-          router.push({
-            pathname: "/(authenticated)/webview",
-            params: { url: EXTERNAL_URLS.FEATURE_REQUESTS, title: translate("profileScreen:comment") },
-          });
-        },
-      },
-    ];
-
-    const communityOptions = [
-      {
-        id: 1,
-        icon: <InstagramIconSvg />,
-        text: translate("profileScreen:networks"),
-        onPress: () => {
-          Linking.openURL(EXTERNAL_URLS.INSTAGRAM);
-        },
-      },
-      {
-        id: 2,
-        icon: <DiscordIconSvg />,
-        text: translate("profileScreen:support"),
-        onPress: () => {
-          Linking.openURL(EXTERNAL_URLS.DISCORD_COMMUNITY);
-        },
-      },
-      {
-        id: 4,
-        icon: <></>,
-        text: translate("profileScreen:deleteAccount"),
-        onPress: () => {
-          setIsDeleteModalVisible(true);
-        },
-      },
-    ];
     const handleDeleteModalClose = useCallback(() => {
-      // trackProfileEvent(PROFILE_EVENTS.DELETE_ACCOUNT_CANCELLED, {
-      //   [EVENT_PROPERTIES.ACTION_TYPE]: "cancel",
-      //   [EVENT_PROPERTIES.PROFILE_SECTION]: "account_management",
-      //   [EVENT_PROPERTIES.INTERACTION_TYPE]: "modal",
-      // });
-
       setIsDeleteModalVisible(false);
     }, [trackProfileEvent]);
 
@@ -504,187 +247,271 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
       [handleCloseCategoryModal]
     );
 
+    const sections = useMemo(() => [
+      {
+        title: translate("profileScreen:settings"),
+        rows: [
+          { symbol: "globe", label: translate("profileScreen:language"), onPress: () => router.push("/(authenticated)/language") },
+          { symbol: "dollarsign.circle", label: translate("profileScreen:currency"), onPress: () => router.push("/(authenticated)/country") },
+          { symbol: "building.columns", label: translate("accountScreen:myAccounts"), onPress: () => router.push("/(authenticated)/accounts") },
+          { symbol: "tag", label: translate("profileScreen:myCategories"), onPress: handleOpenCategoryModal },
+        ],
+      },
+      {
+        title: translate("profileScreen:enjoyingApp"),
+        rows: [
+          { symbol: "star", label: translate("profileScreen:rateUs"), onPress: () => StoreReview.requestReview() },
+          { symbol: "square.and.arrow.up", label: translate("profileScreen:shareWithFriends"), onPress: () => Share.share({ message: translate("profileScreen:shareMessage") }) },
+        ],
+      },
+      {
+        title: translate("profileScreen:getInTouch"),
+        rows: [
+          { symbol: "message", label: translate("profileScreen:help"), onPress: () => Linking.openURL(EXTERNAL_URLS.WHATSAPP_SUPPORT) },
+          { symbol: "lightbulb", label: translate("profileScreen:featureRequests"), onPress: () => router.push({ pathname: "/(authenticated)/webview", params: { url: EXTERNAL_URLS.FEATURE_REQUESTS, title: translate("profileScreen:featureRequests") } }) },
+        ],
+      },
+      {
+        title: translate("profileScreen:followUs"),
+        rows: [
+          { symbol: "camera", label: translate("profileScreen:instagram"), onPress: () => Linking.openURL(EXTERNAL_URLS.INSTAGRAM) },
+          { symbol: "person.3", label: translate("profileScreen:discord"), onPress: () => Linking.openURL(EXTERNAL_URLS.DISCORD_COMMUNITY) },
+        ],
+      },
+      {
+        title: translate("profileScreen:legal"),
+        rows: [
+          { symbol: "doc.text", label: translate("profileScreen:termsConditions"), onPress: () => router.push({ pathname: "/(authenticated)/webview", params: { url: EXTERNAL_URLS.TERMS_CONDITIONS, title: translate("profileScreen:termsConditions") } }) },
+          { symbol: "lock.shield", label: translate("profileScreen:privacyPolicy"), onPress: () => router.push({ pathname: "/(authenticated)/webview", params: { url: EXTERNAL_URLS.PRIVACY_POLICY, title: translate("profileScreen:privacyPolicy") } }) },
+        ],
+      },
+    ], [router, handleOpenCategoryModal]);
+
     return (
       <>
-        <SafeAreaView style={tw`flex-1 bg-[#FAFAFA]`}>
-          <ScrollView
-            contentContainerStyle={tw`px-4 pt-6 pb-24`}
-            showsVerticalScrollIndicator={false}
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            headerLargeTitle: true,
+            headerTransparent: true,
+            headerBlurEffect: theme.blurEffect,
+            headerTintColor: colors.primary,
+            headerBackTitle: translate("common:back"),
+            title: translate("profileScreen:profile"),
+            headerLargeStyle: { backgroundColor: "transparent" },
+            headerLargeTitleStyle: {
+              fontFamily: "SFUIDisplayBold",
+              color: theme.headerTitle,
+              fontSize: 20,
+            },
+            headerTitleStyle: {
+              fontFamily: "SFUIDisplaySemiBold",
+              color: theme.headerTitle,
+            },
+            contentStyle: { backgroundColor: theme.background },
+          }}
+        />
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={tw`px-4 pt-4 pb-24`}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {/* Account Card */}
+          <View
+            style={tw`flex-row items-center bg-white dark:bg-[#1C1C1E] rounded-2xl p-4 border border-[#EBEBEF] dark:border-[#3A3A3C] mb-6`}
           >
-            <Screen
-              safeAreaEdges={["top"]}
-              statusBarStyle={"dark"}
-              header={renderHeader()}
+            <View
+              style={[
+                tw`w-16 h-16 rounded-full bg-[#EAE0FF] border-[3px] border-white overflow-hidden`,
+                {
+                  shadowColor: "#606A84",
+                  shadowOffset: { width: 8, height: 14 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 27,
+                },
+              ]}
             >
-              <View
-                style={tw`flex-row items-start gap-4 border border-[#606A84]/15 bg-white rounded-3xl p-4`}
-              >
-                <View
-                  style={[
-                    tw`flex justify-center items-center shadow-lg w-16 h-16 rounded-full bg-[#EAE0FF] border-[3px] border-white`,
-                    {
-                      shadowColor: "#606A84",
-                      shadowOffset: { width: 8, height: 14 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 27,
-                    },
-                  ]}
-                >
-                  <Image
-                    source={
-                      user?.profile?.avatar_url ||
-                      user?.user?.user_metadata?.avatar_url
-                        ? {
-                            uri:
-                              user?.profile?.avatar_url ||
-                              user?.user?.user_metadata?.avatar_url,
-                          }
-                        : require("@/assets/icons/kebo-profile.png")
-                    }
-                    style={tw`w-full h-full rounded-full`}
-                  />
-                  {/* <TouchableOpacity
-                  style={tw`absolute bottom-0 right-0 w-8 h-8 rounded-full flex justify-center items-center bg-[#6934D2]`}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    showToast("warning", translate("alertMessage:comminSoon"));
-                  }}
-                >
-                  <EditIconSvg />
-                </TouchableOpacity> */}
-                </View>
-                <View style={tw`flex-1 justify-center self-center`}>
-                  <Text weight="medium" color="#110627">
-                    {displayName || translate("profileScreen:noName")}
+              <Image
+                source={
+                  user?.profile?.avatar_url ||
+                  user?.user?.user_metadata?.avatar_url
+                    ? {
+                        uri:
+                          user?.profile?.avatar_url ||
+                          user?.user?.user_metadata?.avatar_url,
+                      }
+                    : require("@/assets/icons/kebo-profile.png")
+                }
+                style={tw`w-full h-full`}
+              />
+            </View>
+            <View style={tw`flex-1 ml-4`}>
+              <Text weight="medium" color={theme.textPrimary}>
+                {displayName || translate("profileScreen:noName")}
+              </Text>
+              <Text type="xs" color={theme.textTertiary}>
+                {user?.profile?.email ||
+                  user?.user?.email ||
+                  translate("profileScreen:noMail")}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => router.push("/(authenticated)/edit-profile")}
+              style={tw`justify-center items-center`}
+            >
+              <PencilSvg />
+            </TouchableOpacity>
+          </View>
+
+          {/* Your Plan */}
+          <Text
+            type="xs"
+            weight="semibold"
+            color={theme.textSecondary}
+            style={tw`uppercase tracking-wide px-1 mb-2`}
+          >
+            {translate("profileScreen:keboPlan")}
+          </Text>
+          <View style={tw`mb-6`}>
+            <View
+              style={tw`bg-[${colors.primary}]/10 rounded-t-2xl px-4`}
+            >
+              <View style={tw`p-4 my-1 flex-row justify-between items-center`}>
+                <View>
+                  <Text type="xs" weight="medium" color={colors.primary}>
+                    {translate("profileScreen:keboPlan")}
                   </Text>
-                  <Text type="xs" color="rgba(96, 106, 132, 0.5)">
-                    {user?.profile?.email ||
-                      user?.user?.email ||
-                      translate("profileScreen:noMail")}
+                  <Text type="2xl" weight="medium">
+                    {translate("profileScreen:kebo")}
+                  </Text>
+                  <Text type="2xl" weight="medium">
+                    {translate("profileScreen:free")}
+                  </Text>
+                </View>
+                <View style={tw`flex-1 ml-6`}>
+                  <Text type="xs" weight="light" color={theme.textPrimary}>
+                    {translate("profileScreen:keboBody")}
+                  </Text>
+                  <Text type="xs" weight="medium" color={theme.textPrimary}>
+                    {translate("profileScreen:keboBody2")}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View style={tw`bg-[#6934D2] rounded-b-2xl px-4`}>
+              <View style={tw`p-4 my-1 flex-row justify-between items-center`}>
+                <View>
+                  <Text type="xs" weight="medium" color={colors.white}>
+                    {translate("profileScreen:keboPro")}
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={() => router.push("/(authenticated)/edit-profile")}
-                  style={tw`justify-center items-center`}
+                  style={tw`bg-white px-4 py-3 rounded-full`}
+                  onPress={() => {
+                    showToast("warning", translate("alertMessage:comminSoon"));
+                  }}
                 >
-                  <PencilSvg />
+                  <Text type="sm" weight="medium" color="#110627">
+                    {translate("profileScreen:keboChange")}
+                  </Text>
                 </TouchableOpacity>
               </View>
-
-              <View style={tw`mt-6`}>
-                <View style={tw`flex-row justify-between gap-2`}>
-                  {options.map(({ id, icon, text, onPress }) => (
-                    <TouchableOpacity
-                      key={id}
-                      style={tw`flex-1 flex-row items-center justify-center bg-[#606A84]/8 rounded-lg px-4 py-2 h-[33px]`}
-                      activeOpacity={0.8}
-                      onPress={onPress}
-                    >
-                      <View style={tw`items-start`}>{icon}</View>
-                      <Text type="xs" weight="light" color="#110627" style={tw`ml-2 text-center`}>
-                        {text}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-              <View style={tw`mt-6`}>
-                <Text weight="medium">
-                  {translate("profileScreen:settings")}
-                </Text>
-                <View style={tw`mt-4 px-4`}>
-                  {settingsOptions.map((option) => (
-                    <TouchableOpacity
-                      key={option.id}
-                      style={tw`flex-row items-center justify-between py-3 border-b border-[#606A84]/10`}
-                      onPress={option.onPress}
-                    >
-                      <View style={tw`flex-row items-center`}>
-                        <View style={tw`mr-2.5`}>{option.icon}</View>
-                        <Text weight="medium" color="#110627">
-                          {option.text}
-                        </Text>
-                      </View>
-                      <ChevronRightIconSvg />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              <View style={tw`mt-6`}>
-                <Text weight="medium">
-                  {translate("profileScreen:functions")}
-                </Text>
-                <View style={tw`mt-4 px-4`}>
-                  {functionsOptions.map((option) => (
-                    <TouchableOpacity
-                      key={option.id}
-                      style={tw`flex-row items-center justify-between py-3 border-b border-[#606A84]/10`}
-                      onPress={option.onPress}
-                    >
-                      <View style={tw`flex-row items-center`}>
-                        <View style={tw`mr-2.5`}>{option.icon}</View>
-                        <Text weight="medium" color="#110627">
-                          {option.text}
-                        </Text>
-                      </View>
-                      <ChevronRightIconSvg />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              <View style={tw`mt-6`}>
-                <Text weight="medium">
-                  {translate("profileScreen:community")}
-                </Text>
-                <View style={tw`mt-4 px-4`}>
-                  {communityOptions.map((option) => (
-                    <TouchableOpacity
-                      key={option.id}
-                      style={tw`flex-row items-center justify-between py-3 border-b border-[#606A84]/10`}
-                      onPress={option.onPress}
-                    >
-                      <View style={tw`flex-row items-center`}>
-                        <View style={tw`mr-2.5`}>{option.icon}</View>
-                        <Text weight="medium" color="#110627">
-                          {option.text}
-                        </Text>
-                      </View>
-                      <ChevronRightIconSvg />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-              <DeleteAccountModal
-                visible={isDeleteModalVisible}
-                onClose={handleDeleteModalClose}
-              />
-              <CustomCategoryModal
-                categories={allCategories}
-                visible={isCategoryModalVisible}
-                onClose={handleCloseCategoryModal}
-                onSelect={handleSelectCategory}
-                navigation={categoryModalNavigation}
-                screenName="Profile"
-                disableTouch={true}
-              />
-            </Screen>
-          </ScrollView>
-          <View style={tw`mt-7 px-4 mb-2`}>
-            <Button
-              variant="solid"
-              color="primary"
-              onPress={() => handleLogout()}
-              title={translate("profileScreen:logOut")}
-              radius="lg"
-            />
-
-            <Text type="xs" color={colors.textGray} style={tw`text-center my-2`}>
-              {translate("profileScreen:version")} {APP_VERSION}
-            </Text>
+            </View>
           </View>
-        </SafeAreaView>
+
+          {/* Data-driven sections */}
+          {sections.map((section) => (
+            <View key={section.title}>
+              <Text
+                type="xs"
+                weight="semibold"
+                color="#606A84"
+                style={tw`uppercase tracking-wide px-1 mb-2`}
+              >
+                {section.title}
+              </Text>
+              <View
+                style={tw`bg-white dark:bg-[#1C1C1E] rounded-2xl overflow-hidden border border-[#EBEBEF] dark:border-[#3A3A3C] mb-6`}
+              >
+                {section.rows.map((row, index) => (
+                  <TouchableOpacity
+                    key={row.label}
+                    style={tw`flex-row items-center px-4 py-3.5 ${
+                      index < section.rows.length - 1
+                        ? "border-b border-[#EBEBEF] dark:border-[#3A3A3C]"
+                        : ""
+                    }`}
+                    onPress={row.onPress}
+                  >
+                    <Icon symbol={row.symbol} size={18} color={colors.primary} />
+                    <Text
+                      weight="medium"
+                      color={theme.textPrimary}
+                      style={tw`flex-1 ml-3`}
+                    >
+                      {row.label}
+                    </Text>
+                    <Icon symbol="chevron.right" size={14} color={theme.chevron} />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          ))}
+
+          {/* Danger Zone */}
+          <Text
+            type="xs"
+            weight="semibold"
+            color={theme.textSecondary}
+            style={tw`uppercase tracking-wide px-1 mb-2`}
+          >
+            {translate("profileScreen:dangerZone")}
+          </Text>
+          <View
+            style={tw`bg-white dark:bg-[#1C1C1E] rounded-2xl overflow-hidden border border-[#EBEBEF] dark:border-[#3A3A3C] mb-6`}
+          >
+            <TouchableOpacity
+              style={tw`flex-row items-center px-4 py-3.5`}
+              onPress={() => setIsDeleteModalVisible(true)}
+            >
+              <Icon symbol="trash" size={18} color="#EF4444" />
+              <Text weight="medium" color="#EF4444" style={tw`flex-1 ml-3`}>
+                {translate("profileScreen:deleteAccount")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Logout */}
+          <Button
+            variant="solid"
+            color="primary"
+            onPress={handleLogout}
+            title={translate("profileScreen:logOut")}
+            radius="lg"
+          />
+
+          {/* Version */}
+          <Text type="xs" color={colors.textGray} style={tw`text-center my-4`}>
+            {translate("profileScreen:version")} {APP_VERSION}
+          </Text>
+        </ScrollView>
+
+        <DeleteAccountModal
+          visible={isDeleteModalVisible}
+          onClose={handleDeleteModalClose}
+        />
+        <CustomCategoryModal
+          categories={allCategories}
+          visible={isCategoryModalVisible}
+          onClose={handleCloseCategoryModal}
+          onSelect={handleSelectCategory}
+          navigation={categoryModalNavigation}
+          screenName="Profile"
+          disableTouch={true}
+        />
       </>
     );
   }

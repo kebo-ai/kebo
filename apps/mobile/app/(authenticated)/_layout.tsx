@@ -2,10 +2,11 @@ import { Redirect, Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { supabase } from "@/config/supabase";
-import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 import logger from "@/utils/logger";
 
 const AuthenticatedLayout = observer(function AuthenticatedLayout() {
+  const { theme } = useTheme();
   const [token, setToken] = useState<string | null | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +47,7 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
         headerShown: false,
         animation: "slide_from_right",
         contentStyle: {
-          backgroundColor: colors.white,
+          backgroundColor: theme.background,
         },
         gestureEnabled: true,
         gestureDirection: "horizontal",

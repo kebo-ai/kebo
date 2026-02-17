@@ -20,6 +20,10 @@ import Config from "@/config";
 import { customFontsToLoad } from "@/theme";
 import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
+import { useColorScheme } from "react-native";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import tw from "twrnc";
+import { useDeviceContext } from "twrnc";
 import { initI18n } from "@/i18n";
 import { loadDateFnsLocale } from "@/utils/formatDate";
 import CustomToast from "@/components/ui/CustomToast";
@@ -43,6 +47,8 @@ Notifications.setNotificationHandler({
 });
 
 export default function RootLayout() {
+  useDeviceContext(tw);
+  const colorScheme = useColorScheme();
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad);
   const [isI18nInitialized, setIsI18nInitialized] = useState(false);
   useNotifications();
@@ -75,37 +81,50 @@ export default function RootLayout() {
     return null;
   }
 
+  const navigationTheme = colorScheme === "dark"
+    ? {
+        ...DarkTheme,
+        colors: {
+          ...DarkTheme.colors,
+          background: colors.dark.background,
+          card: colors.dark.navigationBar,
+        },
+      }
+    : DefaultTheme;
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <ErrorBoundary catchErrors={Config.catchErrors}>
-          <PressablesConfig
-            globalHandlers={{
-              onPress: () => {
-                Haptics.selectionAsync();
-              },
-            }}
-            config={{ minScale: 0.97 }}
-          >
-            <StatusBar style="dark" backgroundColor="transparent" translucent />
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                navigationBarColor: colors.white,
-                contentStyle: {
-                  backgroundColor: colors.white,
+      <ThemeProvider value={navigationTheme}>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <ErrorBoundary catchErrors={Config.catchErrors}>
+            <PressablesConfig
+              globalHandlers={{
+                onPress: () => {
+                  Haptics.selectionAsync();
                 },
-                animation: "slide_from_right",
-                gestureEnabled: true,
-                gestureDirection: "horizontal",
-                animationDuration: 200,
               }}
-            />
-            <CustomToast />
-            <Loader />
-          </PressablesConfig>
-        </ErrorBoundary>
-      </SafeAreaProvider>
+              config={{ minScale: 0.97 }}
+            >
+              <StatusBar style={colorScheme === "dark" ? "light" : "dark"} backgroundColor="transparent" translucent />
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  navigationBarColor: colorScheme === "dark" ? colors.dark.navigationBar : colors.white,
+                  contentStyle: {
+                    backgroundColor: colorScheme === "dark" ? colors.dark.background : colors.white,
+                  },
+                  animation: "slide_from_right",
+                  gestureEnabled: true,
+                  gestureDirection: "horizontal",
+                  animationDuration: 200,
+                }}
+              />
+              <CustomToast />
+              <Loader />
+            </PressablesConfig>
+          </ErrorBoundary>
+        </SafeAreaProvider>
+      </ThemeProvider>
     </GestureHandlerRootView>
   );
 }

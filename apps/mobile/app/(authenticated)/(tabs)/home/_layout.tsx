@@ -1,23 +1,26 @@
 import { Stack } from "expo-router";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function HomeLayout() {
+  const { theme, colors } = useTheme();
+
   return (
     <Stack
       screenOptions={{
         headerLargeTitle: true,
         headerTransparent: true,
-        headerBlurEffect: "extraLight",
+        headerBlurEffect: theme.blurEffect,
         headerLargeStyle: { backgroundColor: "transparent" },
         headerLargeTitleStyle: {
           fontFamily: "SFUIDisplayBold",
-          color: "#110627",
+          color: theme.headerTitle,
           fontSize: 20,
         },
         headerTitleStyle: {
           fontFamily: "SFUIDisplaySemiBold",
-          color: "#110627",
+          color: theme.headerTitle,
         },
-        headerTintColor: "#6934D2",
+        headerTintColor: colors.primary,
       }}
     >
       <Stack.Screen name="index" options={{ title: "Home" }} />

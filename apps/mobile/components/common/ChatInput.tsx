@@ -1,38 +1,50 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-  Platform,
-  Animated,
-} from "react-native";
-import { Text } from "@/components/ui";
-import { Formik } from "formik";
-import * as Yup from "yup";
+import { View, TextInput, TouchableOpacity, Platform } from "react-native";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
-import { Svg, Path } from "react-native-svg";
-import { SendArrowSvg } from "@/components/icons/SendArrowSvg";
 import { translate } from "@/i18n";
-import { useTranslation } from "react-i18next";
-import { useStores } from "@/models/helpers/useStores";
-import { getLanguageName } from "@/i18n/languages";
-import { showToast } from "@/components/ui/CustomToast";
-import { MoreIconSvg } from "@/components/icons/MoreIconSvg";
+import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+import { useTheme } from "@/hooks/useTheme";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading?: boolean;
   inputValue: string;
   setInputValue: (val: string) => void;
-  inputRef: React.RefObject<TextInput>;
+  inputRef: React.RefObject<TextInput | null>;
 }
 
-const validationSchema = Yup.object().shape({
-  message: Yup.string(),
-});
+const LoadingPulse = () => {
+  const opacity = useSharedValue(1);
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(0.3, { duration: 600 }),
+        withTiming(1, { duration: 600 })
+      ),
+      -1
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  return (
+    <Animated.View
+      style={[tw`h-3 w-3 bg-white rounded-sm`, animatedStyle]}
+    />
+  );
+};
 
 export const ChatInput: React.FC<ChatInputProps> = ({
   onSendMessage,
@@ -41,49 +53,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   setInputValue,
   inputRef,
 }) => {
-  const { i18n } = useTranslation();
-  const rootStore = useStores();
-  const userName = rootStore.profileModel?.full_name || "User";
-  const currentLanguage = i18n.language || "en";
-  const languageName = getLanguageName(currentLanguage.split("-")[0]);
+  const { theme } = useTheme();
   const [inputHeight, setInputHeight] = useState(40);
-  const initialValues = { message: inputValue };
-  
-  const LoadingSquare = () => {
-    const opacity = useRef(new Animated.Value(1)).current;
+  const hasText = inputValue.trim().length > 0;
 
-    useEffect(() => {
-      const animation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(opacity, {
-            toValue: 0.3,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-          Animated.timing(opacity, {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-        ])
-      );
-      animation.start();
-      return () => animation.stop();
-    }, [opacity]);
-
-    return (
-      <Animated.View style={[tw`h-3 w-3 bg-white rounded-sm`, { opacity }]} />
-    );
-  };
-
-  const handleSubmit = async (
-    values: { message: string },
-    { resetForm }: any
-  ) => {
-    if (values.message.trim()) {
+  const handleSend = async () => {
+    if (inputValue.trim() && !isLoading) {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      onSendMessage(values.message.trim());
-      resetForm();
+      onSendMessage(inputValue.trim());
       setInputValue("");
     }
   };
@@ -95,74 +72,63 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   }, [inputValue]);
 
   return (
-    <Formik
-      initialValues={{ message: inputValue }}
-      validationSchema={validationSchema}
-      onSubmit={handleSubmit}
-      enableReinitialize
+    <View
+      style={tw`px-4 pb-${Platform.OS === "ios" ? "3" : "3"} bg-[${theme.background}]`}
     >
-      {({ handleChange, handleSubmit, values, errors, touched }) => (
-        <View
-          style={tw`px-4 pb-${Platform.OS === "ios" ? "3" : "3"} bg-[#FAFAFA]`}
+      <View
+        style={[
+          tw`flex-row border border-[${theme.border}] rounded-3xl px-4 py-2 bg-[${theme.surface}]`,
+          { alignItems: "flex-end" },
+        ]}
+      >
+        <TextInput
+          placeholder={translate("chatbotScreen:textInput")}
+          placeholderTextColor={theme.textTertiary}
+          value={inputValue}
+          onChangeText={setInputValue}
+          textAlignVertical="center"
+          style={[
+            tw`flex-1 text-base`,
+            {
+              fontFamily: "SFUIDisplayLight",
+              height: Math.max(40, inputHeight),
+              paddingVertical: 10,
+              color: theme.textPrimary,
+            },
+          ]}
+          multiline
+          onContentSizeChange={(e) =>
+            setInputHeight(e.nativeEvent.contentSize.height)
+          }
+          returnKeyType="done"
+          onSubmitEditing={handleSend}
+          editable={!isLoading}
+          ref={inputRef}
+        />
+        <TouchableOpacity
+          onPress={handleSend}
+          disabled={!hasText || isLoading}
+          style={tw`items-center justify-end pb-1`}
         >
-          <View
-            style={[
-              tw`flex-row border border-[#6934D2] rounded-3xl px-4 py-2 bg-white`,
-              { alignItems: "flex-end" },
-            ]}
-          >
-            <TouchableOpacity
-              onPress={() => showToast("warning", "Coming soon")}
-              style={tw`items-center justify-end mr-2 pb-1`}
+          {isLoading ? (
+            <View
+              style={tw`h-8 w-8 rounded-full bg-[${colors.primary}] items-center justify-center`}
             >
-              <MoreIconSvg />
-            </TouchableOpacity>
-            <TextInput
-              placeholder={translate("chatbotScreen:textInput")}
-              value={values.message}
-              onChangeText={(text) => {
-                handleChange("message")(text);
-                setInputValue(text);
-              }}
-              textAlignVertical="center"
-              style={[
-                tw`flex-1 text-base text-black `,
-                {
-                  fontFamily: "SFUIDisplayLight",
-                  height: Math.max(40, inputHeight),
-                  paddingVertical: 10,
-                },
-              ]}
-              multiline
-              onContentSizeChange={(e) =>
-                setInputHeight(e.nativeEvent.contentSize.height)
-              }
-              returnKeyType="done"
-              onSubmitEditing={() => handleSubmit()}
-              editable={!isLoading}
-              ref={inputRef}
-            />
-            <TouchableOpacity
-              onPress={() => handleSubmit()}
-              disabled={!values.message.trim() || isLoading}
-              style={tw`items-center justify-end pb-1`}
+              <LoadingPulse />
+            </View>
+          ) : (
+            <View
+              style={tw`h-8 w-8 rounded-full bg-[${hasText ? colors.primary : theme.border}] items-center justify-center`}
             >
-              {isLoading ? (
-                <View
-                  style={tw`h-8 w-8 rounded-full bg-[${colors.primary}] items-center justify-center`}
-                >
-                  <LoadingSquare />
-                </View>
-              ) : (
-                <SendArrowSvg />
-              )}
-            </TouchableOpacity>
-          </View>
-          {touched.message && errors.message && (
-            <Text style={tw`text-red-500 text-xs mt-1`}>{errors.message}</Text>
+              <Ionicons
+                name="arrow-up"
+                size={18}
+                color={hasText ? "#FFFFFF" : theme.textTertiary}
+              />
+            </View>
           )}
-        </View>
-      )}
-    </Formik>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };

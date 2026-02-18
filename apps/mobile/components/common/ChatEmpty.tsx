@@ -1,24 +1,12 @@
-import React, { useEffect } from "react";
-import { View, TouchableOpacity, Animated } from "react-native";
+import React from "react";
+import { View, TouchableOpacity } from "react-native";
 import { Text } from "@/components/ui";
 import tw from "twrnc";
-import { colors } from "@/theme/colors";
-import { Svg, Path, Circle } from "react-native-svg";
-// import { ScrollView } from "moti";
 import { ScrollView } from "react-native";
-import { iconRegistry } from "@/components/assets/Icon";
-import { ImageCustom } from "@/components/assets/Image";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { translate } from "@/i18n";
-import {
-  useSharedValue,
-  withTiming,
-  useAnimatedStyle,
-  FadeIn,
-  FadeOut,
-} from "react-native-reanimated";
-import { KeboIconSvg } from "@/components/icons/KeboIconSvg";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { KeboWiseThinkingSvg } from "@/components/icons/KeboWiseThinkingSvg";
+import { useTheme } from "@/hooks/useTheme";
 
 interface SampleQuestion {
   text: string;
@@ -32,7 +20,7 @@ interface ChatEmptyProps {
 export const ChatEmpty: React.FC<ChatEmptyProps> = ({
   onSampleQuestionPress,
 }) => {
-  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const sampleQuestions: SampleQuestion[] = [
     {
       text: translate("chatbotScreen:sampleQuestions"),
@@ -64,21 +52,36 @@ export const ChatEmpty: React.FC<ChatEmptyProps> = ({
           keyboardShouldPersistTaps="always"
         >
           {sampleQuestions.map((question, index) => (
-            <TouchableOpacity
+            <Animated.View
               key={index}
-              style={tw.style(
-                `px-4 py-3 bg-[#606A84]/5 rounded-xl`,
-                index === 0 ? `ml-6` : `ml-0`
-              )}
-              onPress={question.onPress}
+              entering={FadeIn.duration(400).delay(index * 150)}
             >
-              <Text
-                weight="light"
-                style={tw`text-sm text-[#606A84] text-center`}
+              <TouchableOpacity
+                style={[
+                  tw.style(
+                    `px-4 py-3 rounded-xl border`,
+                    index === 0 ? `ml-6` : `ml-0`
+                  ),
+                  {
+                    borderColor: theme.border,
+                    backgroundColor: theme.surface,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.05,
+                    shadowRadius: 2,
+                    elevation: 1,
+                  },
+                ]}
+                onPress={question.onPress}
               >
-                {question.text}
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  weight="light"
+                  style={[tw`text-sm text-center`, { color: theme.textSecondary }]}
+                >
+                  {question.text}
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
           ))}
         </ScrollView>
       </View>

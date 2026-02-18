@@ -37,7 +37,7 @@ export const colors = {
     border: "#3A3A3C",
     chevron: "#636366",
     navigationBar: "#1C1C1E",
-    blurEffect: "dark" as const,
+    blurEffect: "systemChromeMaterialDark" as const,
     headerTitle: "#FFFFFF",
   },
 } as const

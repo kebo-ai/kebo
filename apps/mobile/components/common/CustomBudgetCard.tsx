@@ -4,6 +4,7 @@ import { View, TouchableOpacity, Platform } from "react-native";
 import { Text } from "@/components/ui";
 import { translate } from "@/i18n";
 import { colors } from "@/theme";
+import { useTheme } from "@/hooks/useTheme";
 import tw from "@/hooks/useTailwind";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
@@ -55,6 +56,7 @@ const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
   isSwipeOpen = false,
 }) => {
   const { formatAmount } = useCurrencyFormatter();
+  const { theme } = useTheme();
   const { total_metrics } = budget;
   const progressWidth = `${Math.min(
     total_metrics.overall_progress_percentage,
@@ -86,7 +88,7 @@ const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
     <View>
       <TouchableOpacity
         style={[
-          tw`bg-white p-4 shadow-sm border border-[#E1E5EC]`,
+          tw`bg-[${theme.surface}] p-4 shadow-sm border border-[${theme.border}]`,
           isSwipeOpen ? tw`rounded-l-3xl` : tw`rounded-3xl`,
         ]}
         onPress={() => {
@@ -98,7 +100,7 @@ const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
           <View>
             <Text
               weight="medium"
-              style={tw`text-black text-base`}
+              color={theme.textPrimary}
             >
               {budget.budget.custom_name}
             </Text>
@@ -147,14 +149,16 @@ const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
           <View style={tw`flex-row items-end`}>
             <Text
               weight="medium"
-              style={tw`text-black text-xl`}
+              type="xl"
+              color={theme.textPrimary}
             >
               {formatAmount(total_metrics.total_budget)}
             </Text>
           </View>
           <Text
             weight="light"
-            style={tw`text-[#606A84] text-xs`}
+            type="xs"
+            color={theme.textSecondary}
           >
             {Math.min(total_metrics.overall_progress_percentage, 100).toFixed(
               0
@@ -181,19 +185,16 @@ const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
         <View style={tw`flex-row justify-between mt-2`}>
           <Text
             weight="light"
-            style={[
-              tw`text-xs`,
-              total_metrics.total_spent > total_metrics.total_budget
-                ? tw`text-[#ED706B]`
-                : tw`text-[#5C6784]`,
-            ]}
+            type="xs"
+            color={total_metrics.total_spent > total_metrics.total_budget ? "#ED706B" : theme.textSecondary}
           >
             {formatAmount(total_metrics.total_spent)}{" "}
             {translate("budgetScreen:spent")}
           </Text>
           <Text
             weight="light"
-            style={tw`text-[#5C6784] text-xs`}
+            type="xs"
+            color={theme.textSecondary}
           >
             {formatAmount(total_metrics.total_remaining)}{" "}
             {translate("budgetScreen:toSpend")}

@@ -1,18 +1,18 @@
 import { observer } from "mobx-react-lite";
 import React, { FC, useCallback, useEffect, useRef, useState } from "react";
-import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
-import { Screen } from "@/components/Screen";
+import { Stack, useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import {
   View,
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 import tw from "@/hooks/useTailwind";
 import { translate } from "@/i18n";
-import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { CategoriesListBudget } from "@/components/common/CategoriesListBudget";
 import CustomBudgetCard from "@/components/common/CustomBudgetCard";
@@ -49,6 +49,7 @@ interface BudgetScreenProps {}
 export const BudgetScreen: FC<BudgetScreenProps> = observer(
   function BudgetScreen() {
     const router = useRouter();
+    const { theme } = useTheme();
     const params = useLocalSearchParams<{
       budgetId: string;
       categoryId?: string;
@@ -117,6 +118,10 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
       }, [budgetId])
     );
 
+    const handleRefresh = useCallback(async () => {
+      await loadBudget(false);
+    }, [budgetId]);
+
     const handleCategorySelect = useCallback(
       (category: Category) => {
         const isAlreadyAdded = budgetData?.budget_lines.some(
@@ -170,7 +175,6 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
     const handleConfirmDelete = useCallback(async () => {
       if (categoryToDelete) {
         await handleDeleteCategory(categoryToDelete);
-      } else {
       }
       setIsDeleteAlertVisible(false);
       setCategoryToDelete(null);
@@ -221,70 +225,6 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
       });
     }, [router, budgetId, budgetData]);
 
-    if (isLoading) {
-      return (
-        <>
-          <Screen
-            safeAreaEdges={["top"]}
-            preset="scroll"
-            backgroundColor="#FAFAFA"
-            statusBarBackgroundColor="#FAFAFA"
-            header={
-              <CustomHeaderSecondary
-                title={translate("budgetScreen:detailBudget")}
-                onPress={navigateToBudgetsTab}
-              />
-            }
-          >
-            <View style={tw`px-6 py-4`}>
-              <ActivityIndicator size="small" color={colors.primary} />
-            </View>
-          </Screen>
-        </>
-      );
-    }
-
-    if (isRefreshing) {
-      return (
-        <>
-          <Screen
-            safeAreaEdges={["top"]}
-            preset="scroll"
-            backgroundColor="#FAFAFA"
-            statusBarBackgroundColor="#FAFAFA"
-            header={
-              <CustomHeaderSecondary
-                title={translate("budgetScreen:detailBudget")}
-                onPress={navigateToBudgetsTab}
-              />
-            }
-          >
-            <View style={tw`px-6 py-4`}>
-              <ActivityIndicator size="small" color={colors.primary} />
-            </View>
-          </Screen>
-        </>
-      );
-    }
-
-    if (!budgetData) {
-      return (
-        <View style={tw`flex-1 items-center justify-center`}>
-          <Text style={tw`text-[#606A84]`}>
-            {translate("budgetScreen:budgetNotFound")}
-          </Text>
-        </View>
-      );
-    }
-
-    const availableCategories = categoryStoreModel.categories.filter(
-      (category) =>
-        category.type === "Expense" &&
-        !budgetData.budget_lines.some(
-          (line) => line.category_id === category.id
-        )
-    );
-
     const parseDate = (dateString: string) => {
       try {
         ensureValidMomentLocale();
@@ -307,21 +247,91 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
       }
     };
 
+    const availableCategories = budgetData
+      ? categoryStoreModel.categories.filter(
+          (category) =>
+            category.type === "Expense" &&
+            !budgetData.budget_lines.some(
+              (line) => line.category_id === category.id
+            )
+        )
+      : [];
+
+    if (isLoading) {
+      return (
+        <>
+          <Stack.Screen
+            options={{
+              headerShown: true,
+              title: translate("budgetScreen:detailBudget"),
+              headerBackTitle: translate("budgetScreen:budget"),
+              headerTintColor: colors.primary,
+              headerTitleStyle: {
+                fontFamily: "SFUIDisplaySemiBold",
+                color: theme.headerTitle,
+              },
+              headerTransparent: true,
+              headerBlurEffect: theme.blurEffect,
+            }}
+          />
+          <View style={tw`flex-1 items-center justify-center`}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        </>
+      );
+    }
+
+    if (!budgetData) {
+      return (
+        <>
+          <Stack.Screen
+            options={{
+              headerShown: true,
+              title: translate("budgetScreen:detailBudget"),
+              headerBackTitle: translate("budgetScreen:budget"),
+              headerTintColor: colors.primary,
+              headerTitleStyle: {
+                fontFamily: "SFUIDisplaySemiBold",
+                color: theme.headerTitle,
+              },
+              headerTransparent: true,
+              headerBlurEffect: theme.blurEffect,
+            }}
+          />
+          <View style={tw`flex-1 items-center justify-center`}>
+            <KeboSadIconSvg width={50} height={50} />
+            <Text color={theme.textSecondary} style={tw`mt-2`}>
+              {translate("budgetScreen:budgetNotFound")}
+            </Text>
+          </View>
+        </>
+      );
+    }
+
     return (
       <>
-        <Screen
-          safeAreaEdges={["top"]}
-          preset="scroll"
-          backgroundColor="#FAFAFA"
-          statusBarBackgroundColor="#FAFAFA"
-          header={
-            <CustomHeaderSecondary
-              title={translate("budgetScreen:detailBudget")}
-              onPress={navigateToBudgetsTab}
-            />
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title: translate("budgetScreen:detailBudget"),
+            headerBackTitle: translate("budgetScreen:budget"),
+            headerTintColor: colors.primary,
+            headerTitleStyle: {
+              fontFamily: "SFUIDisplaySemiBold",
+              color: theme.headerTitle,
+            },
+            headerTransparent: true,
+            headerBlurEffect: theme.blurEffect,
+          }}
+        />
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
           }
         >
-          <View style={tw`px-6 mb-4`}>
+          <View style={tw`px-4 py-4`}>
             <CustomBudgetCard
               budget={{
                 budget: {
@@ -336,10 +346,7 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
               onEditPress={handleEditPress}
             />
             <View style={tw`mt-4`}>
-              <Text
-                style={tw`text-black text-base`}
-                weight="medium"
-              >
+              <Text weight="medium" color={theme.textPrimary}>
                 {translate("budgetScreen:subtitle")}
               </Text>
             </View>
@@ -350,7 +357,7 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
                 style={tw`flex-1`}
                 contentContainerStyle={tw`gap-1`}
               >
-                {availableCategories.map( (category) => (
+                {availableCategories.map((category) => (
                   <View key={category.id} style={tw`items-center`}>
                     <TouchableOpacity
                       style={tw`rounded-lg`}
@@ -374,23 +381,23 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
                   onPress={navigateToNewCategory}
                 >
                   <View
-                    style={tw`mt-2 w-[42px] h-[42px] bg-[#6934D2] rounded-lg items-center justify-center`}
+                    style={tw`mt-2 w-[42px] h-[42px] bg-[${colors.primary}] rounded-lg items-center justify-center`}
                   >
                     <Text style={tw`text-white text-2xl`}>+</Text>
                   </View>
-                  <Text style={tw`text-xs mt-2 text-[#606A84] text-center `}>
+                  <Text type="xs" color={theme.textSecondary} style={tw`mt-2 text-center`}>
                     {translate("components:categoryModal.add")}
                   </Text>
                 </TouchableOpacity>
               </ScrollView>
             </View>
             <View
-              style={tw`py-2 bg-white border border-[#EBEBEF] rounded-[20px] mt-4`}
+              style={tw`py-2 bg-[${theme.surface}] border border-[${theme.border}] rounded-[20px] mt-4`}
             >
               {budgetData.budget_lines.length === 0 ? (
                 <View style={tw`items-center py-8`}>
                   <KeboSadIconSvg width={50} height={50} />
-                  <Text style={tw`text-[#606A84] text-center mt-2`}>
+                  <Text color={theme.textSecondary} style={tw`text-center mt-2`}>
                     {translate("budgetScreen:noCategory")}
                   </Text>
                 </View>
@@ -409,7 +416,7 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
               )}
             </View>
           </View>
-        </Screen>
+        </ScrollView>
         <CustomAlert
           visible={isDeleteAlertVisible}
           title={translate("budgetScreen:deleteCategory")}

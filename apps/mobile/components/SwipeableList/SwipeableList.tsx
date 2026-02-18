@@ -158,9 +158,9 @@ export const SwipeableList = <T extends SwipeableItem>({
   return (
     <View style={tw`${containerStyle}`}>
       {data.map((item) => (
-        <GestureHandlerRootView key={item.id} style={tw`bg-white`}>
+        <GestureHandlerRootView key={item.id} style={tw`bg-transparent`}>
           {disableSwipe ? (
-            <View style={tw`bg-white`}>
+            <View style={tw`bg-transparent`}>
               {renderItem(item)}
             </View>
           ) : (
@@ -193,8 +193,8 @@ export const SwipeableList = <T extends SwipeableItem>({
               overshootRight={false}
               enabled={!disableSwipe}
               enableTrackpadTwoFingerGesture={Platform.OS === 'ios'}
-              containerStyle={tw`bg-white`}
-              childrenContainerStyle={tw`bg-white`}
+              containerStyle={tw`bg-transparent`}
+              childrenContainerStyle={tw`bg-transparent`}
               hitSlop={{ left: 0, right: 0, top: 10, bottom: 10 }}
               useNativeAnimations={Platform.OS === 'ios'}
               shouldCancelWhenOutside={true}
@@ -207,7 +207,7 @@ export const SwipeableList = <T extends SwipeableItem>({
                   }
                 }}
               >
-                <View style={tw`bg-white`}>
+                <View style={tw`bg-transparent`}>
                   {renderItem(item)}
                 </View>
               </TouchableWithoutFeedback>

@@ -1,31 +1,29 @@
 import { observer } from "mobx-react-lite";
 import React, { FC, useEffect, useState, useCallback, useRef } from "react";
-import { Screen } from "@/components/Screen";
 import {
   View,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  RefreshControl,
+  Animated,
+  Alert,
 } from "react-native";
-import { Text } from "@/components/ui";
+import { Swipeable } from "react-native-gesture-handler";
+import { Text, Icon } from "@/components/ui";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 import tw from "@/hooks/useTailwind";
 import { Ionicons } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
 import { translate } from "@/i18n";
-import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import CustomBudgetCard from "@/components/common/CustomBudgetCard";
 import { budgetService } from "@/services/BudgetService";
-import { useFocusEffect, useRouter } from "expo-router";
+import { Stack, useFocusEffect, useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
-import { SwipeableListWrapper } from "@/components";
-import { RowMap } from "react-native-swipe-list-view";
-import CustomAlert from "@/components/common/CustomAlert";
 import { showToast } from "@/components/ui/CustomToast";
-import { InteractionManager } from "react-native";
 import BudgetIntroSlider from "@/components/common/BudgetIntroSlider";
-import { load, save, remove } from "@/utils/storage/storage";
+import { load, save } from "@/utils/storage/storage";
 import { supabase } from "@/config/supabase";
 import logger from "@/utils/logger";
 import moment from "moment";
@@ -65,17 +63,16 @@ interface BudgetsScreenProps {}
 export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
   function BudgetsScreen() {
     const router = useRouter();
+    const { theme } = useTheme();
     const analytics = useAnalytics();
     const [budgets, setBudgets] = useState<Budget[]>([]);
     const [loading, setLoading] = useState(false);
-    const [budgetToDelete, setBudgetToDelete] = useState<string | null>(null);
-    const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [openRow, setOpenRow] = useState<string | null>(null);
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [showIntroSlider, setShowIntroSlider] = useState(false);
     const [isCheckingIntro, setIsCheckingIntro] = useState(true);
     const [userName, setUserName] = useState("");
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
 
     useEffect(() => {
       const getUserData = async () => {
@@ -136,6 +133,10 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
       checkIntroShown();
     }, [checkIntroShown]);
 
+    const parseDate = (dateString: string) => {
+      return moment(dateString, "DD/MM/YYYY").toDate();
+    };
+
     const checkAndLoadBudgets = useCallback(async () => {
       try {
         if (isInitialLoad) {
@@ -177,132 +178,79 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
       }, [checkAndLoadBudgets])
     );
 
+    const handleRefresh = useCallback(async () => {
+      setIsRefreshing(true);
+      await checkAndLoadBudgets();
+      setIsRefreshing(false);
+    }, [checkAndLoadBudgets]);
+
     const handleDelete = useCallback((budgetId: string) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      setBudgetToDelete(budgetId);
-      setIsDeleteAlertVisible(true);
-    }, []);
+      swipeableRefs.current[budgetId]?.close();
+      Alert.alert(
+        translate("budgetScreen:deleteBudget"),
+        translate("budgetScreen:deleteConfirmationMessage"),
+        [
+          { text: translate("common:cancel"), style: "cancel" },
+          {
+            text: translate("common:delete"),
+            style: "destructive",
+            onPress: async () => {
+              try {
+                const success = await budgetService.deleteBudget(budgetId);
+                if (success) {
+                  showToast("success", translate("budgetScreen:budgetDeleted"));
+                  await checkAndLoadBudgets();
+                } else {
+                  showToast("error", translate("budgetScreen:errorDeletingBudget"));
+                }
+              } catch (error) {
+                logger.error("Error deleting budget:", error);
+                showToast("error", translate("budgetScreen:errorDeletingBudget"));
+              }
+            },
+          },
+        ]
+      );
+    }, [checkAndLoadBudgets]);
 
-    const handleConfirmDelete = useCallback(async () => {
-      if (!budgetToDelete) return;
+    const renderRightActions = useCallback(
+      (progress: Animated.AnimatedInterpolation<number>, budgetId: string) => {
+        const translateX = progress.interpolate({
+          inputRange: [0, 1],
+          outputRange: [80, 0],
+        });
 
-      setIsDeleting(true);
-      try {
-        const success = await budgetService.deleteBudget(budgetToDelete);
-        if (success) {
-          showToast("success", translate("budgetScreen:budgetDeleted"));
-          await checkAndLoadBudgets();
-        } else {
-          showToast("error", translate("budgetScreen:errorDeletingBudget"));
-        }
-      } catch (error) {
-        logger.error("Error deleting budget:", error);
-        showToast("error", translate("budgetScreen:errorDeletingBudget"));
-      } finally {
-        setIsDeleting(false);
-        setIsDeleteAlertVisible(false);
-        setBudgetToDelete(null);
-      }
-    }, [budgetToDelete, checkAndLoadBudgets]);
-
-    const onRowClose = useCallback(() => setOpenRow(null), []);
-
-    const handleScroll = useCallback(() => {
-      if (openRow) {
-        setOpenRow(null);
-      }
-    }, [openRow]);
+        return (
+          <Animated.View
+            style={[
+              tw`w-20 items-center justify-center rounded-r-3xl`,
+              { backgroundColor: colors.secondary, transform: [{ translateX }] },
+            ]}
+          >
+            <TouchableOpacity
+              style={tw`flex-1 w-full items-center justify-center`}
+              onPress={() => handleDelete(budgetId)}
+            >
+              <Icon symbol="trash" size={24} color={colors.white} />
+              <Text type="xs" weight="medium" color="white" style={tw`mt-1`}>
+                {translate("common:delete")}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        );
+      },
+      [handleDelete]
+    );
 
     const handleAddBudgetPress = useCallback(() => {
       try {
-        // analytics.trackEvent("budget_add_button_clicked", {
-        //   screen_name: "BudgetsScreen",
-        //   action_type: "click",
-        //   interaction_type: "button",
-        //   action: "add_budget",
-        // });
         logger.debug("Analytics tracked for add budget button");
       } catch (error) {
         logger.debug("Analytics error:", error);
       }
       router.push("/(authenticated)/budget/new");
     }, [analytics, router]);
-
-    useFocusEffect(
-      useCallback(() => {
-        return () => {
-          setOpenRow(null);
-        };
-      }, [])
-    );
-
-    const parseDate = (dateString: string) => {
-      return moment(dateString, "DD/MM/YYYY").toDate();
-    };
-
-    const renderBudgetItem = useCallback(
-      (budgetData: Budget) => (
-        <View style={tw`py-1 bg-[#FAFAFA]`}>
-          <TouchableOpacity
-            style={tw`bg-[#FAFAFA]`}
-            onPress={() => {
-              router.push({
-                pathname: "/(authenticated)/budget/[budgetId]",
-                params: { budgetId: budgetData.budget.id },
-              });
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            }}
-          >
-            <CustomBudgetCard
-              budget={budgetData}
-              isSwipeOpen={openRow === budgetData.id}
-              onArrowPress={() => {
-                router.push({
-                  pathname: "/(authenticated)/budget/[budgetId]",
-                  params: { budgetId: budgetData.budget.id },
-                });
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-      ),
-      [router, openRow]
-    );
-
-    const renderHiddenItem = useCallback(
-      (data: { item: Budget }, rowMap: RowMap<Budget>) => (
-        <View
-          style={[
-            tw`flex-1 flex-row justify-end items-stretch py-1`,
-            {
-              backgroundColor: "#FAFAFA",
-            },
-          ]}
-        >
-          <TouchableOpacity
-            style={[
-              tw`bg-[${colors.secondary}] w-20 justify-center items-center rounded-r-3xl`,
-            ]}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-              setTimeout(() => {
-                handleDelete(data.item.budget.id);
-              }, 100);
-            }}
-          >
-            <MaterialIcons name="delete" size={28} color={colors.white} />
-            <Text
-              style={tw`text-xs mt-1 text-white`}
-              weight="medium"
-              color="white"
-            >
-              {translate("common:delete")}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      ),
-      [handleDelete]
-    );
 
     if (isCheckingIntro) {
       return (
@@ -331,98 +279,89 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
     }
 
     return (
-      <Screen
-        safeAreaEdges={["top"]}
-        preset="scroll"
-        backgroundColor="#FAFAFA"
-        statusBarBackgroundColor="#FAFAFA"
-        header={
-          <CustomHeaderSecondary
-            title={translate("budgetScreen:budget")}
-            showPrimaryIcon={false}
-          />
-        }
-      >
-        <ScrollView
-          style={tw`flex-1 px-6`}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          showsVerticalScrollIndicator={true}
-          bounces={true}
-          overScrollMode="always"
-        >
-          {loading && budgets.length > 0 && (
-            <View style={tw`py-2 items-center`}>
-              <ActivityIndicator size="small" color={colors.primary} />
-            </View>
-          )}
-          <TouchableOpacity
-            style={tw`mt-4 flex-row bg-white items-center justify-center rounded-full py-2 border border-[${colors.primary}]`}
-            onPress={handleAddBudgetPress}
-          >
-            <View
-              style={tw`bg-[#C4A8FF] h-[28px] w-[28px] rounded-lg items-center justify-center`}
-            >
-              <Ionicons name="add" size={24} color="white" />
-            </View>
-            <Text
-              style={tw`text-[${colors.primary}] ml-2 text-sm ml-4`}
-              weight="semibold"
-              color={colors.primary}
-            >
-              {translate("budgetScreen:addBudget")}
-            </Text>
-          </TouchableOpacity>
-          {budgets.length === 0 ? (
-            <View style={tw`items-center mt-10`}>
-              <KeboSadIconSvg width={50} height={50} />
-              <Text style={tw`text-[#606A84] text-center mt-2`}>
-                {translate("budgetScreen:noBudgets")}
-              </Text>
-            </View>
-          ) : (
-            <View style={tw`mt-4 mb-20`}>
-              <SwipeableListWrapper
-                data={budgets}
-                renderItem={renderBudgetItem}
-                renderHiddenItem={renderHiddenItem}
-                rightOpenValue={-80}
-                disableRightSwipe
-                keyExtractor={(item) => item.id}
-                onRowOpen={(rowKey) => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  setOpenRow(rowKey);
-                }}
-                onRowClose={onRowClose}
-                useNativeDriver={true}
-                onSwipeStart={() => {
-                  InteractionManager.runAfterInteractions(() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  });
-                }}
-                onSwipeEnd={() => {}}
-                onDelete={handleDelete}
-                rightThreshold={70}
-                deleteButtonStyle={`bg-[${colors.secondary}]`}
-                containerStyle="bg-[#FAFAFA]"
-              />
-            </View>
-          )}
-        </ScrollView>
-        <CustomAlert
-          visible={isDeleteAlertVisible}
-          title={translate("budgetScreen:deleteBudget")}
-          message={translate("budgetScreen:deleteConfirmationMessage")}
-          onConfirm={handleConfirmDelete}
-          onCancel={() => {
-            setIsDeleteAlertVisible(false);
-            setBudgetToDelete(null);
+      <>
+        <Stack.Screen
+          options={{
+            title: translate("budgetScreen:budget"),
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={handleAddBudgetPress}
+                style={{ flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, paddingVertical: 6, backgroundColor: "rgba(105, 52, 210, 0.1)", borderRadius: 20 }}
+              >
+                <Ionicons name="add-circle" size={24} color={colors.primary} />
+                <Text type="sm" weight="semibold" color={colors.primary}>
+                  {translate("budgetScreen:addBudget")}
+                </Text>
+              </TouchableOpacity>
+            ),
           }}
-          type="danger"
-          confirmText={translate("common:delete")}
-          cancelText={translate("common:cancel")}
         />
-      </Screen>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+          }
+        >
+          <View style={tw`px-4 py-4`}>
+            {loading && budgets.length > 0 && (
+              <View style={tw`py-2 items-center`}>
+                <ActivityIndicator size="small" color={colors.primary} />
+              </View>
+            )}
+            {budgets.length === 0 ? (
+              <View style={tw`items-center mt-10`}>
+                <KeboSadIconSvg width={50} height={50} />
+                <Text color={theme.textSecondary} style={tw`text-center mt-2`}>
+                  {translate("budgetScreen:noBudgets")}
+                </Text>
+              </View>
+            ) : (
+              <View style={tw`mt-2 mb-20 gap-3`}>
+                {budgets.map((budgetData) => (
+                  <Swipeable
+                    key={budgetData.id}
+                    ref={(ref) => { swipeableRefs.current[budgetData.id] = ref; }}
+                    renderRightActions={(progress) =>
+                      renderRightActions(progress, budgetData.budget.id)
+                    }
+                    rightThreshold={40}
+                    overshootRight={false}
+                    onSwipeableWillOpen={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      // Close other open rows
+                      Object.entries(swipeableRefs.current).forEach(([id, ref]) => {
+                        if (id !== budgetData.id && ref) ref.close();
+                      });
+                    }}
+                  >
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        router.push({
+                          pathname: "/(authenticated)/budget/[budgetId]",
+                          params: { budgetId: budgetData.budget.id },
+                        });
+                      }}
+                    >
+                      <CustomBudgetCard
+                        budget={budgetData}
+                        onArrowPress={() => {
+                          router.push({
+                            pathname: "/(authenticated)/budget/[budgetId]",
+                            params: { budgetId: budgetData.budget.id },
+                          });
+                        }}
+                      />
+                    </TouchableOpacity>
+                  </Swipeable>
+                ))}
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </>
     );
   }
 );

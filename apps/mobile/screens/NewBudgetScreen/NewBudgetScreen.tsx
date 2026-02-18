@@ -5,15 +5,14 @@ import {
   Platform,
   KeyboardAvoidingView,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
-import { Text } from "@/components/ui";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { Screen } from "@/components/Screen";
+import { Text, Button } from "@/components/ui";
+import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 import { translate } from "@/i18n";
 import { TxKeyPath } from "@/i18n";
-import CustomHeader from "@/components/common/CustomHeader";
-import CustomButton from "@/components/common/CustomButton";
 import tw from "@/hooks/useTailwind";
 import CustomInput from "@/components/common/CustomInput";
 import { useFormik } from "formik";
@@ -40,6 +39,7 @@ interface NewBudgetScreenProps {}
 
 export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
   const router = useRouter();
+  const { theme } = useTheme();
   const params = useLocalSearchParams<{
     isEditing?: string;
     budgetId?: string;
@@ -53,15 +53,13 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
   const isEditing = params.isEditing === "true";
   const budgetId = params.budgetId;
 
-  // Parse budget data from params
-  let budgetData;
-  try {
-    budgetData = params.budgetData
-      ? JSON.parse(params.budgetData)
-      : undefined;
-  } catch (e) {
-    budgetData = undefined;
-  }
+  const [budgetData] = useState(() => {
+    try {
+      return params.budgetData ? JSON.parse(params.budgetData) : undefined;
+    } catch {
+      return undefined;
+    }
+  });
 
   const monthNames = [
     "january",
@@ -78,9 +76,12 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
     "december",
   ];
 
-  const now = new Date();
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 30);
+  const [now] = useState(() => new Date());
+  const [defaultEndDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d;
+  });
   const monthIndex = now.getMonth();
   const currentMonthKey = monthNames[monthIndex];
   const translatedMonth = translate(`months:${currentMonthKey}` as TxKeyPath);
@@ -139,7 +140,7 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
     initialValues: {
       name: `${translate("newBudgetScreen:budget")} ${translatedMonth}`,
       startDate: now,
-      endDate: endDate,
+      endDate: defaultEndDate,
     },
     onSubmit: handleSubmit,
   });
@@ -176,94 +177,89 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
 
   return (
     <>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: isEditing
+            ? translate("newBudgetScreen:editBudget")
+            : translate("newBudgetScreen:createBudget"),
+          headerBackTitle: translate("budgetScreen:budget"),
+          headerTintColor: colors.primary,
+          headerTitleStyle: {
+            fontFamily: "SFUIDisplaySemiBold",
+            color: theme.headerTitle,
+          },
+          headerTransparent: true,
+          headerBlurEffect: theme.blurEffect,
+        }}
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1, backgroundColor: "#FAFAFA" }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={0}
       >
-        <Screen
-          safeAreaEdges={["top", "bottom"]}
-          preset="scroll"
-          backgroundColor="#FAFAFA"
-          statusBarBackgroundColor={colors.primary}
-          statusBarStyle="light"
-          header={
-            <CustomHeader
-              onPress={() => router.back()}
-              title={
-                isEditing
-                  ? translate("newBudgetScreen:editBudget")
-                  : translate("newBudgetScreen:createBudget")
-              }
-            />
-          }
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          style={tw`flex-1`}
+          contentContainerStyle={tw`px-6 pb-6`}
         >
-          <View style={tw`flex-1 px-6`}>
-            <View style={tw`pt-10`}>
-              <Text
-                style={tw`text-2xl text-black`}
-                weight="bold"
-              >
-                {isEditing
-                  ? translate("newBudgetScreen:editBudget")
-                  : translate("newBudgetScreen:title")}
-              </Text>
-              <Text
-                style={tw`text-sm text-black pt-2`}
-                weight="light"
-              >
-                {translate("newBudgetScreen:description")}
-              </Text>
-            </View>
+          <Text type="sm" weight="light" color={theme.textSecondary} style={tw`pt-2 pb-4`}>
+            {translate("newBudgetScreen:description")}
+          </Text>
 
-            <View style={tw`pt-4`}>
-              <CustomInput
-                label={translate("newBudgetScreen:labelName")}
-                placeholder={translate("newBudgetScreen:labelName")}
-                value={formik.values.name}
-                onChangeText={formik.handleChange("name")}
-              />
-            </View>
-
-            <View>
-              <Text style={tw`text-sm font-light mb-1 text-[#606A84]/50`}>
-                {translate("newBudgetScreen:labelTime")}
-              </Text>
-
-              <TouchableOpacity
-                onPress={() => setCalendarRangeVisible(true)}
-                style={tw`mb-3`}
-              >
-                <View
-                  style={tw`flex-row items-center justify-between border border-border-gray bg-white rounded-xl px-4 h-15`}
-                >
-                  <Text style={tw`text-black mr-2`}>
-                    {formatDate(formik.values.startDate)} -{" "}
-                    {formatDate(formik.values.endDate)}
-                  </Text>
-
-                  <ArrowDownSimpleIcon
-                    width={12}
-                    height={8}
-                    color={colors.primary}
-                  />
-                </View>
-              </TouchableOpacity>
-            </View>
+          <View>
+            <CustomInput
+              label={translate("newBudgetScreen:labelName")}
+              placeholder={translate("newBudgetScreen:labelName")}
+              value={formik.values.name}
+              onChangeText={formik.handleChange("name")}
+            />
           </View>
-        </Screen>
 
-        <CustomButton
-          variant="primary"
-          isEnabled={isFormValidForSubmission}
-          onPress={formik.handleSubmit}
-          title={
-            isEditing
-              ? translate("newBudgetScreen:updateBudget")
-              : translate("newBudgetScreen:createBudget")
-          }
-          adaptToKeyboard
-        />
+          <View>
+            <Text type="sm" weight="light" color={theme.textTertiary} style={tw`mb-1`}>
+              {translate("newBudgetScreen:labelTime")}
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => setCalendarRangeVisible(true)}
+              style={tw`mb-3`}
+            >
+              <View
+                style={tw`flex-row items-center justify-between border border-[${theme.border}] bg-[${theme.surface}] rounded-xl px-4 h-15`}
+              >
+                <Text color={theme.textPrimary}>
+                  {formatDate(formik.values.startDate)} -{" "}
+                  {formatDate(formik.values.endDate)}
+                </Text>
+
+                <ArrowDownSimpleIcon
+                  width={12}
+                  height={8}
+                  color={colors.primary}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+
+        <View style={tw`px-6 pb-4 pt-2`}>
+          <Button
+            title={
+              isEditing
+                ? translate("newBudgetScreen:updateBudget")
+                : translate("newBudgetScreen:createBudget")
+            }
+            onPress={() => formik.handleSubmit()}
+            disabled={!isFormValidForSubmission}
+            loading={isLoading}
+            size="md"
+            radius="lg"
+            haptic
+          />
+        </View>
         <CalendarRangePicker
           startDate={formik.values.startDate}
           endDate={formik.values.endDate}

@@ -1,18 +1,18 @@
 import { observer } from "mobx-react-lite";
 import logger from "@/utils/logger";
 import React, { FC, useCallback, useEffect, useState } from "react";
-import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
-import { Screen } from "@/components/Screen";
+import { Stack, useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import {
   View,
   ScrollView,
   InteractionManager,
+  RefreshControl,
 } from "react-native";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 import tw from "@/hooks/useTailwind";
 import { translate } from "@/i18n";
-import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { budgetService } from "@/services/BudgetService";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
@@ -66,6 +66,7 @@ interface BudgetDetailScreenProps {}
 export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
   function BudgetDetailScreen() {
     const router = useRouter();
+    const { theme } = useTheme();
     const params = useLocalSearchParams<{
       budgetId: string;
       categoryId: string;
@@ -75,6 +76,7 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
     const [categoryDetails, setCategoryDetails] =
       useState<CategoryDetails | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const { formatAmount } = useCurrencyFormatter();
     const [openRow, setOpenRow] = useState<string | null>(null);
     const [transactionToDelete, setTransactionToDelete] = useState<
@@ -137,6 +139,12 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
         }
       }, [budgetId, categoryId])
     );
+
+    const handleRefresh = useCallback(async () => {
+      setIsRefreshing(true);
+      await loadCategoryDetails();
+      setIsRefreshing(false);
+    }, [budgetId, categoryId]);
 
     const handleEditTransaction = useCallback(
       (transaction: Transaction) => {
@@ -218,13 +226,29 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
       setTransactionToDelete(null);
     }, []);
 
+    const headerOptions = {
+      headerShown: true,
+      title: translate("budgetScreen:detailCategory"),
+      headerTintColor: colors.primary,
+      headerTitleStyle: {
+        fontFamily: "SFUIDisplaySemiBold",
+        color: theme.headerTitle,
+      },
+      headerTransparent: true,
+      headerBlurEffect: theme.blurEffect,
+    } as const;
+
     if (!categoryDetails) {
       return (
-        <View style={tw`flex-1 items-center justify-center`}>
-          <Text style={tw`text-[#606A84]`}>
-            {translate("budgetScreen:budgetNotFound")}
-          </Text>
-        </View>
+        <>
+          <Stack.Screen options={headerOptions} />
+          <View style={tw`flex-1 items-center justify-center`}>
+            <KeboSadIconSvg width={50} height={50} />
+            <Text color={theme.textSecondary} style={tw`mt-2`}>
+              {translate("budgetScreen:budgetNotFound")}
+            </Text>
+          </View>
+        </>
       );
     }
 
@@ -232,95 +256,86 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
 
     return (
       <>
-        <Screen
-          safeAreaEdges={["top"]}
-          preset="scroll"
-          backgroundColor="#FAFAFA"
-          statusBarBackgroundColor="#FAFAFA"
-          header={
-            <CustomHeaderSecondary
-              title={translate("budgetScreen:detailCategory")}
-              onPress={() => router.back()}
-            />
+        <Stack.Screen options={headerOptions} />
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
           }
         >
-          <ScrollView style={tw`flex-1`}>
-            <CustomBudgetCategoryCard
-              category_metrics={category_metrics}
-              router={router}
-              editCategory={() => {
-                const categoryForEdit: CategorySnapshotIn = {
-                  id: category_metrics.category_id,
-                  category_id: category_metrics.category_id,
-                  name: category_metrics.category_name,
-                  icon_url:
-                    category_metrics.icon_url ||
-                    category_metrics.icon_emoji ||
-                    "",
-                  icon_emoji: category_metrics.icon_emoji,
-                  color_id: category_metrics.color_id,
-                  type: "Expense",
-                  user_id: "",
-                  is_visible: true,
-                };
+          <CustomBudgetCategoryCard
+            category_metrics={category_metrics}
+            router={router}
+            editCategory={() => {
+              const categoryForEdit: CategorySnapshotIn = {
+                id: category_metrics.category_id,
+                category_id: category_metrics.category_id,
+                name: category_metrics.category_name,
+                icon_url:
+                  category_metrics.icon_url ||
+                  category_metrics.icon_emoji ||
+                  "",
+                icon_emoji: category_metrics.icon_emoji,
+                color_id: category_metrics.color_id,
+                type: "Expense",
+                user_id: "",
+                is_visible: true,
+              };
 
-                router.push({
-                  pathname: "/(authenticated)/create-budget-category/[budgetId]",
-                  params: {
-                    budgetId: budgetId,
-                    isEditing: "true",
-                    categoryId: categoryId,
-                    amount: String(category_metrics.budgeted_amount),
-                    selectedCategory: JSON.stringify(categoryForEdit),
-                  },
-                });
-              }}
-            />
+              router.push({
+                pathname: "/(authenticated)/create-budget-category/[budgetId]",
+                params: {
+                  budgetId: budgetId,
+                  isEditing: "true",
+                  categoryId: categoryId,
+                  amount: String(category_metrics.budgeted_amount),
+                  selectedCategory: JSON.stringify(categoryForEdit),
+                },
+              });
+            }}
+          />
 
-            <View style={tw`px-6 mt-2`}>
-              <Text
-                style={tw`text-base`}
-                weight="semibold"
-              >
-                {translate("homeScreen:titleTransaction")}
-                <Text style={tw`text-base`}>💸👀</Text>
-              </Text>
-              <View
-                style={tw`border border-[#EBEBEF] rounded-[18px] overflow-hidden bg-white mt-2`}
-              >
-                {transactions.length === 0 ? (
-                  <View style={tw`py-8 items-center`}>
-                    <KeboSadIconSvg width={50} height={50} />
-                    <Text style={tw`text-[#606A84] text-center mt-2`}>
-                      {translate("transactionScreen:noTransaction")}
-                    </Text>
-                  </View>
-                ) : (
-                  <SwipeableListWrapper
-                    data={transactions}
-                    renderItem={renderTransactionItem}
-                    keyExtractor={(item) => item.id}
-                    onRowOpen={(rowKey) => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      setOpenRow(rowKey);
-                    }}
-                    onRowClose={() => setOpenRow(null)}
-                    useNativeDriver={true}
-                    onSwipeStart={() => {
-                      InteractionManager.runAfterInteractions(() => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      });
-                    }}
-                    onSwipeEnd={() => {}}
-                    onDelete={handleDelete}
-                    rightThreshold={70}
-                    deleteButtonStyle={`bg-[${colors.secondary}]`}
-                  />
-                )}
-              </View>
+          <View style={tw`px-4 mt-2`}>
+            <Text weight="semibold" color={theme.textPrimary}>
+              {translate("homeScreen:titleTransaction")}
+              <Text>💸👀</Text>
+            </Text>
+            <View
+              style={tw`border border-[${theme.border}] rounded-[18px] overflow-hidden bg-[${theme.surface}] mt-2`}
+            >
+              {transactions.length === 0 ? (
+                <View style={tw`py-8 items-center`}>
+                  <KeboSadIconSvg width={50} height={50} />
+                  <Text color={theme.textSecondary} style={tw`text-center mt-2`}>
+                    {translate("transactionScreen:noTransaction")}
+                  </Text>
+                </View>
+              ) : (
+                <SwipeableListWrapper
+                  data={transactions}
+                  renderItem={renderTransactionItem}
+                  keyExtractor={(item) => item.id}
+                  onRowOpen={(rowKey) => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    setOpenRow(rowKey);
+                  }}
+                  onRowClose={() => setOpenRow(null)}
+                  useNativeDriver={true}
+                  onSwipeStart={() => {
+                    InteractionManager.runAfterInteractions(() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    });
+                  }}
+                  onSwipeEnd={() => {}}
+                  onDelete={handleDelete}
+                  rightThreshold={70}
+                  deleteButtonStyle={`bg-[${colors.secondary}]`}
+                />
+              )}
             </View>
-          </ScrollView>
-        </Screen>
+          </View>
+        </ScrollView>
 
         <CustomAlert
           visible={isDeleteAlertVisible}

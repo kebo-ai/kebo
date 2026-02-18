@@ -1,28 +1,25 @@
 import logger from "@/utils/logger";
 import { observer } from "mobx-react-lite";
-import React, { FC, useState, useRef, useEffect } from "react";
+import React, { FC, useState, useRef, useEffect, useLayoutEffect } from "react";
 import {
   View,
   FlatList,
-  KeyboardAvoidingView,
-  Platform,
   Keyboard,
   Alert,
   TextInput,
   TouchableOpacity,
-  PanResponder,
+  Pressable,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { KeyboardProvider, KeyboardStickyView } from "react-native-keyboard-controller";
 import tw from "twrnc";
 import moment from "moment";
 import * as Haptics from "expo-haptics";
 
 // Components
-import { ChatHeader } from "@/components/common/ChatHeader";
 import { ChatInput } from "@/components/common/ChatInput";
 import { ChatMessage } from "@/components/common/ChatMessage";
 import { ChatEmpty } from "@/components/common/ChatEmpty";
@@ -35,6 +32,8 @@ import { MessageType } from "@/components/common/ChatMessage";
 import { translate } from "@/i18n";
 import { colors } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/hooks/useTheme";
+import { NewChatIconSvg } from "@/components/icons/NewChatIconSvg";
 
 interface Message {
   id: string;
@@ -42,7 +41,7 @@ interface Message {
   type: MessageType;
   timestamp: string;
   isLoading?: boolean;
-  rawResponse?: any; // Add rawResponse field to store raw API data
+  rawResponse?: any;
 }
 
 interface ChatbotScreenProps {}
@@ -50,41 +49,45 @@ interface ChatbotScreenProps {}
 export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
   function ChatbotScreen() {
     const router = useRouter();
+    const navigation = useNavigation();
+    const { theme } = useTheme();
+    const insets = useSafeAreaInsets();
+    const headerHeight = useHeaderHeight();
     const params = useLocalSearchParams<{ initialQuestion?: string }>();
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [keyboardVisible, setKeyboardVisible] = useState(false);
     const flatListRef = useRef<FlatList>(null);
-    const insets = useSafeAreaInsets();
     const [inputValue, setInputValue] = useState("");
     const inputRef = useRef<TextInput | null>(null);
 
-    // Constant bottom padding to keep content above the absolutely-positioned tab bar
-    const contentBottomPadding = 60;
-
     const [showScrollToEnd, setShowScrollToEnd] = useState(false);
 
-    // Keyboard listeners
+    // Dynamic headerRight — show new chat button when messages exist
+    useLayoutEffect(() => {
+      navigation.setOptions({
+        headerRight: messages.length > 0
+          ? () => (
+              <TouchableOpacity onPress={handleNewChat} style={tw`px-1`}>
+                <NewChatIconSvg />
+              </TouchableOpacity>
+            )
+          : undefined,
+      });
+    }, [navigation, messages.length]);
+
+    // Scroll to end when keyboard appears
     useEffect(() => {
       const keyboardDidShowListener = Keyboard.addListener(
         "keyboardDidShow",
         () => {
-          setKeyboardVisible(true);
           if (messages.length > 0) {
             flatListRef.current?.scrollToEnd({ animated: true });
           }
         }
       );
-      const keyboardDidHideListener = Keyboard.addListener(
-        "keyboardDidHide",
-        () => {
-          setKeyboardVisible(false);
-        }
-      );
 
       return () => {
         keyboardDidShowListener.remove();
-        keyboardDidHideListener.remove();
       };
     }, [messages.length]);
 
@@ -95,30 +98,8 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       }
     }, [params.initialQuestion]);
 
-
-    // Configure PanResponder for swipe gesture
-    const panResponder = useRef(
-      PanResponder.create({
-        onMoveShouldSetPanResponder: (_, gestureState) => {
-          return Math.abs(gestureState.dx) > 10;
-        },
-        onPanResponderMove: (_, gestureState) => {
-          if (gestureState.dx > 0) {
-            // Optional: you can add an animation here
-          }
-        },
-        onPanResponderRelease: (_, gestureState) => {
-          if (gestureState.dx > 100) {
-            router.back();
-          }
-        },
-      })
-    ).current;
-
-
     // Handle sending a message
     const handleSendMessage = async (content: string) => {
-      // Add user message
       const userMessage: Message = {
         id: Date.now().toString(),
         content,
@@ -126,7 +107,6 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
         timestamp: moment().format("HH:mm"),
       };
 
-      // Create loading message placeholder
       const loadingMessageId = (Date.now() + 1).toString();
       const loadingMessage: Message = {
         id: loadingMessageId,
@@ -144,21 +124,14 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       setIsLoading(true);
 
       try {
-        // Get response from backend API
         const response = await ChatService.sendMessage(content);
-
-        // Get the raw response data
         const rawResponseData = response.rawResponse || {};
-
-        // Display the raw response from the API directly (could be response, message, or any field)
-        // If rawResponse exists and has a response property, use that directly
         const responseContent =
           rawResponseData.response ||
           rawResponseData.message ||
           rawResponseData.content ||
           response.content;
 
-        // Update messages by replacing the loading message with the actual response
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.id === loadingMessageId
@@ -172,10 +145,8 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
           )
         );
 
-        // Vibrate to give feedback when bot response arrives
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-        // Handle API errors
         if (response.error) {
           logger.error("Chat API error:", response.error);
           if (response.error.includes("No session found")) {
@@ -188,8 +159,6 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
         }
       } catch (error) {
         logger.error("Error getting chatbot response:", error);
-
-        // Update messages by replacing the loading message with the error message
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.id === loadingMessageId
@@ -206,7 +175,6 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       }
     };
 
-    // Handle pressing a sample question
     const handleSampleQuestionPress = (question: string) => {
       setInputValue((prev) => prev + " " + question);
       setTimeout(() => {
@@ -216,7 +184,6 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
 
     const handleNewChat = () => {
       setMessages([]);
-      // Ensure keyboard opens after clearing messages
       setTimeout(() => {
         if (inputRef.current) {
           inputRef.current.focus();
@@ -242,68 +209,81 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       setShowScrollToEnd(!isAtBottom && messages.length > 0);
     };
 
-    return (
-      <SafeAreaView style={tw`flex-1 bg-[#FAFAFA]`} {...panResponder.panHandlers}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={tw`flex-1`}
-          keyboardVerticalOffset={Platform.OS === "ios" ? -contentBottomPadding : 0}
-        >
-          <View style={tw`flex-1`}>
-            <ChatHeader
-              onNewChat={messages.length > 0 ? handleNewChat : undefined}
-            />
+    // Space reserved for the input at the bottom so content doesn't hide behind it
+    const inputAreaHeight = 70;
 
-            <View style={[tw`flex-1`, { paddingBottom: contentBottomPadding }]}>
-              {messages.length === 0 && !inputValue ? (
-                <ChatEmpty onSampleQuestionPress={handleSampleQuestionPress} />
-              ) : (
-                <FlatList
-                  ref={flatListRef}
-                  data={messages}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => (
-                    <ChatMessage
-                      content={item.content}
-                      type={item.type}
-                      timestamp={item.timestamp}
-                      isLoading={item.isLoading}
-                    />
-                  )}
-                  contentContainerStyle={tw`p-4 pb-4`}
-                  showsVerticalScrollIndicator={false}
-                  onScroll={handleScroll}
-                  scrollEventThrottle={16}
-                />
-              )}
-              {showScrollToEnd && (
-                <TouchableOpacity
-                  style={tw`absolute left-1/2 -translate-x-1/2 bottom-20 justify-center items-center rounded-full p-2 shadow-xs bg-[#E7DFF7] border border-[${colors.primary}]`}
-                  onPress={() =>
-                    flatListRef.current?.scrollToEnd({ animated: true })
-                  }
-                >
-                  <Ionicons
-                    name="chevron-down"
-                    size={16}
-                    color={colors.primary}
-                    style={tw`items-center justify-center`}
-                  />
-                </TouchableOpacity>
-              )}
-              <View style={tw`mt-4`}>
-                <ChatInput
-                  onSendMessage={handleSendMessage}
-                  isLoading={isLoading}
-                  inputValue={inputValue}
-                  setInputValue={setInputValue}
-                  inputRef={inputRef}
-                />
-              </View>
+    return (
+      <KeyboardProvider>
+      <Pressable style={[tw`flex-1`, { backgroundColor: theme.background }]} onPress={Keyboard.dismiss}>
+        <View style={tw`flex-1`}>
+          {messages.length === 0 && !inputValue ? (
+            <View style={[tw`flex-1`, { paddingTop: headerHeight, paddingBottom: inputAreaHeight + insets.bottom + 50 }]}>
+              <ChatEmpty onSampleQuestionPress={handleSampleQuestionPress} />
             </View>
-          </View>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+          ) : (
+            <FlatList
+              ref={flatListRef}
+              data={messages}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <ChatMessage
+                  content={item.content}
+                  type={item.type}
+                  timestamp={item.timestamp}
+                  isLoading={item.isLoading}
+                />
+              )}
+              contentContainerStyle={[
+                tw`px-4 pb-4`,
+                { paddingTop: headerHeight + 16, paddingBottom: inputAreaHeight + insets.bottom + 50 },
+              ]}
+              showsVerticalScrollIndicator={false}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+              keyboardDismissMode="interactive"
+            />
+          )}
+          {showScrollToEnd && (
+            <TouchableOpacity
+              style={[
+                tw`absolute left-1/2 -translate-x-1/2 bottom-32 justify-center items-center rounded-full p-2 shadow-xs border`,
+                {
+                  backgroundColor: theme.surface,
+                  borderColor: colors.primary,
+                },
+              ]}
+              onPress={() =>
+                flatListRef.current?.scrollToEnd({ animated: true })
+              }
+            >
+              <Ionicons
+                name="chevron-down"
+                size={16}
+                color={colors.primary}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <KeyboardStickyView
+          style={{
+            position: "absolute",
+            bottom: insets.bottom + 50,
+            left: 0,
+            right: 0,
+          }}
+          offset={{ opened: insets.bottom + 50, closed: 0 }}
+        >
+          <ChatInput
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            inputRef={inputRef}
+          />
+        </KeyboardStickyView>
+      </Pressable>
+      </KeyboardProvider>
     );
   }
 );

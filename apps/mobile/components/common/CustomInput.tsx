@@ -7,8 +7,7 @@ import {
   TextInputProps,
 } from "react-native";
 import tw from "@/hooks/useTailwind";
-import { useTranslation } from "react-i18next";
-import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 
 interface CustomInputProps extends TextInputProps {
   label: string;
@@ -22,17 +21,18 @@ const CustomInput: React.FC<CustomInputProps> = ({
   ...props
 }) => {
   const [isSecure, setIsSecure] = useState(type === "password");
+  const { theme } = useTheme();
 
   return (
     <View style={tw`mb-4 w-full`}>
-      <Text style={tw`text-sm font-light mb-1 text-[#606A84]/50`}>{label}</Text>
+      <Text style={[tw`text-sm font-light mb-1`, { color: theme.textTertiary }]}>{label}</Text>
       <View
-        style={tw`flex-row items-center border border-border-gray bg-white rounded-xl px-4`}
+        style={tw`flex-row items-center border border-[${theme.border}] bg-[${theme.surface}] rounded-xl px-4`}
       >
         <TextInput
-          style={tw`flex-1 h-14 text-black`}
+          style={[tw`flex-1 h-14`, { color: theme.textPrimary }]}
           placeholder={placeholder}
-          placeholderTextColor={"#57626C"}
+          placeholderTextColor={theme.textTertiary}
           secureTextEntry={isSecure}
           keyboardType={
             type === "email"

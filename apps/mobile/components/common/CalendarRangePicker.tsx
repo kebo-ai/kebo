@@ -1,8 +1,6 @@
 import React, { useState, useCallback } from "react";
 import {
   View,
-  Text,
-  TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
 } from "react-native";
@@ -12,8 +10,9 @@ import { es, enUS } from "date-fns/locale";
 import tw from "@/hooks/useTailwind";
 import { translate } from "@/i18n";
 import i18n from "@/i18n/i18n";
-import CustomButton from "./CustomButton";
+import { Button } from "@/components/ui";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 
 interface CalendarRangePickerProps {
   startDate: Date;
@@ -30,6 +29,7 @@ export const CalendarRangePicker: React.FC<CalendarRangePickerProps> = ({
   isVisible,
   onClose,
 }) => {
+  const { theme } = useTheme();
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
   const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
   const [isSelectingEnd, setIsSelectingEnd] = useState(false);
@@ -121,20 +121,21 @@ export const CalendarRangePicker: React.FC<CalendarRangePickerProps> = ({
     >
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={tw`flex-1 justify-center items-center bg-black/50 px-4`}>
-          <View style={tw`bg-white rounded-2xl p-6 w-full max-w-sm`}>
+          <View style={tw`bg-[${theme.surface}] rounded-2xl p-6 w-full max-w-sm`}>
             <Calendar
+              key={theme.surface}
               onDayPress={handleDayPress}
               markedDates={generateMarkedDates()}
               markingType="period"
               theme={{
-                backgroundColor: "#ffffff",
-                calendarBackground: "#ffffff",
-                textSectionTitleColor: "black",
+                backgroundColor: theme.surface,
+                calendarBackground: theme.surface,
+                textSectionTitleColor: theme.textPrimary,
                 selectedDayBackgroundColor: colors.primary,
                 selectedDayTextColor: "#ffffff",
                 todayTextColor: colors.primary,
-                dayTextColor: "#2d4150",
-                textDisabledColor: "#E2DEE9",
+                dayTextColor: theme.textPrimary,
+                textDisabledColor: theme.textTertiary,
                 dotColor: colors.primary,
                 selectedDotColor: "#ffffff",
                 arrowColor: colors.primary,
@@ -152,19 +153,22 @@ export const CalendarRangePicker: React.FC<CalendarRangePickerProps> = ({
 
             <View style={tw`flex-row mt-6 gap-3`}>
               <View style={tw`flex-1`}>
-                <CustomButton
-                  variant="secondary"
-                  onPress={handleCancel}
+                <Button
                   title={translate("newBudgetScreen:cancel")}
-                  isEnabled={true}
+                  onPress={handleCancel}
+                  variant="outline"
+                  size="md"
+                  radius="lg"
                 />
               </View>
               <View style={tw`flex-1`}>
-                <CustomButton
-                  variant="primary"
-                  onPress={handleConfirm}
+                <Button
                   title={translate("newBudgetScreen:confirm")}
-                  isEnabled={!!(selectedStartDate && selectedEndDate)}
+                  onPress={handleConfirm}
+                  disabled={!(selectedStartDate && selectedEndDate)}
+                  size="md"
+                  radius="lg"
+                  haptic
                 />
               </View>
             </View>

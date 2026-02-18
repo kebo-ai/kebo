@@ -131,6 +131,12 @@ const zh: Translations = {
     sending: "发送中...",
     thinking: "思考中...",
     reportPlaceholder: "请描述您举报此内容的原因...",
+    loadingAnalyzing: "正在分析您的财务状况...",
+    loadingCrunching: "正在计算数据...",
+    loadingReviewing: "正在审查您的交易...",
+    loadingPatterns: "正在查看消费模式...",
+    loadingInsights: "正在准备您的分析报告...",
+    loadingAlmost: "即将完成...",
   },
   reportsScreen: {
     title: "您的财务，详尽呈现 🐨📊",

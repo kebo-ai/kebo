@@ -135,6 +135,12 @@ const fr: Translations = {
     thinking: "Réflexion...",
     reportPlaceholder:
       "Décrivez pourquoi vous souhaitez signaler ce contenu...",
+    loadingAnalyzing: "Analyse de vos finances...",
+    loadingCrunching: "Calcul des chiffres...",
+    loadingReviewing: "Revue de vos transactions...",
+    loadingPatterns: "Analyse des habitudes de dépenses...",
+    loadingInsights: "Préparation de vos insights...",
+    loadingAlmost: "Presque terminé...",
   },
   reportsScreen: {
     title: "Vos finances, en détail 🐨📊",

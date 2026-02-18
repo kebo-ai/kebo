@@ -139,6 +139,12 @@ const de: Translations = {
     sending: "Wird gesendet...",
     thinking: "Denken...",
     reportPlaceholder: "Beschreibe, warum du diesen Inhalt melden möchtest...",
+    loadingAnalyzing: "Analyse deiner Finanzen...",
+    loadingCrunching: "Zahlen werden berechnet...",
+    loadingReviewing: "Überprüfung deiner Transaktionen...",
+    loadingPatterns: "Ausgabemuster werden analysiert...",
+    loadingInsights: "Deine Insights werden vorbereitet...",
+    loadingAlmost: "Fast fertig...",
   },
   reportsScreen: {
     title: "Deine Finanzen, im Detail 🐨📊",

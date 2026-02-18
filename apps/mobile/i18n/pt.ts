@@ -134,6 +134,12 @@ const pt = {
     sending: "Enviando...",
     thinking: "Pensando...",
     reportPlaceholder: "Descreva por que deseja denunciar este conteúdo...",
+    loadingAnalyzing: "Analisando suas finanças...",
+    loadingCrunching: "Processando os números...",
+    loadingReviewing: "Revisando suas transações...",
+    loadingPatterns: "Analisando padrões de gastos...",
+    loadingInsights: "Preparando seus insights...",
+    loadingAlmost: "Quase lá...",
   },
   reportsScreen: {
     title: "Suas finanças, em detalhes 🐨📊",

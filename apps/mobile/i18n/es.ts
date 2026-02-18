@@ -134,6 +134,12 @@ const es = {
     sending: "Enviando...",
     thinking: "Pensando...",
     reportPlaceholder: "Describe por qué deseas reportar este contenido...",
+    loadingAnalyzing: "Analizando tus finanzas...",
+    loadingCrunching: "Procesando los números...",
+    loadingReviewing: "Revisando tus transacciones...",
+    loadingPatterns: "Observando patrones de gasto...",
+    loadingInsights: "Preparando tus insights...",
+    loadingAlmost: "Ya casi...",
   },
   reportsScreen: {
     title: "Tus finanzas, en detalle 🐨📊",

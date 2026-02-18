@@ -9,15 +9,13 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import { Text } from "@/components/ui";
+import { Text, Button } from "@/components/ui";
 import { RowMap } from "react-native-swipe-list-view";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { MaterialIcons } from "@expo/vector-icons";
-import { BackIconSvg } from "@/components/icons/BackSvg";
 import { translate } from "@/i18n";
 import { colors } from "@/theme";
 import tw from "@/hooks/useTailwind";
-import { Screen } from "@/components/Screen";
 import CustomAlert from "@/components/common/CustomAlert";
 import {
   deleteAccountService,
@@ -27,7 +25,7 @@ import { useStores } from "@/models/helpers/useStores";
 import { showToast } from "@/components/ui/CustomToast";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
-import { useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";
+import { Stack, useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";
 
 interface BankOption {
   id: string;
@@ -438,132 +436,123 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
 
     return (
       <>
-        <Screen
-          safeAreaEdges={["top"]}
-          preset="scroll"
-          statusBarStyle={"dark"}
-          backgroundColor="#FAFAFA"
-          header={
-            <View style={tw`w-full`}>
-              <View style={tw`justify-between flex-row items-center`}>
-                <TouchableOpacity
-                  onPress={() => router.back()}
-                  style={tw`w-12 h-12 flex justify-center items-center shadow-md`}
-                >
-                  <BackIconSvg width={15} height={15} color={colors.black} />
-                </TouchableOpacity>
-                <Text
-                  style={tw`text-lg align-center text-center`}
-                  weight="medium"
-                  color="#110627"
-                >
-                  {translate("accountScreen:myAccounts")}
-                </Text>
-                <View style={tw`w-12`} />
-              </View>
-            </View>
-          }
-        >
-          {loading ? (
-            <View style={tw`flex-1 items-center justify-center py-12`}>
-              <ActivityIndicator size="large" color={colors.primary} />
-            </View>
-          ) : (
-            <View style={tw`px-6 bg-[#FAFAFA] mt-4`}>
-              <TouchableWithoutFeedback disabled={isDeleting || isUpdating}>
-                <View style={tw`flex-1`}>
-                  <View
-                    style={tw`border border-[#EBEBEF] rounded-[18px] overflow-hidden bg-white`}
-                  >
-                    {bankOptions.length === 0 ? (
-                      <View
-                        style={tw`flex-1 items-center justify-center py-12`}
-                      >
-                        <KeboSadIconSvg width={60} height={60} />
-                        <Text style={tw`text-[#606A84] text-base mt-4`}>
-                          {translate("components:bankModal.noAccounts")}
-                        </Text>
-                      </View>
-                    ) : (
-                      <View>
-                        <SwipeListView
-                          data={bankOptions}
-                          renderItem={renderItem}
-                          renderHiddenItem={renderHiddenItem}
-                          rightOpenValue={hideBankActions ? 0 : -130}
-                          disableRightSwipe={hideBankActions}
-                          keyExtractor={(item) => item.id}
-                          style={tw`mb-4`}
-                          onRowOpen={(rowKey) => setOpenRow(rowKey)}
-                          onRowClose={() => setOpenRow(null)}
-                          useNativeDriver={true}
-                          swipeToOpenPercent={10}
-                          swipeToClosePercent={90}
-                          closeOnRowBeginSwipe={true}
-                          recalculateHiddenLayout={true}
-                          disableHiddenLayoutCalculation={false}
-                          directionalDistanceChangeThreshold={5}
-                          onEndReached={loadMore}
-                          onEndReachedThreshold={0.5}
-                        />
-                      </View>
-                    )}
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-              <CustomAlert
-                visible={isDeleteAlertVisible}
-                title={translate("components:bankModal.deleteAccount")}
-                message={translate("components:bankModal.deleteMessage")}
-                onConfirm={handleConfirmDelete}
-                onCancel={() => {
-                  setIsDeleteAlertVisible(false);
-                  setBankToDelete(null);
-                }}
-                type="danger"
-                confirmText={translate("components:bankModal.confirmDelete")}
-                cancelText={translate("components:bankModal.cancelDelete")}
-              />
-              {(isDeleting || isUpdating) && (
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            headerLargeTitle: true,
+            headerTransparent: true,
+            headerBlurEffect: "extraLight",
+            headerBackTitle: translate("common:back"),
+            headerTintColor: colors.primary,
+            title: translate("accountScreen:myAccounts"),
+            headerLargeStyle: { backgroundColor: "transparent" },
+            headerLargeTitleStyle: {
+              fontFamily: "SFUIDisplayBold",
+              color: "#110627",
+              fontSize: 20,
+            },
+            headerTitleStyle: {
+              fontFamily: "SFUIDisplaySemiBold",
+              color: "#110627",
+            },
+            contentStyle: { backgroundColor: "#FAFAFA" },
+          }}
+        />
+        {loading ? (
+          <View style={tw`flex-1 items-center justify-center`}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        ) : (
+          <View style={tw`flex-1`}>
+            <TouchableWithoutFeedback disabled={isDeleting || isUpdating}>
+              <View style={tw`flex-1 px-4 pt-20`}>
                 <View
-                  style={[
-                    tw`absolute left-0 top-0 w-full h-full z-50 items-center justify-center`,
-                    { backgroundColor: "rgba(255,255,255,0.7)" },
-                  ]}
+                  style={tw`border border-[#EBEBEF] rounded-2xl overflow-hidden bg-white`}
                 >
-                  <ActivityIndicator size="large" color={colors.primary} />
-                  <Text style={tw`mt-2 text-[${colors.primary}] font-medium`}>
-                    {translate("common:deleting") + "..."}
-                  </Text>
+                  {bankOptions.length === 0 ? (
+                    <View
+                      style={tw`items-center justify-center py-12`}
+                    >
+                      <KeboSadIconSvg width={60} height={60} />
+                      <Text style={tw`text-[#606A84] text-base mt-4`}>
+                        {translate("components:bankModal.noAccounts")}
+                      </Text>
+                    </View>
+                  ) : (
+                    <SwipeListView
+                      data={bankOptions}
+                      renderItem={renderItem}
+                      renderHiddenItem={renderHiddenItem}
+                      rightOpenValue={hideBankActions ? 0 : -130}
+                      disableRightSwipe={hideBankActions}
+                      keyExtractor={(item) => item.id}
+                      onRowOpen={(rowKey) => setOpenRow(rowKey)}
+                      onRowClose={() => setOpenRow(null)}
+                      useNativeDriver={true}
+                      swipeToOpenPercent={10}
+                      swipeToClosePercent={90}
+                      closeOnRowBeginSwipe={true}
+                      recalculateHiddenLayout={true}
+                      disableHiddenLayoutCalculation={false}
+                      directionalDistanceChangeThreshold={5}
+                      onEndReached={loadMore}
+                      onEndReachedThreshold={0.5}
+                    />
+                  )}
                 </View>
-              )}
-            </View>
-          )}
-        </Screen>
-        <View style={tw`px-6 bg-[#FAFAFA]`}>
-          <TouchableOpacity
-            onPress={() => {
-              router.push({
-                pathname: "/(authenticated)/select-bank",
-                params: {
-                  isTransfer: isTransfer ? "true" : "false",
-                  transferType,
-                  fromBankModal: "true",
-                  fromScreen: screenName,
-                },
-              });
-            }}
-            style={tw`h-[44px] bg-white gap-[3px] rounded-[40px] justify-center border border-[${colors.primary}] items-center mt-2 mb-10`}
-          >
-            <Text
-              style={tw`text-center text-sm`}
-              weight="semibold"
-              color={colors.primary}
-            >
-              {translate("components:bankModal.addAccount")}
-            </Text>
-          </TouchableOpacity>
-        </View>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push({
+                      pathname: "/(authenticated)/select-bank",
+                      params: {
+                        isTransfer: isTransfer ? "true" : "false",
+                        transferType,
+                        fromBankModal: "true",
+                        fromScreen: screenName,
+                      },
+                    });
+                  }}
+                  style={tw`h-[44px] bg-white rounded-full justify-center border border-[${colors.primary}] items-center mt-4`}
+                >
+                  <Text
+                    weight="semibold"
+                    color={colors.primary}
+                  >
+                    {translate("components:bankModal.addAccount")}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+
+            <CustomAlert
+              visible={isDeleteAlertVisible}
+              title={translate("components:bankModal.deleteAccount")}
+              message={translate("components:bankModal.deleteMessage")}
+              onConfirm={handleConfirmDelete}
+              onCancel={() => {
+                setIsDeleteAlertVisible(false);
+                setBankToDelete(null);
+              }}
+              type="danger"
+              confirmText={translate("components:bankModal.confirmDelete")}
+              cancelText={translate("components:bankModal.cancelDelete")}
+            />
+            {(isDeleting || isUpdating) && (
+              <View
+                style={[
+                  tw`absolute left-0 top-0 w-full h-full z-50 items-center justify-center`,
+                  { backgroundColor: "rgba(255,255,255,0.7)" },
+                ]}
+              >
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={tw`mt-2 text-[${colors.primary}] font-medium`}>
+                  {translate("common:deleting") + "..."}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
       </>
     );
   }

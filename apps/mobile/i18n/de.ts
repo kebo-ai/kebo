@@ -103,6 +103,17 @@ const de: Translations = {
     community: "Gemeinschaft",
     opinions: "Meinungen und Verbesserungen",
     comments: "Hinterlassen Sie uns Ihre Kommentare",
+    enjoyingApp: "Gefällt dir die App?",
+    rateUs: "Bewerte uns im App Store",
+    shareWithFriends: "Mit Freunden teilen",
+    shareMessage: "Verwalte deine Finanzen mit Kebo! Lade es herunter auf https://kebo.app",
+    getInTouch: "Kontaktiere uns",
+    featureRequests: "Vorschläge",
+    followUs: "Folge uns",
+    instagram: "Instagram",
+    discord: "Discord",
+    legal: "Rechtliches",
+    dangerZone: "Gefahrenzone",
   },
 
   chatbotScreen: {

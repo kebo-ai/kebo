@@ -761,7 +761,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
         options={{
           title: translate("homeScreen:greetings", { full_name: firstName }),
           headerRight: () => (
-            <TouchableOpacity onPress={handleProfileNavigation}>
+            <TouchableOpacity onPress={handleProfileNavigation} style={{ alignItems: "center", justifyContent: "center" }}>
               <Image
                 source={avatarSource}
                 style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary }}

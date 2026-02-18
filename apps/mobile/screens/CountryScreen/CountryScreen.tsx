@@ -1,13 +1,11 @@
 import logger from "@/utils/logger";
 import React, { FC, useEffect } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import { Text } from "@/components/ui";
 import tw from "twrnc";
-import { Screen } from "@/components";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
-import { BackBlackSvg } from "@/components/icons/BackBlackSvg";
 import { showToast } from "@/components/ui/CustomToast";
 import { useStores } from "@/models/helpers/useStores";
 import { translate } from "@/i18n";
@@ -241,69 +239,66 @@ export const CountryScreen: FC<CountryScreenProps> = observer(
       }
     };
 
-    const renderHeader = () => (
-      <View style={tw`justify-between flex-row items-center`}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={tw`w-12 h-12 flex justify-center items-center shadow-md`}
-        >
-          <BackBlackSvg width={15} height={15} />
-        </TouchableOpacity>
-
-        <Text
-          style={tw`text-black text-lg text-center font-medium`}
-          weight="medium"
-        >
-          {translate("countryScreen:selectCountry")}
-        </Text>
-        <View style={tw`w-12 h-12`} />
-      </View>
-    );
-
     return (
-      <Screen
-        safeAreaEdges={["top"]}
-        preset="scroll"
-        statusBarStyle="dark"
-        header={renderHeader()}
-        backgroundColor="white"
-      >
-        <View style={tw`px-4 mt-6`}>
-          {countries.map((country) => (
-            <TouchableOpacity
-              key={country.code}
-              style={tw`flex-row items-center p-4 border-b border-[#606A84]/10`}
-              onPress={() => handleCountryChange(country.code)}
-            >
-              <Text style={tw`text-3xl mr-4`}>{country.flag}</Text>
-              <View style={tw`flex-1`}>
-                <Text
-                  style={tw`text-base`}
-                  weight="medium"
-                  color="#110627"
-                >
-                  {country.name}
-                </Text>
-                <Text
-                  style={tw`text-sm`}
-                  weight="light"
-                  color="#606A84"
-                >
-                  {country.currencyName} ({country.currencySymbol}{" "}
-                  {country.currency})
-                </Text>
-              </View>
-              {selectedCountry === country.code && (
-                <View style={tw`ml-auto`}>
-                  <View
-                    style={tw`w-4 h-4 rounded-full bg-[${colors.primary}]`}
-                  />
+      <>
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            headerLargeTitle: true,
+            headerTransparent: true,
+            headerBlurEffect: "extraLight",
+            headerBackTitle: translate("common:back"),
+            headerTintColor: colors.primary,
+            title: translate("countryScreen:selectCountry"),
+            headerLargeStyle: { backgroundColor: "transparent" },
+            headerLargeTitleStyle: {
+              fontFamily: "SFUIDisplayBold",
+              color: "#110627",
+              fontSize: 20,
+            },
+            headerTitleStyle: {
+              fontFamily: "SFUIDisplaySemiBold",
+              color: "#110627",
+            },
+            contentStyle: { backgroundColor: "#FAFAFA" },
+          }}
+        />
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={tw`px-4 pt-4 pb-24`}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={tw`bg-white rounded-2xl overflow-hidden border border-[#EBEBEF]`}>
+            {countries.map((country, index) => (
+              <TouchableOpacity
+                key={country.code}
+                style={tw`flex-row items-center p-4 ${
+                  index < countries.length - 1 ? "border-b border-[#EBEBEF]" : ""
+                }`}
+                onPress={() => handleCountryChange(country.code)}
+              >
+                <Text style={tw`text-3xl mr-4`}>{country.flag}</Text>
+                <View style={tw`flex-1`}>
+                  <Text weight="medium" color="#110627">
+                    {country.name}
+                  </Text>
+                  <Text type="xs" weight="light" color="#606A84">
+                    {country.currencyName} ({country.currencySymbol}{" "}
+                    {country.currency})
+                  </Text>
                 </View>
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-      </Screen>
+                {selectedCountry === country.code && (
+                  <View
+                    style={tw`w-5 h-5 rounded-full bg-[${colors.primary}] items-center justify-center`}
+                  >
+                    <View style={tw`w-2 h-2 rounded-full bg-white`} />
+                  </View>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </>
     );
   }
 );

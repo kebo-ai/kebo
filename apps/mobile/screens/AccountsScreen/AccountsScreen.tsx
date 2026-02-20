@@ -8,15 +8,17 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   Image,
+  ScrollView,
+  Alert,
 } from "react-native";
 import { Text, Button } from "@/components/ui";
 import { RowMap } from "react-native-swipe-list-view";
 import { SwipeListView } from "react-native-swipe-list-view";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { translate } from "@/i18n";
 import { colors } from "@/theme";
 import tw from "@/hooks/useTailwind";
-import CustomAlert from "@/components/common/CustomAlert";
+import { useTheme } from "@/hooks/useTheme";
 import {
   deleteAccountService,
   getAccountsWithBalance,
@@ -65,6 +67,7 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
     const router = useRouter();
     const params = useLocalSearchParams<{ visible?: string }>();
     const visible = params.visible !== "false";
+    const { theme } = useTheme();
 
     const {
       accountStoreModel: {
@@ -77,8 +80,6 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
     } = useStores();
     const { getSymbol, formatAmount } = useCurrencyFormatter();
     const [openRow, setOpenRow] = useState<string | null>(null);
-    const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
-    const [bankToDelete, setBankToDelete] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const [accountsWithBalance, setAccountsWithBalance] = useState<any[]>([]);
@@ -157,16 +158,27 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
     ];
 
     const handleDelete = (bankId: string) => {
-      setBankToDelete(bankId);
-      setIsDeleteAlertVisible(true);
+      Alert.alert(
+        translate("components:bankModal.deleteAccount"),
+        translate("components:bankModal.deleteMessage"),
+        [
+          {
+            text: translate("components:bankModal.cancelDelete"),
+            style: "cancel",
+          },
+          {
+            text: translate("components:bankModal.confirmDelete"),
+            style: "destructive",
+            onPress: () => confirmDelete(bankId),
+          },
+        ]
+      );
     };
 
-    const handleConfirmDelete = async () => {
-      if (!bankToDelete) return;
-
+    const confirmDelete = async (bankId: string) => {
       setIsDeleting(true);
       try {
-        const result = await deleteAccountService(bankToDelete);
+        const result = await deleteAccountService(bankId);
         if (result.kind === "ok") {
           setIsUpdating(true);
           await getListAccount();
@@ -241,8 +253,6 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
       } finally {
         setIsDeleting(false);
         setIsUpdating(false);
-        setIsDeleteAlertVisible(false);
-        setBankToDelete(null);
       }
     };
 
@@ -260,13 +270,13 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
       const accountType = found?.account_type ?? "-";
 
       switch (accountType.toLowerCase()) {
-        case "cuenta corriente estándar":
+        case "cuenta corriente est\u00e1ndar":
           return translate("accountTypes:checkingAccount");
-        case "cuenta de ahorro estándar":
+        case "cuenta de ahorro est\u00e1ndar":
           return translate("accountTypes:savingsAccount");
         case "cuenta de efectivo":
           return translate("accountTypes:cashAccount");
-        case "cuenta de tarjeta de crédito":
+        case "cuenta de tarjeta de cr\u00e9dito":
           return translate("accountTypes:creditCardAccount");
         default:
           return accountType;
@@ -294,8 +304,9 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
             });
           }}
           style={[
-            tw`py-4 px-4 bg-white`,
-            !isLastItem && tw`border-b border-[#EBEBEF]`,
+            tw`py-4 px-4`,
+            { backgroundColor: theme.surface },
+            !isLastItem && { borderBottomWidth: 1, borderBottomColor: theme.border },
           ]}
         >
           <View style={tw`flex-row justify-between items-center`}>
@@ -304,7 +315,7 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
                 source={{
                   uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}${data.item.icon_url}`,
                 }}
-                style={tw`w-10 h-10 rounded-full border border-[#6934D2]/15 mr-3`}
+                style={[tw`w-10 h-10 rounded-full border mr-3`, { backgroundColor: theme.surface, borderColor: theme.border }]}
                 resizeMode="contain"
               />
             ) : (
@@ -328,7 +339,7 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
                   weight="medium"
                   color={isSelected
                     ? colors.primary
-                    : "rgba(96, 106, 132, 1)"}
+                    : theme.textPrimary}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
@@ -339,7 +350,7 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
                 <Text
                   style={tw`text-xs`}
                   weight="light"
-                  color="#606A84"
+                  color={theme.textSecondary}
                 >
                   {data.item.description}
                 </Text>
@@ -352,7 +363,7 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
                 color={
                   getAccountType(data.item.id) ===
                   translate("accountTypes:creditCardAccount")
-                    ? "#606A84"
+                    ? theme.textSecondary
                     : colors.primary
                 }
                 numberOfLines={1}
@@ -363,7 +374,7 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
               <Text
                 style={tw`text-xs mt-0.5`}
                 weight="normal"
-                color="#606A84"
+                color={theme.textSecondary}
               >
                 {getAccountType(data.item.id)}
               </Text>
@@ -388,9 +399,8 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
         >
           <TouchableOpacity
             style={[
-              tw`${
-                openRow === data.item.id ? `bg-[${colors.primary}]` : "bg-white"
-              } w-[65px] h-full justify-center items-center`,
+              tw`w-[65px] h-full justify-center items-center`,
+              { backgroundColor: openRow === data.item.id ? colors.primary : theme.surface },
             ]}
             onPress={() => {
               router.push({
@@ -416,11 +426,8 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
           </TouchableOpacity>
           <TouchableOpacity
             style={[
-              tw`${
-                openRow === data.item.id
-                  ? `bg-[${colors.secondary}]`
-                  : "bg-white"
-              } w-[65px] h-full justify-center items-center rounded-r-[20px]`,
+              tw`w-[65px] h-full justify-center items-center rounded-r-[20px]`,
+              { backgroundColor: openRow === data.item.id ? colors.secondary : theme.surface },
             ]}
             onPress={() => handleDelete(data.item.id)}
           >
@@ -441,21 +448,50 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
             headerShown: true,
             headerLargeTitle: true,
             headerTransparent: true,
-            headerBlurEffect: "extraLight",
+            headerBlurEffect: theme.blurEffect,
             headerBackTitle: translate("common:back"),
             headerTintColor: colors.primary,
             title: translate("accountScreen:myAccounts"),
             headerLargeStyle: { backgroundColor: "transparent" },
             headerLargeTitleStyle: {
               fontFamily: "SFUIDisplayBold",
-              color: "#110627",
+              color: theme.headerTitle,
               fontSize: 20,
             },
             headerTitleStyle: {
               fontFamily: "SFUIDisplaySemiBold",
-              color: "#110627",
+              color: theme.headerTitle,
             },
-            contentStyle: { backgroundColor: "#FAFAFA" },
+            contentStyle: { backgroundColor: theme.background },
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => {
+                  router.push({
+                    pathname: "/(authenticated)/select-bank",
+                    params: {
+                      isTransfer: isTransfer ? "true" : "false",
+                      transferType,
+                      fromBankModal: "true",
+                      fromScreen: screenName,
+                    },
+                  });
+                }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  backgroundColor: "rgba(105, 52, 210, 0.1)",
+                  borderRadius: 20,
+                }}
+              >
+                <Ionicons name="add-circle" size={24} color={colors.primary} />
+                <Text type="sm" weight="semibold" color={colors.primary}>
+                  {translate("components:bankModal.addAccount")}
+                </Text>
+              </TouchableOpacity>
+            ),
           }}
         />
         {loading ? (
@@ -463,18 +499,22 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : (
-          <View style={tw`flex-1`}>
+          <ScrollView
+            contentInsetAdjustmentBehavior="automatic"
+            contentContainerStyle={tw`px-4 pt-4 pb-24`}
+            showsVerticalScrollIndicator={false}
+          >
             <TouchableWithoutFeedback disabled={isDeleting || isUpdating}>
-              <View style={tw`flex-1 px-4 pt-20`}>
+              <View>
                 <View
-                  style={tw`border border-[#EBEBEF] rounded-2xl overflow-hidden bg-white`}
+                  style={[tw`rounded-2xl overflow-hidden border`, { borderColor: theme.border, backgroundColor: theme.surface }]}
                 >
                   {bankOptions.length === 0 ? (
                     <View
                       style={tw`items-center justify-center py-12`}
                     >
                       <KeboSadIconSvg width={60} height={60} />
-                      <Text style={tw`text-[#606A84] text-base mt-4`}>
+                      <Text style={tw`text-base mt-4`} color={theme.textTertiary}>
                         {translate("components:bankModal.noAccounts")}
                       </Text>
                     </View>
@@ -497,61 +537,28 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
                       directionalDistanceChangeThreshold={5}
                       onEndReached={loadMore}
                       onEndReachedThreshold={0.5}
+                      scrollEnabled={false}
                     />
                   )}
                 </View>
 
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push({
-                      pathname: "/(authenticated)/select-bank",
-                      params: {
-                        isTransfer: isTransfer ? "true" : "false",
-                        transferType,
-                        fromBankModal: "true",
-                        fromScreen: screenName,
-                      },
-                    });
-                  }}
-                  style={tw`h-[44px] bg-white rounded-full justify-center border border-[${colors.primary}] items-center mt-4`}
-                >
-                  <Text
-                    weight="semibold"
-                    color={colors.primary}
-                  >
-                    {translate("components:bankModal.addAccount")}
-                  </Text>
-                </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>
 
-            <CustomAlert
-              visible={isDeleteAlertVisible}
-              title={translate("components:bankModal.deleteAccount")}
-              message={translate("components:bankModal.deleteMessage")}
-              onConfirm={handleConfirmDelete}
-              onCancel={() => {
-                setIsDeleteAlertVisible(false);
-                setBankToDelete(null);
-              }}
-              type="danger"
-              confirmText={translate("components:bankModal.confirmDelete")}
-              cancelText={translate("components:bankModal.cancelDelete")}
-            />
             {(isDeleting || isUpdating) && (
               <View
                 style={[
                   tw`absolute left-0 top-0 w-full h-full z-50 items-center justify-center`,
-                  { backgroundColor: "rgba(255,255,255,0.7)" },
+                  { backgroundColor: theme.background + "B3" },
                 ]}
               >
                 <ActivityIndicator size="large" color={colors.primary} />
-                <Text style={tw`mt-2 text-[${colors.primary}] font-medium`}>
+                <Text style={tw`mt-2 font-medium`} color={colors.primary}>
                   {translate("common:deleting") + "..."}
                 </Text>
               </View>
             )}
-          </View>
+          </ScrollView>
         )}
       </>
     );

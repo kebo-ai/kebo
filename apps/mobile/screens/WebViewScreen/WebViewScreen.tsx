@@ -4,35 +4,54 @@ import {
   View,
   ActivityIndicator,
   Linking,
-  SafeAreaView,
-  Platform,
-  StatusBar as RNStatusBar,
 } from "react-native";
-import { Text } from "@/components/ui";
 import { WebView } from "react-native-webview";
-import { Screen } from "@/components";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { observer } from "mobx-react-lite";
 import tw from "twrnc";
-import { BackBlackSvg } from "@/components/icons/BackBlackSvg";
-import { TouchableOpacity } from "react-native";
-import { ScrollView } from "moti";
-import { StatusBar, StatusBarProps, StatusBarStyle } from "expo-status-bar";
+import { useTheme } from "@/hooks/useTheme";
+import { colors } from "@/theme/colors";
+import { translate } from "@/i18n";
 
 interface WebViewScreenProps {}
+
+const DARK_MODE_CSS = `
+  @media (prefers-color-scheme: dark) {
+    html, body {
+      background-color: #000 !important;
+      color: #e0e0e0 !important;
+    }
+  }
+`;
+
+const FORCE_DARK_JS = `
+  (function() {
+    var meta = document.querySelector('meta[name="color-scheme"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'color-scheme';
+      document.head.appendChild(meta);
+    }
+    meta.content = 'SCHEME';
+
+    var style = document.createElement('style');
+    style.textContent = \`${DARK_MODE_CSS}\`;
+    document.head.appendChild(style);
+  })();
+  true;
+`;
 
 export const WebViewScreen: FC<WebViewScreenProps> = observer(
   function WebViewScreen() {
     const router = useRouter();
+    const { isDark, theme } = useTheme();
     const params = useLocalSearchParams<{ url: string; title: string }>();
     const url = params.url || "";
     const title = params.title || "";
     const [isLoading, setIsLoading] = useState(true);
 
-    // Check if it's a WhatsApp URL
     const isWhatsApp = url.includes("wa.me");
 
-    // If it's WhatsApp, redirect and go back
     React.useEffect(() => {
       if (isWhatsApp) {
         Linking.openURL(url);
@@ -40,62 +59,49 @@ export const WebViewScreen: FC<WebViewScreenProps> = observer(
       }
     }, [isWhatsApp, url]);
 
-    const renderHeader = () => {
-      return (
-        <View style={tw`justify-between flex-row items-center`}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={tw`w-12 h-12 flex justify-center items-center shadow-md`}
-          >
-            <BackBlackSvg width={15} height={15} />
-          </TouchableOpacity>
-
-          <View style={tw`flex-1 items-center`}>
-            <Text
-              style={tw`text-black text-lg text-center font-medium`}
-              weight="medium"
-            >
-              {}
-            </Text>
-          </View>
-          <View style={tw`w-12`} />
-        </View>
-      );
-    };
-
     if (isWhatsApp) {
-      return null; // Don't render anything for WhatsApp as it will redirect
+      return null;
     }
 
+    const injectedJS = FORCE_DARK_JS.replace(
+      "SCHEME",
+      isDark ? "dark" : "light"
+    );
+
     return (
-      <>
-        <SafeAreaView style={{ backgroundColor: "white" }}>
-          <View
-            style={{
-              height: Platform.OS === "android" ? RNStatusBar.currentHeight : 0,
-              backgroundColor: "white",
-            }}
-          />
-          <StatusBar
-            style={"dark"}
-            backgroundColor={"transparent"}
-            translucent={true}
-          />
-          {renderHeader()}
-        </SafeAreaView>
+      <View style={{ flex: 1, backgroundColor: theme.background }}>
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title,
+            headerBackTitle: translate("navigator:reports"),
+            headerTransparent: true,
+            headerBlurEffect: theme.blurEffect,
+            headerTitleStyle: {
+              fontFamily: "SFUIDisplaySemiBold",
+              color: theme.headerTitle,
+            },
+            headerTintColor: colors.primary,
+          }}
+        />
         {isLoading && (
           <View
-            style={tw`absolute inset-0 justify-center items-center bg-white z-10`}
+            style={[
+              tw`absolute inset-0 justify-center items-center z-10`,
+              { backgroundColor: theme.background },
+            ]}
           >
-            <ActivityIndicator size="large" color="#6934D2" />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         )}
         <WebView
           source={{ uri: url }}
-          style={tw`flex-1 px-4`}
+          style={{ flex: 1, backgroundColor: theme.background }}
           javaScriptEnabled={true}
           domStorageEnabled={true}
           startInLoadingState={true}
+          injectedJavaScript={injectedJS}
+          forceDarkOn={isDark}
           onLoadStart={() => {
             logger.debug("Loading URL:", url);
             setIsLoading(true);
@@ -104,14 +110,14 @@ export const WebViewScreen: FC<WebViewScreenProps> = observer(
             logger.debug("Finished loading");
             setIsLoading(false);
           }}
-          onError={(syntheticEvent) => {
+          onError={() => {
             setIsLoading(false);
           }}
-          onHttpError={(syntheticEvent) => {
+          onHttpError={() => {
             setIsLoading(false);
           }}
         />
-      </>
+      </View>
     );
   }
 );

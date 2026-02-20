@@ -1,15 +1,13 @@
 import logger from "@/utils/logger";
-import React, { FC, useState, useEffect, useRef } from "react";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import React, { FC, useState, useEffect } from "react";
+import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
 import tw from "@/hooks/useTailwind";
-import { View, Image, Platform, TextInput, Keyboard } from "react-native";
+import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
-import CustomHeader from "@/components/common/CustomHeader";
-import { FixedScreen } from "@/components/FixedScreen";
-import CustomButton from "@/components/common/CustomButton";
-import CustomListItemOption from "@/components/common/CustomListItemOption";
+import { useTheme } from "@/hooks/useTheme";
 import { useStores } from "@/models/helpers/useStores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -20,8 +18,12 @@ import {
   updateAccountService,
 } from "@/services/AccountService";
 import { translate } from "@/i18n";
-import { AccountBalanceInput } from "@/components/AccountBalanceInput";
-import * as Localization from "expo-localization";
+import { useNumberEntry } from "@/hooks/useNumberEntry";
+import { useShakeAnimation } from "@/hooks/useShakeAnimation";
+import { AmountDisplay } from "@/components/transaction/AmountDisplay";
+import { NumberPad } from "@/components/transaction/NumberPad";
+import { TransactionFieldRow } from "@/components/transaction/TransactionFieldRow";
+import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
 
 // Interface for safe account type to use with formik
 interface SafeAccountType {
@@ -46,14 +48,6 @@ interface BankOption {
 }
 
 interface EditAccountScreenProps {}
-
-const locale = Localization.getLocales()[0]?.languageTag || "en-US";
-
-const getDecimalSeparator = () => {
-  const numberWithDecimal = 1.1;
-  const formatted = new Intl.NumberFormat(locale).format(numberWithDecimal);
-  return formatted.replace(/\d/g, "")[0];
-};
 
 const validationSchema = Yup.object().shape({
   balance: Yup.number()
@@ -85,6 +79,8 @@ const cloneAccountType = (accountType: any): SafeAccountType => {
 export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
   function EditAccountScreen() {
     const router = useRouter();
+    const { theme } = useTheme();
+    const { decimalSeparator } = useCurrencyFormatter();
     const params = useLocalSearchParams<{
       accountId: string;
       accountData?: string;
@@ -115,8 +111,10 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
 
     const [isLoading, setIsLoading] = useState(true);
     const [accountDetail, setAccountDetail] = useState<any>(null);
-    const amountInputRef = useRef<TextInput>(null);
-    const hasFocusedRef = useRef(false);
+
+    const insets = useSafeAreaInsets();
+    const numberEntry = useNumberEntry(2);
+    const amountShake = useShakeAnimation();
 
     // Check if the bank is "efectivo" (cash)
     const isCashBank = accountData?.name?.toLowerCase() === "efectivo";
@@ -128,59 +126,6 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
           (type) => type.type_name?.toLowerCase() !== "efectivo"
         );
 
-    useEffect(() => {
-      getListAccountType();
-      if (accountId) {
-        fetchAccountDetail();
-      }
-    }, [accountId]);
-
-    // Focus the input when component mounts
-    useEffect(() => {
-      const focusTimeout = setTimeout(() => {
-        if (amountInputRef.current && !hasFocusedRef.current) {
-          Keyboard.dismiss();
-          requestAnimationFrame(() => {
-            setTimeout(() => {
-              amountInputRef.current?.focus();
-              hasFocusedRef.current = true;
-            }, 100);
-          });
-        }
-      }, 500);
-
-      return () => {
-        clearTimeout(focusTimeout);
-        hasFocusedRef.current = false;
-        Keyboard.dismiss();
-      };
-    }, []);
-
-    const fetchAccountDetail = async () => {
-      setIsLoading(true);
-      try {
-        const result = await getAccountDetailService(accountId || "");
-        if (result.kind === "ok" && result.data) {
-          setAccountDetail(result.data);
-          // Update form values with fetched data
-          formik.setValues({
-            balance: Number(result.data.balance ?? 0),
-            accountType: result.data.account_types
-              ? cloneAccountType(result.data.account_types)
-              : { id: "" },
-            description: result.data.customized_name ?? "",
-          });
-        } else {
-          showToast("error", translate("accountBalanceScreen:accountError"));
-        }
-      } catch (error) {
-        logger.error("Error fetching account detail:", error);
-        showToast("error", translate("accountBalanceScreen:accountError"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     const formik = useFormik({
       initialValues: {
         balance: Number(accountData?.balance ?? 0),
@@ -188,7 +133,6 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
           const foundType = accountTypes.find(
             (type) => type.id === accountData?.account_type_id
           );
-          // Clone the account type to avoid MobX reference issues
           if (!foundType) return { id: "" } as SafeAccountType;
           return cloneAccountType(foundType);
         })(),
@@ -206,17 +150,12 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
           });
 
           if (result.kind === "ok") {
-            // Update the accounts list
             await getListAccount();
-
             showToast(
               "success",
               translate("accountBalanceScreen:accountSuccess")
             );
-            Keyboard.dismiss();
-            setTimeout(() => {
-              router.back();
-            }, 100);
+            router.back();
           } else {
             showToast("error", translate("accountBalanceScreen:accountError"));
           }
@@ -232,133 +171,141 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
       },
     });
 
-    if (isLoading) {
-      return (
-        <FixedScreen
-          safeAreaEdges={["top"]}
-          backgroundColor="#FAFAFA"
-          statusBarBackgroundColor={colors.primary}
-          header={
-            <CustomHeader
-              onPress={() => router.back()}
-              title={translate("accountBalanceScreen:editAccount")}
-            />
-          }
-        >
-          <View style={tw`flex-1 justify-center items-center`}>
-            <Text>{translate("editTransaction:loading")}</Text>
-          </View>
-        </FixedScreen>
-      );
-    }
+    useEffect(() => {
+      getListAccountType();
+      if (accountId) {
+        fetchAccountDetail();
+      }
+    }, [accountId]);
+
+    // Sync number entry → formik balance
+    useEffect(() => {
+      const balance = numberEntry.amountInCents / 100;
+      formik.setFieldValue("balance", balance);
+    }, [numberEntry.amountInCents]);
+
+    const fetchAccountDetail = async () => {
+      setIsLoading(true);
+      try {
+        const result = await getAccountDetailService(accountId || "");
+        if (result.kind === "ok" && result.data) {
+          setAccountDetail(result.data);
+
+          const balance = Number(result.data.balance ?? 0);
+          const cents = Math.round(balance * 100);
+          numberEntry.setFromCents(cents);
+
+          formik.setValues({
+            balance,
+            accountType: result.data.account_types
+              ? cloneAccountType(result.data.account_types)
+              : { id: "" },
+            description: result.data.customized_name ?? "",
+          });
+        } else {
+          showToast("error", translate("accountBalanceScreen:accountError"));
+        }
+      } catch (error) {
+        logger.error("Error fetching account detail:", error);
+        showToast("error", translate("accountBalanceScreen:accountError"));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const handleSubmit = () => {
+      if (numberEntry.amountInCents === 0) {
+        amountShake.shake();
+        return;
+      }
+      if (!formik.values.accountType?.id) {
+        return;
+      }
+      formik.handleSubmit();
+    };
 
     return (
       <>
-        <FixedScreen
-          safeAreaEdges={["top"]}
-          backgroundColor="#FAFAFA"
-          statusBarBackgroundColor={colors.primary}
-          header={
-            <CustomHeader
-              onPress={() => router.back()}
-              title={translate("accountBalanceScreen:editAccount")}
-            />
-          }
-        >
-          <View style={tw`p-4 bg-white rounded-2xl shadow-md w-full`}>
-            <AccountBalanceInput
-              ref={amountInputRef}
-              value={formik.values.balance}
-              onChange={(textValue) => {
-                // Parse numeric value from the string
-                const separator = getDecimalSeparator();
-                // Replace the separator with a dot for proper parsing
-                const numericValue =
-                  parseFloat(textValue.replace(separator, ".")) || 0;
-                // Set value for validation and form submission
-                formik.setFieldValue("balance", numericValue);
-              }}
-              label={translate("accountBalanceScreen:accountBalance")}
-            />
-            <View
-              style={tw`flex-row items-center justify-between h-[60px]
-                border-t border-b border-[rgba(96,106,132,0.15)] border-solid`}
-            >
-              <View style={tw`flex-row items-center gap-[9px]`}>
-                <Image
-                  source={{
-                    uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}${accountData.bank_url}`,
-                  }}
-                  style={tw`w-[22px] h-[22px] border border-[#6934D2]/15 rounded-full`}
-                />
-                <Text
-                  style={tw`text-base`}
-                  weight="semibold"
-                  color="rgba(96, 106, 132, 1)"
-                >
-                  {accountData.name || ""}
-                </Text>
-              </View>
-            </View>
-            <View style={tw`flex-row items-center justify-between h-[60px] `}>
-              <View style={tw`flex-row items-center`}>
-                <CustomListItemOption
-                  showBorder={false}
-                  icon="note"
-                  label={translate("accountBalanceScreen:description")}
-                  showChevron={false}
-                  onPress={() => true}
-                  inputValue={formik.values.description}
-                  setInputValue={formik.handleChange("description")}
-                  returnKeyType="done"
-                />
-              </View>
-            </View>
-            {!isCashBank && (
-              <View
-                style={tw`flex-row items-center justify-between h-[60px]
-                  border-t border-b border-[rgba(96,106,132,0.15)] border-solid`}
-              >
-                <View style={tw`flex-row items-center`}>
-                  <CustomListItemOption
-                    icon="recurrence"
-                    label={translate("accountBalanceScreen:typeAccountTitle")}
-                    labelText={translate(
-                      "accountBalanceScreen:typeAccountTitle"
-                    )}
-                    showBorder={false}
-                    recurrenceSelected={formik.values.accountType?.type_name}
-                    onPress={() => setModalVisible(true)}
-                  />
-                </View>
-              </View>
-            )}
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            headerBackTitle: translate("common:back"),
+            headerTintColor: colors.primary,
+            title: translate("accountBalanceScreen:editAccount"),
+            headerTitleStyle: {
+              fontFamily: "SFUIDisplaySemiBold",
+              color: theme.headerTitle,
+            },
+            headerStyle: { backgroundColor: theme.background },
+            contentStyle: { backgroundColor: theme.background },
+          }}
+        />
+        {isLoading ? (
+          <View style={tw`flex-1 justify-center items-center`}>
+            <Text color={theme.textPrimary}>
+              {translate("editTransaction:loading")}
+            </Text>
           </View>
-          <ModalAccountType
-            visible={modalVisible}
-            onClose={() => setModalVisible(false)}
-            onSelect={(selected) => {
-              // Clone the selected account type to avoid MobX reference issues
-              formik.setFieldValue("accountType", cloneAccountType(selected));
-              setModalVisible(false);
-            }}
-            selectedValue={formik.values.accountType as any}
-            data={filteredAccountTypes}
-            title={translate("accountBalanceScreen:typeAccountTitle")}
-          />
-        </FixedScreen>
-        <CustomButton
-          variant="primary"
-          isEnabled={
-            !!(
-              formik.isValid &&
-              formik.values.balance !== 0 &&
-              formik.values.accountType.id
-            )
-          }
-          onPress={formik.handleSubmit}
-          title={translate("accountBalanceScreen:continue")}
-          adaptToKeyboard={true}
+        ) : (
+          <View style={[tw`flex-1`, { paddingBottom: insets.bottom }]}>
+            <AmountDisplay
+              entryType={numberEntry.entryType}
+              amountInCents={numberEntry.amountInCents}
+              wholePart={numberEntry.wholePart}
+              decimalSuffix={numberEntry.decimalSuffix}
+              onBackspace={numberEntry.handleBackspace}
+              shakeOffset={amountShake.offset}
+            />
+
+            <View style={tw`px-4`}>
+              <TransactionFieldRow
+                icon="business-outline"
+                label={accountData.name || ""}
+                value={accountData.name || ""}
+                imageUrl={accountData.bank_url}
+                showChevron={false}
+              />
+
+              <TransactionFieldRow
+                icon="create-outline"
+                label={translate("accountBalanceScreen:description")}
+                isNote
+                noteValue={formik.values.description}
+                onNoteChange={formik.handleChange("description")}
+                showChevron={false}
+              />
+
+              {!isCashBank && (
+                <TransactionFieldRow
+                  icon="swap-horizontal-outline"
+                  label={translate("accountBalanceScreen:typeAccountTitle")}
+                  value={formik.values.accountType?.type_name}
+                  onPress={() => setModalVisible(true)}
+                />
+              )}
+            </View>
+
+            <NumberPad
+              entryType={numberEntry.entryType}
+              decimalSeparator={decimalSeparator}
+              onDigit={numberEntry.handleDigit}
+              onBackspace={numberEntry.handleBackspace}
+              onDecimal={numberEntry.handleDecimal}
+              onSubmit={handleSubmit}
+            />
+          </View>
+        )}
+
+        <ModalAccountType
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onSelect={(selected) => {
+            formik.setFieldValue("accountType", cloneAccountType(selected));
+            setModalVisible(false);
+          }}
+          selectedValue={formik.values.accountType as any}
+          data={filteredAccountTypes}
+          title={translate("accountBalanceScreen:typeAccountTitle")}
         />
       </>
     );

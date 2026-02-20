@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { supabase } from "@/config/supabase";
 import { useTheme } from "@/hooks/useTheme";
+import { colors } from "@/theme/colors";
 import logger from "@/utils/logger";
 
 const AuthenticatedLayout = observer(function AuthenticatedLayout() {
@@ -98,6 +99,84 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
           presentation: "formSheet",
           sheetGrabberVisible: true,
           sheetAllowedDetents: [0.75, 1.0],
+        }}
+      />
+      <Stack.Screen
+        name="reports-income"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerBlurEffect: theme.blurEffect,
+          headerTintColor: colors.primary,
+          headerTitleStyle: {
+            fontFamily: "SFUIDisplaySemiBold",
+            color: theme.headerTitle,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="reports-category"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerBlurEffect: theme.blurEffect,
+          headerTintColor: colors.primary,
+          headerTitleStyle: {
+            fontFamily: "SFUIDisplaySemiBold",
+            color: theme.headerTitle,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="webview"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerBlurEffect: theme.blurEffect,
+          headerTintColor: colors.primary,
+          headerTitleStyle: {
+            fontFamily: "SFUIDisplaySemiBold",
+            color: theme.headerTitle,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="budget/[budgetId]"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerBlurEffect: theme.blurEffect,
+          headerTintColor: colors.primary,
+          headerTitleStyle: {
+            fontFamily: "SFUIDisplaySemiBold",
+            color: theme.headerTitle,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="budget-detail/[budgetId]"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerBlurEffect: theme.blurEffect,
+          headerTintColor: colors.primary,
+          headerTitleStyle: {
+            fontFamily: "SFUIDisplaySemiBold",
+            color: theme.headerTitle,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="budget/new"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerBlurEffect: theme.blurEffect,
+          headerTintColor: colors.primary,
+          headerTitleStyle: {
+            fontFamily: "SFUIDisplaySemiBold",
+            color: theme.headerTitle,
+          },
         }}
       />
     </Stack>

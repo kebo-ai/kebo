@@ -7,6 +7,7 @@ import { useCurrencyFormatter } from "./CurrencyFormatter";
 import * as Haptics from "expo-haptics";
 import { SwipeableListWrapper } from "@/components";
 import { colors } from "@/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RowMap } from "react-native-swipe-list-view";
 import { MaterialIcons } from "@expo/vector-icons";
 import { InteractionManager } from "react-native";
@@ -42,25 +43,35 @@ export const CategoriesListBudget: React.FC<CategoriesListBudgetProps> = ({
   onRowClose,
 }) => {
   const { formatAmount } = useCurrencyFormatter();
+  const { isDark, theme } = useTheme();
 
   if (data.length === 0) {
     return (
       <View
-        style={tw`border border-[#EBEBEF] bg-white p-6 rounded-[18px] mx-4 mb-4`}
+        style={[
+          tw`p-6 rounded-[18px] mx-4 mb-4`,
+          {
+            borderWidth: 1,
+            borderColor: theme.border,
+            backgroundColor: theme.surface,
+          },
+        ]}
       >
-        <Text style={tw`text-[#606A84] text-center`}>
+        <Text color={theme.textSecondary} style={tw`text-center`}>
           {translate("budgetScreen:noCategory")}
         </Text>
       </View>
     );
   }
 
+  const progressTrackBg = isDark ? "rgba(96, 106, 132, 0.25)" : "#F5F5F5";
+
   const renderBudgetItem = (
     item: BudgetLine,
     index: number,
     isLast: boolean
   ) => (
-    <View style={tw`bg-white`}>
+    <View style={{ backgroundColor: theme.surface }}>
       <TouchableOpacity
         onPress={() => {
           onCategoryPress(item.category_id);
@@ -70,11 +81,18 @@ export const CategoriesListBudget: React.FC<CategoriesListBudgetProps> = ({
         <View
           style={[
             tw`flex-row items-center justify-between py-4 px-4`,
-            !isLast && tw`border-b border-[#EBEBEF]`,
+            !isLast && { borderBottomWidth: 1, borderBottomColor: theme.border },
           ]}
         >
           <View
-            style={tw`w-10 h-10 rounded-full bg-white border border-[#606A84]/50 items-center justify-center mr-3`}
+            style={[
+              tw`w-10 h-10 rounded-full items-center justify-center mr-3`,
+              {
+                backgroundColor: theme.surface,
+                borderWidth: 1,
+                borderColor: isDark ? "rgba(96, 106, 132, 0.5)" : "rgba(96, 106, 132, 0.5)",
+              },
+            ]}
           >
             <Text style={tw`text-xl`}>{item.icon_emoji || item.icon_url}</Text>
           </View>
@@ -82,19 +100,24 @@ export const CategoriesListBudget: React.FC<CategoriesListBudgetProps> = ({
             <View style={tw`flex-row justify-between items-center`}>
               <Text
                 weight="light"
-                style={tw`text-base text-[#606A84]`}
+                style={tw`text-base`}
+                color={theme.textSecondary}
               >
                 {item.category_name}
               </Text>
               <Text
                 weight="medium"
-                style={tw`text-[#110627] text-sm`}
+                style={tw`text-sm`}
+                color={theme.textPrimary}
               >
                 {formatAmount(item.amount)}
               </Text>
             </View>
             <View
-              style={tw`mt-2 bg-[#F5F5F5] h-2 rounded-full overflow-hidden`}
+              style={[
+                tw`mt-2 h-2 rounded-full overflow-hidden`,
+                { backgroundColor: progressTrackBg },
+              ]}
             >
               <View
                 style={[
@@ -108,22 +131,21 @@ export const CategoriesListBudget: React.FC<CategoriesListBudgetProps> = ({
             </View>
             <View style={tw`flex-row justify-between items-center mt-1`}>
               <Text
-                style={[
-                  tw`text-xs font-light`,
-                  item.spent_amount >= item.amount
-                    ? tw`text-[#ED706B]`
-                    : tw`text-[#606A84]`,
-                ]}
+                style={tw`text-xs font-light`}
+                color={item.spent_amount >= item.amount ? "#ED706B" : theme.textSecondary}
               >
                 {formatAmount(item.spent_amount)}
               </Text>
-              <Text style={tw`text-[#606A84] text-xs font-light`}>
+              <Text
+                style={tw`text-xs font-light`}
+                color={theme.textSecondary}
+              >
                 {formatAmount(item.remaining_amount)}
               </Text>
             </View>
           </View>
           <View style={tw`items-end`}>
-            <MaterialIcons name="chevron-right" size={24} color="#6934D2" />
+            <MaterialIcons name="chevron-right" size={24} color={colors.primary} />
           </View>
         </View>
       </TouchableOpacity>
@@ -174,7 +196,7 @@ export const CategoriesListBudget: React.FC<CategoriesListBudgetProps> = ({
 
   if (!onDeleteCategory && !onConfirmDelete) {
     return (
-      <View style={tw`bg-white rounded-[18px] overflow-hidden`}>
+      <View style={[tw`rounded-[18px] overflow-hidden`, { backgroundColor: theme.surface }]}>
         {data.map((item, index) => (
           <View key={item.id}>
             {renderBudgetItem(item, index, index === data.length - 1)}
@@ -190,7 +212,7 @@ export const CategoriesListBudget: React.FC<CategoriesListBudgetProps> = ({
   };
 
   return (
-    <View style={tw`bg-white rounded-[18px] overflow-hidden`}>
+    <View style={[tw`rounded-[18px] overflow-hidden`, { backgroundColor: theme.surface }]}>
       <SwipeableListWrapper
         data={data}
         renderItem={renderItemWrapper}

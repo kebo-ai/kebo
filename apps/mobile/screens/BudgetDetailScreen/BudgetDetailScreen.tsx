@@ -229,6 +229,7 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
     const headerOptions = {
       headerShown: true,
       title: translate("budgetScreen:detailCategory"),
+      headerBackTitle: translate("budgetScreen:detailBudget"),
       headerTintColor: colors.primary,
       headerTitleStyle: {
         fontFamily: "SFUIDisplaySemiBold",
@@ -238,25 +239,19 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
       headerBlurEffect: theme.blurEffect,
     } as const;
 
-    if (!categoryDetails) {
-      return (
-        <>
-          <Stack.Screen options={headerOptions} />
+    const { category_metrics, transactions } = categoryDetails ?? {};
+
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.background }}>
+        <Stack.Screen options={headerOptions} />
+        {!categoryDetails ? (
           <View style={tw`flex-1 items-center justify-center`}>
             <KeboSadIconSvg width={50} height={50} />
             <Text color={theme.textSecondary} style={tw`mt-2`}>
               {translate("budgetScreen:budgetNotFound")}
             </Text>
           </View>
-        </>
-      );
-    }
-
-    const { category_metrics, transactions } = categoryDetails;
-
-    return (
-      <>
-        <Stack.Screen options={headerOptions} />
+        ) : (
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           showsVerticalScrollIndicator={false}
@@ -336,7 +331,7 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
             </View>
           </View>
         </ScrollView>
-
+        )}
         <CustomAlert
           visible={isDeleteAlertVisible}
           title={translate("common:delete")}
@@ -347,7 +342,7 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
           cancelText={translate("common:cancel")}
           type="danger"
         />
-      </>
+      </View>
     );
   }
 );

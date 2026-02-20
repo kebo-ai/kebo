@@ -247,6 +247,19 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
       }
     };
 
+    const headerOptions = {
+      headerShown: true,
+      title: translate("budgetScreen:detailBudget"),
+      headerBackTitle: translate("budgetScreen:budget"),
+      headerTintColor: colors.primary,
+      headerTitleStyle: {
+        fontFamily: "SFUIDisplaySemiBold",
+        color: theme.headerTitle,
+      },
+      headerTransparent: true,
+      headerBlurEffect: theme.blurEffect,
+    } as const;
+
     const availableCategories = budgetData
       ? categoryStoreModel.categories.filter(
           (category) =>
@@ -257,73 +270,21 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
         )
       : [];
 
-    if (isLoading) {
-      return (
-        <>
-          <Stack.Screen
-            options={{
-              headerShown: true,
-              title: translate("budgetScreen:detailBudget"),
-              headerBackTitle: translate("budgetScreen:budget"),
-              headerTintColor: colors.primary,
-              headerTitleStyle: {
-                fontFamily: "SFUIDisplaySemiBold",
-                color: theme.headerTitle,
-              },
-              headerTransparent: true,
-              headerBlurEffect: theme.blurEffect,
-            }}
-          />
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.background }}>
+        <Stack.Screen options={headerOptions} />
+        {isLoading ? (
           <View style={tw`flex-1 items-center justify-center`}>
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
-        </>
-      );
-    }
-
-    if (!budgetData) {
-      return (
-        <>
-          <Stack.Screen
-            options={{
-              headerShown: true,
-              title: translate("budgetScreen:detailBudget"),
-              headerBackTitle: translate("budgetScreen:budget"),
-              headerTintColor: colors.primary,
-              headerTitleStyle: {
-                fontFamily: "SFUIDisplaySemiBold",
-                color: theme.headerTitle,
-              },
-              headerTransparent: true,
-              headerBlurEffect: theme.blurEffect,
-            }}
-          />
+        ) : !budgetData ? (
           <View style={tw`flex-1 items-center justify-center`}>
             <KeboSadIconSvg width={50} height={50} />
             <Text color={theme.textSecondary} style={tw`mt-2`}>
               {translate("budgetScreen:budgetNotFound")}
             </Text>
           </View>
-        </>
-      );
-    }
-
-    return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            title: translate("budgetScreen:detailBudget"),
-            headerBackTitle: translate("budgetScreen:budget"),
-            headerTintColor: colors.primary,
-            headerTitleStyle: {
-              fontFamily: "SFUIDisplaySemiBold",
-              color: theme.headerTitle,
-            },
-            headerTransparent: true,
-            headerBlurEffect: theme.blurEffect,
-          }}
-        />
+        ) : (
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           showsVerticalScrollIndicator={false}
@@ -417,6 +378,7 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
             </View>
           </View>
         </ScrollView>
+        )}
         <CustomAlert
           visible={isDeleteAlertVisible}
           title={translate("budgetScreen:deleteCategory")}
@@ -432,7 +394,7 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
           confirmText={translate("common:delete")}
           cancelText={translate("common:cancel")}
         />
-      </>
+      </View>
     );
   }
 );

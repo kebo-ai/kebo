@@ -22,6 +22,8 @@ export const ProfileModel = types
     timezone: types.maybeNull(types.string),
     updated_at: types.maybe(types.string),
     user_id: types.maybe(types.string),
+    // Local-only preference: "1,234.56" | "1.234,56" | "1 234.56" | "1 234,56"
+    number_format: types.optional(types.string, "1,234.56"),
   })
   .actions((self) => ({
     save(modelSnapshot: ProfileSnapshotIn) {
@@ -68,6 +70,9 @@ export const ProfileModel = types
     setCountryAndCurrency(country: string, currency: string) {
       self.country = country;
       self.currency = currency;
+    },
+    setNumberFormat(format: string) {
+      self.number_format = format;
     },
   }));
 

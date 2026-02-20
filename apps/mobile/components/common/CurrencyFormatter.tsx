@@ -3,6 +3,28 @@ import React, { useMemo } from "react";
 import * as Localization from "expo-localization";
 import { useStores } from "@/models/helpers/useStores";
 
+// Number format → separators mapping
+const FORMAT_SEPARATORS: Record<string, { thousands: string; decimal: string }> = {
+  "1,234.56": { thousands: ",", decimal: "." },
+  "1.234,56": { thousands: ".", decimal: "," },
+  "1 234.56": { thousands: " ", decimal: "." },
+  "1 234,56": { thousands: " ", decimal: "," },
+};
+
+function formatWithSeparators(
+  value: number,
+  thousands: string,
+  decimal: string,
+  minDecimals: number = 2,
+  maxDecimals: number = 2,
+): string {
+  const fixed = value.toFixed(maxDecimals);
+  const [wholePart, decPart] = fixed.split(".");
+  const wholeWithSep = wholePart.replace(/\B(?=(\d{3})+(?!\d))/g, thousands);
+  if (maxDecimals === 0) return wholeWithSep;
+  return `${wholeWithSep}${decimal}${decPart}`;
+}
+
 interface CurrencyFormatterProps {
   amount: string | number;
   showSymbol?: boolean;
@@ -37,9 +59,11 @@ export const useCurrencyFormatter = () => {
   const { profileModel } = useStores();
   const deviceLanguage = Localization.getLocales()[0]?.languageCode || "en";
   const deviceRegion = Localization.getLocales()[0]?.regionCode || "US";
-  
+
   const userCurrency = profileModel?.currency;
   const userCountry = profileModel?.country;
+  const numberFormat = profileModel?.number_format ?? "1,234.56";
+  const separators = FORMAT_SEPARATORS[numberFormat] ?? FORMAT_SEPARATORS["1,234.56"];
   
   const { region, locale } = useMemo(() => {
     const calculatedRegion = userCountry || deviceRegion;
@@ -139,17 +163,15 @@ export const useCurrencyFormatter = () => {
     ): string => {
       const numericAmount =
         typeof amount === "string" ? parseFloat(amount) : amount;
-      const currentLocale = customLocale || locale;
       const currencyCode = customCurrency || userCurrency || currencyMap[region] || "USD";
       const symbol = getSymbol(currencyCode);
 
       try {
-        const formatted = new Intl.NumberFormat(currentLocale, {
-          style: "decimal",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(numericAmount);
-
+        const formatted = formatWithSeparators(
+          numericAmount,
+          separators.thousands,
+          separators.decimal,
+        );
         return showSymbol ? `${symbol} ${formatted}` : formatted;
       } catch (error) {
         logger.error("Error formatting amount:", error);
@@ -158,7 +180,7 @@ export const useCurrencyFormatter = () => {
           : numericAmount.toFixed(2);
       }
     };
-  }, [locale, region, userCurrency, getSymbol]);
+  }, [region, userCurrency, getSymbol, separators]);
 
   const parseLocaleNumber = (stringNumber: string): number => {
     const thousandSeparator = Intl.NumberFormat(locale)
@@ -183,6 +205,8 @@ export const useCurrencyFormatter = () => {
     locale,
     region,
     userCurrency,
+    decimalSeparator: separators.decimal,
+    thousandsSeparator: separators.thousands,
   };
 };
 

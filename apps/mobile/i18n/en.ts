@@ -113,6 +113,7 @@ const en = {
     discord: "Discord",
     legal: "Legal",
     dangerZone: "Danger Zone",
+    numberFormat: "Number Format",
   },
   chatbotScreen: {
     errorSesion: "Session Error",

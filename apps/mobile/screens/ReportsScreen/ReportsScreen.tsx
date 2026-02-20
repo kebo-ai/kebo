@@ -1,42 +1,37 @@
 import { observer } from "mobx-react-lite";
 import { FC } from "react";
 import { useRouter } from "expo-router";
-import { Screen } from "@/components/Screen";
-import { View, TouchableOpacity } from "react-native";
+import { View, ScrollView } from "react-native";
 import { Text } from "@/components/ui";
 import { showToast } from "@/components/ui/CustomToast";
 import tw from "@/hooks/useTailwind";
+import { useTheme } from "@/hooks/useTheme";
 import { translate } from "@/i18n";
 import CustomReportCard from "@/components/common/CustomReportCard";
 import { EXTERNAL_URLS } from "@/config/urls";
-
-interface ReportCardProps {
-  image: React.ReactNode;
-  onPress: () => void;
-}
-
-const ReportCard: FC<ReportCardProps> = ({ image, onPress }) => (
-  <TouchableOpacity onPress={onPress}>
-    <View>{image}</View>
-  </TouchableOpacity>
-);
 
 interface ReportsScreenProps {}
 
 export const ReportsScreen: FC<ReportsScreenProps> = observer(
   function ReportsScreen() {
     const router = useRouter();
+    const { theme } = useTheme();
 
     const handleReportPress = () => {
       showToast("warning", translate("alertMessage:comminSoon"));
     };
 
     return (
-      <Screen safeAreaEdges={["top"]} preset="scroll" statusBarStyle={"dark"}>
-          <View style={tw`flex-1 min-h-screen px-6 pb-24`}>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: theme.background }}
+        contentInsetAdjustmentBehavior="automatic"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={tw`px-6 pb-24`}>
             <Text
-              style={tw`text-center text-sm pb-6 mt-4`}
+              style={tw`text-center text-sm pb-6 mt-1`}
               weight="semibold"
+              color={theme.headerTitle}
             >
               {translate("reportsScreen:title")}
             </Text>
@@ -128,7 +123,7 @@ export const ReportsScreen: FC<ReportsScreenProps> = observer(
               </View>
             </View>
           </View>
-      </Screen>
+      </ScrollView>
     );
   }
 );

@@ -82,8 +82,12 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
       <Stack.Screen
         name="transaction"
         options={{
-          presentation: "modal",
+          presentation: "card",
           animation: "slide_from_bottom",
+          animationDuration: 80,
+          headerShown: false,
+          gestureEnabled: false,
+          contentStyle: { backgroundColor: theme.background },
         }}
       />
       <Stack.Screen

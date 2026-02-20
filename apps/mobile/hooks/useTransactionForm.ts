@@ -45,11 +45,10 @@ export const useTransactionForm = (navigation: any) => {
     },
     onSubmit: async (values, { resetForm }) => {
       try {
-        showLoader();
         const selectedDateMoment = moment(values.date);
         const now = moment();
         let formattedDate;
-        
+
         if (selectedDateMoment.isValid()) {
           const datePart = selectedDateMoment.format("YYYY-MM-DD");
           const timePart = now.format("HH:mm:ss.SSS Z");
@@ -57,7 +56,7 @@ export const useTransactionForm = (navigation: any) => {
         } else {
           formattedDate = now.format("YYYY-MM-DD HH:mm:ss.SSS Z");
         }
-        
+
         runInAction(() => {
           transactionModel.updateField("date", formattedDate);
           transactionModel.setMetadata({ note: values.note });
@@ -73,30 +72,27 @@ export const useTransactionForm = (navigation: any) => {
               undefined
             );
           }
-        });   
-
-        await transactionModel.saveTransaction();
-        await transactionModel.updateField("amount", 0);
-
-        runInAction(() => {
-          transactionModel.updateField("description", "");
         });
-        
-        // Navigate to Home with parameter indicating a transaction was created
-        navigation.navigate("Home", { transactionCreated: true });
-        
 
         const successMessage = translate(
           successMessages[transactionModel.transaction_type as TransactionType] || DEFAULT_SUCCESS_MESSAGE
         );
-        
+
+        // Navigate immediately (optimistic)
+        navigation.navigate("Home", { transactionCreated: true });
+        resetForm();
         showToast("success", successMessage);
+
+        // Save in background
+        await transactionModel.saveTransaction();
+
+        runInAction(() => {
+          transactionModel.updateField("amount", 0);
+          transactionModel.updateField("description", "");
+        });
       } catch (error) {
         logger.error("Error submitting transaction:", error);
         showToast("error", translate(ERROR_MESSAGE));
-      } finally {
-        resetForm();
-        hideLoader();
       }
     },
   });

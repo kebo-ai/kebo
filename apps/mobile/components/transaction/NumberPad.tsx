@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Text } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { colors } from "@/theme/colors";
+import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import type { NumberEntryType } from "@/hooks/useNumberEntry";
 
 interface NumberPadProps {
@@ -25,6 +26,7 @@ export function NumberPad({
   onSubmit,
 }: NumberPadProps) {
   const { theme } = useTheme();
+  const keyboardHeight = useKeyboardHeight();
 
   const renderDigit = (digit: number) => (
     <PressableScale
@@ -39,7 +41,17 @@ export function NumberPad({
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background, borderTopColor: theme.border, borderTopWidth: StyleSheet.hairlineWidth }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          height: keyboardHeight,
+          backgroundColor: theme.background,
+          borderTopColor: theme.border,
+          borderTopWidth: StyleSheet.hairlineWidth,
+        },
+      ]}
+    >
       <View style={styles.row}>
         {renderDigit(1)}
         {renderDigit(2)}
@@ -55,7 +67,7 @@ export function NumberPad({
         {renderDigit(8)}
         {renderDigit(9)}
       </View>
-      <View style={styles.row}>
+      <View style={[styles.row, { marginBottom: 0 }]}>
         {entryType === 2 ? (
           <PressableScale
             style={[styles.button, { backgroundColor: theme.surfaceSecondary }]}
@@ -84,13 +96,13 @@ export function NumberPad({
         {renderDigit(0)}
         <View style={styles.actionGroup}>
           <PressableScale
-            style={[styles.actionButton, { flex: 1, backgroundColor: theme.surfaceSecondary }]}
+            style={[styles.actionButton, { backgroundColor: theme.surfaceSecondary }]}
             onPress={onBackspace}
           >
             <Ionicons name="backspace-outline" size={24} color={theme.textPrimary} />
           </PressableScale>
           <PressableScale
-            style={[styles.actionButton, { flex: 1, backgroundColor: colors.primary }]}
+            style={[styles.actionButton, { backgroundColor: colors.primary }]}
             onPress={onSubmit}
           >
             <Ionicons name="checkmark" size={26} color="#FFFFFF" />
@@ -108,14 +120,13 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   row: {
+    flex: 1,
     flexDirection: "row",
-    justifyContent: "center",
     gap: 8,
     marginBottom: 8,
   },
   button: {
     flex: 1,
-    height: 48,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
@@ -126,7 +137,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   actionButton: {
-    height: 48,
+    flex: 1,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",

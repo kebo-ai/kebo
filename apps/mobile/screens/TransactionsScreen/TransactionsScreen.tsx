@@ -15,6 +15,7 @@ import { TransactionService } from "@/services/TransactionService";
 import tw from "twrnc";
 import moment from "moment";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 import { BackIconSvg } from "@/components/icons/BackSvg";
 import { ArrowUpIconSvg } from "@/components/icons/ArrowUpIcon";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -102,6 +103,7 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
       transactionType: params.transactionType,
     }), [params.accountIds, params.months, params.categoryIds, params.transactionType]);
     const origin = (params.origin as "Home" | "Accounts") ?? "Home";
+    const { theme, isDark } = useTheme();
     const [transactions, setTransactions] = useState<GroupedTransaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -676,9 +678,9 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
         <View style={tw`mb-2`}>
           <View style={tw`px-4 py-2`}>
             <Text
-              style={tw`text-base text-[#606A84]/70`}
+              style={tw`text-base`}
               weight="medium"
-              color="#606A84"
+              color={theme.textSecondary}
             >
               {item.name}
             </Text>
@@ -757,8 +759,8 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
       <Screen
         safeAreaEdges={["top"]}
         preset="fixed"
-        statusBarStyle={"dark"}
-        backgroundColor="#FAFAFA"
+        statusBarStyle={isDark ? "light" : "dark"}
+        backgroundColor={theme.background}
         header={
           <View style={tw`w-full`}>
             <View style={tw`justify-between flex-row items-center`}>
@@ -766,12 +768,12 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
                 onPress={() => router.back()}
                 style={tw`w-12 h-12 flex justify-center items-center shadow-md`}
               >
-                <BackIconSvg width={15} height={15} color={colors.black} />
+                <BackIconSvg width={15} height={15} color={theme.textPrimary} />
               </TouchableOpacity>
               <Text
-                style={tw`text-[#110627] text-lg align-center`}
+                style={tw`text-lg`}
                 weight="medium"
-                color="#110627"
+                color={theme.textPrimary}
               >
                 {translate("transactionScreen:transactionTitle")}
               </Text>
@@ -825,14 +827,20 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
             >
               <TouchableOpacity
                 onPress={clearAllFilters}
-                style={tw`w-9 h-9 rounded-lg border border-[#606A84]/20 ${
-                  selectedBanks.length > 0 ||
-                  selectedMonths.length > 0 ||
-                  selectedCategories.length > 0 ||
-                  selectedType !== null
-                    ? `bg-[${colors.primary}]`
-                    : `bg-[${colors.white}]`
-                } items-center justify-center`}
+                style={[
+                  tw`w-9 h-9 rounded-lg items-center justify-center`,
+                  {
+                    borderWidth: 1,
+                    borderColor: theme.border,
+                    backgroundColor:
+                      selectedBanks.length > 0 ||
+                      selectedMonths.length > 0 ||
+                      selectedCategories.length > 0 ||
+                      selectedType !== null
+                        ? colors.primary
+                        : theme.surface,
+                  },
+                ]}
                 accessibilityLabel="Limpiar filtros"
               >
                 <MaterialIcons
@@ -892,24 +900,24 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
             </ScrollView>
           </View>
 
-          <View style={tw`px-4 bg-[#FAFAFA] mt-4`}>
+          <View style={[tw`px-4 mt-4`, { backgroundColor: theme.background }]}>
             {loading && page === 1 ? (
               <View style={tw`flex-1 items-center justify-center py-8`}>
                 <ActivityIndicator size="large" color={colors.primary} />
-                <Text style={tw`mt-4 text-base text-[#606A84]`}>
+                <Text style={tw`mt-4 text-base`} color={theme.textSecondary}>
                   {translate("transactionScreen:chargingTransaction")}
                 </Text>
               </View>
             ) : transactions.length === 0 ? (
               <View style={tw`flex-1 items-center justify-center py-12`}>
                 <KeboSadIconSvg width={60} height={60} />
-                <Text style={tw`text-[#606A84] text-base mt-4`}>
+                <Text style={tw`text-base mt-4`} color={theme.textSecondary}>
                   {translate("transactionScreen:noTransaction")}
                 </Text>
               </View>
             ) : (
               <View
-                style={tw`border border-[#EBEBEF] rounded-[18px] overflow-hidden bg-white`}
+                style={[tw`rounded-[18px] overflow-hidden`, { borderWidth: 1, borderColor: theme.border, backgroundColor: theme.surface }]}
               >
                 {transactions.map((group) => (
                   <View key={group.name}>
@@ -924,7 +932,7 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
             {loading && page > 1 && (
               <View style={tw`py-4 items-center`}>
                 <ActivityIndicator size="small" color={colors.primary} />
-                <Text style={tw`mt-2 text-sm text-[#606A84]`}>
+                <Text style={tw`mt-2 text-sm`} color={theme.textSecondary}>
                   {translate("transactionScreen:chargingMoreTransaction")}
                 </Text>
               </View>

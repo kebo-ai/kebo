@@ -37,6 +37,7 @@ import { colors } from "@/theme/colors";
 import * as Haptics from "expo-haptics";
 import { PressablesConfig } from "pressto";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -97,6 +98,7 @@ export default function RootLayout() {
       <ThemeProvider value={navigationTheme}>
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <ErrorBoundary catchErrors={Config.catchErrors}>
+            <KeyboardProvider>
               <PressablesConfig
                 globalHandlers={{
                   onPress: () => {
@@ -122,6 +124,7 @@ export default function RootLayout() {
                 <CustomToast />
                 <Loader />
               </PressablesConfig>
+            </KeyboardProvider>
           </ErrorBoundary>
         </SafeAreaProvider>
       </ThemeProvider>

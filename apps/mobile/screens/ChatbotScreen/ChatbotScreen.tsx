@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { KeyboardProvider, KeyboardStickyView } from "react-native-keyboard-controller";
+import { KeyboardStickyView } from "react-native-keyboard-controller";
 import tw from "twrnc";
 import moment from "moment";
 import * as Haptics from "expo-haptics";
@@ -61,6 +61,7 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
     const inputRef = useRef<TextInput | null>(null);
 
     const [showScrollToEnd, setShowScrollToEnd] = useState(false);
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
 
     // Dynamic headerRight — show new chat button when messages exist
     useLayoutEffect(() => {
@@ -75,21 +76,26 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       });
     }, [navigation, messages.length]);
 
-    // Scroll to end when keyboard appears
+    // Track keyboard height for dynamic content padding
     useEffect(() => {
-      const keyboardDidShowListener = Keyboard.addListener(
-        "keyboardDidShow",
-        () => {
-          if (messages.length > 0) {
-            flatListRef.current?.scrollToEnd({ animated: true });
-          }
-        }
-      );
-
+      const showListener = Keyboard.addListener("keyboardWillShow", (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+      });
+      const hideListener = Keyboard.addListener("keyboardWillHide", () => {
+        setKeyboardHeight(0);
+      });
       return () => {
-        keyboardDidShowListener.remove();
+        showListener.remove();
+        hideListener.remove();
       };
-    }, [messages.length]);
+    }, []);
+
+    // Scroll to end when keyboard state changes
+    useEffect(() => {
+      if (messages.length > 0) {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }
+    }, [keyboardHeight]);
 
     // Process initialQuestion from route params, if present
     useEffect(() => {
@@ -209,15 +215,17 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       setShowScrollToEnd(!isAtBottom && messages.length > 0);
     };
 
-    // Space reserved for the input at the bottom so content doesn't hide behind it
+    // Dynamic bottom padding: ensures last message is always above the input
     const inputAreaHeight = 70;
+    const bottomPadding = keyboardHeight > 0
+      ? keyboardHeight + inputAreaHeight // keyboard open: content clears keyboard + input
+      : inputAreaHeight + insets.bottom + 50; // keyboard closed: content clears tab bar + input
 
     return (
-      <KeyboardProvider>
       <Pressable style={[tw`flex-1`, { backgroundColor: theme.background }]} onPress={Keyboard.dismiss}>
         <View style={tw`flex-1`}>
           {messages.length === 0 && !inputValue ? (
-            <View style={[tw`flex-1`, { paddingTop: headerHeight, paddingBottom: inputAreaHeight + insets.bottom + 50 }]}>
+            <View style={[tw`flex-1`, { paddingTop: headerHeight, paddingBottom: bottomPadding }]}>
               <ChatEmpty onSampleQuestionPress={handleSampleQuestionPress} />
             </View>
           ) : (
@@ -235,7 +243,7 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
               )}
               contentContainerStyle={[
                 tw`px-4 pb-4`,
-                { paddingTop: headerHeight + 16, paddingBottom: inputAreaHeight + insets.bottom + 50 },
+                { paddingTop: headerHeight + 16, paddingBottom: bottomPadding },
               ]}
               showsVerticalScrollIndicator={false}
               onScroll={handleScroll}
@@ -283,7 +291,6 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
           />
         </KeyboardStickyView>
       </Pressable>
-      </KeyboardProvider>
     );
   }
 );

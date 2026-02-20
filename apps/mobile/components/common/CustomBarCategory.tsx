@@ -3,6 +3,7 @@ import { View, Text, TouchableWithoutFeedback, Animated } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import tw from "twrnc";
 import TooltipOverlay from "./TooltipOverlay";
+import { useTheme } from "@/hooks/useTheme";
 
 interface CategoryData {
   id: string;
@@ -43,6 +44,7 @@ export const CustomBarCategory: React.FC<CustomBarCategoryProps> = ({
   setTooltipX,
 }) => {
   const [animation] = useState(new Animated.Value(0));
+  const { isDark, theme } = useTheme();
 
   const formatYAxisValue = (value: number) => {
     if (value >= 1_000_000) return `${Math.round(value / 1_000_000)}M`;
@@ -132,7 +134,7 @@ export const CustomBarCategory: React.FC<CustomBarCategoryProps> = ({
       hideTooltip();
     } else {
       const x = initialSpacing + index * (barWidth + spacing);
-      setTooltipX(x); 
+      setTooltipX(x);
       setActiveBarIndex(index);
       showTooltip(item, index, x);
     }
@@ -149,13 +151,16 @@ export const CustomBarCategory: React.FC<CustomBarCategoryProps> = ({
     ) {
       return <Text style={tw`text-xl text-center`}>{icon}</Text>;
     }
-    return <Text style={tw`text-xs text-center text-[#606A84]`}></Text>;
+    return <Text style={[tw`text-xs text-center`, { color: theme.textSecondary }]}></Text>;
   };
+
+  const chartBg = isDark ? "rgba(196, 168, 255, 0.08)" : "rgba(196, 168, 255, 0.15)";
+  const rulesColor = isDark ? "rgba(196, 168, 255, 0.2)" : "#E6DAFD";
 
   return (
     <View style={[tw`px-4 items-center`]}>
       <TouchableWithoutFeedback onPress={hideTooltip}>
-        <View style={[tw`bg-[#C4A8FF]/15 rounded-3xl py-3 w-full`]}>
+        <View style={[tw`rounded-3xl py-3 w-full`, { backgroundColor: chartBg }]}>
           <TouchableWithoutFeedback onPress={hideTooltip}>
             <View style={tw`overflow-hidden`}>
               <BarChart
@@ -165,10 +170,13 @@ export const CustomBarCategory: React.FC<CustomBarCategoryProps> = ({
                 initialSpacing={initialSpacing}
                 barWidth={barWidth}
                 xAxisLabelTextStyle={renderXAxisLabel}
-                yAxisTextStyle={tw`text-black font-light text-[10px] text-center`}
+                yAxisTextStyle={[
+                  tw`font-light text-[10px] text-center`,
+                  { color: theme.textSecondary },
+                ]}
                 noOfSections={6}
                 xAxisThickness={1}
-                xAxisColor="#E6DAFD"
+                xAxisColor={rulesColor}
                 yAxisThickness={0}
                 yAxisLabelTexts={yAxisLabelTexts}
                 xAxisLabelTexts={xAxisLabels}
@@ -177,7 +185,7 @@ export const CustomBarCategory: React.FC<CustomBarCategoryProps> = ({
                 showGradient={false}
                 barBorderRadius={2}
                 rulesType="solid"
-                rulesColor="#E6DAFD"
+                rulesColor={rulesColor}
                 rulesThickness={1}
                 onPress={handleBarPress}
               />

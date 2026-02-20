@@ -2,19 +2,19 @@ import logger from "@/utils/logger";
 import React, { FC, useState, useEffect, useCallback, memo } from "react";
 import {
   Platform,
-  KeyboardAvoidingView,
   View,
   Dimensions,
   Text,
   TouchableWithoutFeedback,
   ActivityIndicator,
+  ScrollView,
+  StatusBar,
 } from "react-native";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
-import { Screen } from "@/components";
 import { observer } from "mobx-react-lite";
 import { translate } from "@/i18n";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import moment from "moment";
 import { CustomReportDay } from "@/components/common/CustomReportDay";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
@@ -25,8 +25,8 @@ import { ChartService } from "@/services/ChartService";
 import { deleteCategoryService } from "@/services/CategoryService";
 import { showToast } from "@/components/ui/CustomToast";
 import { CategoriesList } from "@/components/common/CategoriesList";
-import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
+import { useTheme } from "@/hooks/useTheme";
 
 interface ReportsCategoryScreenProps {}
 
@@ -44,6 +44,7 @@ interface CategoryData {
 export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
   function ReportsCategoryScreen() {
     const router = useRouter();
+    const { isDark, theme } = useTheme();
     const screenWidth = Dimensions.get("window").width - 32;
     const [availableMonths, setAvailableMonths] = useState<string[]>([]);
     const [selectedMonthIndex, setSelectedMonthIndex] = useState(0);
@@ -198,18 +199,32 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
 
     const renderCategoryContent = useCallback(
       () => (
-        <View style={tw`px-4 bg-[#FAFAFA]`}>
+        <View style={[tw`px-4`, { backgroundColor: theme.background }]}>
           {categories.length === 0 ? (
             <View
-              style={tw`border border-[#EBEBEF] bg-white py-6 rounded-[18px]`}
+              style={[
+                tw`py-6 rounded-[18px]`,
+                {
+                  borderWidth: 1,
+                  borderColor: theme.border,
+                  backgroundColor: theme.surface,
+                },
+              ]}
             >
-              <Text style={tw`text-[#606A84] text-center`}>
+              <Text style={[tw`text-center`, { color: theme.textSecondary }]}>
                 {translate("homeScreen:noTransactions")}
               </Text>
             </View>
           ) : (
             <View
-              style={tw`border border-[#EBEBEF] bg-white rounded-[18px] overflow-hidden`}
+              style={[
+                tw`rounded-[18px] overflow-hidden`,
+                {
+                  borderWidth: 1,
+                  borderColor: theme.border,
+                  backgroundColor: theme.surface,
+                },
+              ]}
             >
               {categories.map((item) => (
                 <View key={item.id}>
@@ -223,6 +238,7 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
       [
         categories,
         renderTransactionItemWrapper,
+        theme,
       ]
     );
 
@@ -245,7 +261,8 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
 
     return (
       <TouchableWithoutFeedback onPress={hideTooltip}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: theme.background }}>
+          <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
           {tooltipVisible && (
             <TouchableWithoutFeedback onPress={hideTooltip}>
               <View
@@ -261,80 +278,79 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
               />
             </TouchableWithoutFeedback>
           )}
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={tw`flex-1`}
+          <Stack.Screen
+            options={{
+              headerShown: true,
+              title: translate("reportsCategoryScreen:reportsCategoryTitle"),
+              headerBackTitle: translate("navigator:reports"),
+              headerTransparent: true,
+              headerBlurEffect: theme.blurEffect,
+              headerTitleStyle: {
+                fontFamily: "SFUIDisplaySemiBold",
+                color: theme.headerTitle,
+              },
+              headerTintColor: colors.primary,
+            }}
+          />
+          <ScrollView
+            contentInsetAdjustmentBehavior="automatic"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={
+              Platform.OS === "android" ? { paddingBottom: 70 } : undefined
+            }
           >
-            <Screen
-              safeAreaEdges={["top"]}
-              preset="scroll"
-              backgroundColor="#FAFAFA"
-              statusBarBackgroundColor="#FAFAFA"
-              header={
-                <CustomHeaderSecondary
-                  onPress={() => router.back()}
-                  title={translate(
-                    "reportsCategoryScreen:reportsCategoryTitle"
-                  )}
+            <CustomReportDay
+              month={selectedMonth}
+              total={total}
+              porcentaje={total && total !== 0 ? 100 : 0}
+              onPrev={handlePrevMonth}
+              onNext={handleNextMonth}
+              disablePrev={selectedMonthIndex === 0}
+              disableNext={selectedMonthIndex === availableMonths.length - 1}
+            />
+            {isLoading ? (
+              <View style={tw`items-center justify-center py-10`}>
+                <ActivityIndicator size="large" color={colors.primary} />
+              </View>
+            ) : categoryData.length === 0 ? (
+              <View style={tw`items-center justify-center py-10`}>
+                <KeboSadIconSvg width={60} height={60} />
+                <Text style={[tw`text-center`, { color: theme.textSecondary }]}>
+                  {translate("homeScreen:noTransactions")}
+                </Text>
+              </View>
+            ) : (
+              <>
+                <CustomBarCategory
+                  data={categoryData}
+                  width={screenWidth}
+                  tooltipVisible={tooltipVisible}
+                  tooltipData={tooltipData}
+                  showTooltip={showTooltip}
+                  hideTooltip={hideTooltip}
+                  activeBarIndex={activeBarIndex}
+                  setActiveBarIndex={setActiveBarIndex}
+                  tooltipX={tooltipX}
+                  setTooltipX={setTooltipX}
                 />
-              }
-              contentContainerStyle={
-                Platform.OS === "android" ? { paddingBottom: 70 } : undefined
-              }
-            >
-              <CustomReportDay
-                month={selectedMonth}
-                total={total}
-                porcentaje={total && total !== 0 ? 100 : 0}
-                onPrev={handlePrevMonth}
-                onNext={handleNextMonth}
-                disablePrev={selectedMonthIndex === 0}
-                disableNext={selectedMonthIndex === availableMonths.length - 1}
-              />
-              {isLoading ? (
-                <View style={tw`items-center justify-center py-10`}>
-                  <ActivityIndicator size="large" color={colors.primary} />
+                <View style={tw`pt-6`}>
+                  {renderCategoryContent()}
                 </View>
-              ) : categoryData.length === 0 ? (
-                <View style={tw`items-center justify-center py-10`}>
-                  <KeboSadIconSvg width={60} height={60} />
-                  <Text style={tw`text-[#606A84] text-center`}>
-                    {translate("homeScreen:noTransactions")}
-                  </Text>
-                </View>
-              ) : (
-                <>
-                  <CustomBarCategory
-                    data={categoryData}
-                    width={screenWidth}
-                    tooltipVisible={tooltipVisible}
-                    tooltipData={tooltipData}
-                    showTooltip={showTooltip}
-                    hideTooltip={hideTooltip}
-                    activeBarIndex={activeBarIndex}
-                    setActiveBarIndex={setActiveBarIndex}
-                    tooltipX={tooltipX}
-                    setTooltipX={setTooltipX}
-                  />
-                  <View style={tw`pt-6`}>
-                    {renderCategoryContent()}
-                  </View>
-                  <CustomAlert
-                    visible={isDeleteAlertVisible}
-                    title={translate("homeScreen:titleAlert")}
-                    message={translate(
-                      "components:categoryModal.deleteCategory"
-                    )}
-                    onConfirm={handleConfirmDelete}
-                    onCancel={handleCloseDeleteAlert}
-                    type="danger"
-                    confirmText={translate("homeScreen:delete")}
-                    cancelText={translate("homeScreen:cancel")}
-                  />
-                </>
-              )}
-            </Screen>
-          </KeyboardAvoidingView>
+                <CustomAlert
+                  visible={isDeleteAlertVisible}
+                  title={translate("homeScreen:titleAlert")}
+                  message={translate(
+                    "components:categoryModal.deleteCategory"
+                  )}
+                  onConfirm={handleConfirmDelete}
+                  onCancel={handleCloseDeleteAlert}
+                  type="danger"
+                  confirmText={translate("homeScreen:delete")}
+                  cancelText={translate("homeScreen:cancel")}
+                />
+              </>
+            )}
+          </ScrollView>
         </View>
       </TouchableWithoutFeedback>
     );

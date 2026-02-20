@@ -9,6 +9,7 @@ import { colors } from "@/theme/colors";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
 import { translateCategoryName } from "@/utils/categoryTranslations";
 import { useRoute } from "@react-navigation/native";
+import { useTheme } from "@/hooks/useTheme";
 
 interface ItemData {
   id: string;
@@ -44,14 +45,22 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
   transaction_count,
 }) => {
   const { formatAmount } = useCurrencyFormatter();
+  const { isDark, theme } = useTheme();
   const currentScreen = useRoute().name;
 
   if (data.length === 0) {
     return (
       <View
-        style={tw`border border-[#EBEBEF] bg-white p-6 rounded-[18px] mx-4 mb-4`}
+        style={[
+          tw`p-6 rounded-[18px] mx-4 mb-4`,
+          {
+            borderWidth: 1,
+            borderColor: theme.border,
+            backgroundColor: theme.surface,
+          },
+        ]}
       >
-        <Text style={tw`text-[#606A84] text-center`}>
+        <Text color={theme.textSecondary} style={tw`text-center`}>
           {translate("homeScreen:noTransactions")}
         </Text>
       </View>
@@ -59,7 +68,7 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
   }
 
   return (
-    <View style={tw`bg-white rounded-[18px] overflow-hidden `}>
+    <View style={[tw`rounded-[18px] overflow-hidden`, { backgroundColor: theme.surface }]}>
       {data.map((item) => {
         const isExpense = item.transaction_type === "Expense";
         const isIncome = item.transaction_type === "Income";
@@ -78,10 +87,10 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
 
         let borderColor = item.color || colors.bgGray;
         let amountColor = isExpense
-          ? "#606A84"
+          ? theme.textSecondary
           : isIncome
           ? "#9C88FF"
-          : "#606A84";
+          : theme.textSecondary;
         if (isExpense) borderColor = "#9C88FF";
         if (isIncome) borderColor = "#9C88FF";
 
@@ -111,11 +120,20 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
         return (
           <Pressable
             key={item.id}
-            style={tw`bg-[#FAFAFA]`}
+            style={{ backgroundColor: theme.background }}
             onPress={handlePress}
             android_ripple={{ color: colors.primary + "20" }}
           >
-            <View style={tw`py-4 bg-white border-b border-[#EBEBEF] pl-4`}>
+            <View
+              style={[
+                tw`py-4 pl-4`,
+                {
+                  backgroundColor: theme.surface,
+                  borderBottomWidth: 1,
+                  borderBottomColor: theme.border,
+                },
+              ]}
+            >
               <View style={tw`flex-row justify-between items-center`}>
                 <View style={tw`flex-row items-center`}>
                   <View
@@ -146,11 +164,15 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
                   <View>
                     <Text
                       weight="medium"
-                      style={tw`text-base text-[#110627]`}
+                      style={tw`text-base`}
+                      color={theme.textPrimary}
                     >
                       {descriptionText}
                     </Text>
-                    <Text style={tw`text-[10px] text-[#606A84] mt-0.5`}>
+                    <Text
+                      style={tw`text-[10px] mt-0.5`}
+                      color={theme.textSecondary}
+                    >
                       {item.transaction_count}{" "}
                       {item.transaction_count === 1
                         ? translate("reportsCategoryScreen:transaction")
@@ -171,7 +193,8 @@ export const CategoriesList: React.FC<CategoriesListProps> = ({
                     item.percentage !== undefined && (
                       <Text
                         weight="normal"
-                        style={tw`text-xs text-[#606A84] mt-0.5`}
+                        style={tw`text-xs mt-0.5`}
+                        color={theme.textSecondary}
                       >
                         {item.percentage.toFixed(1)}%
                       </Text>

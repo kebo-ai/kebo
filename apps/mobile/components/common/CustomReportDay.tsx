@@ -12,6 +12,7 @@ import { ArrowRightIconSvg } from "@/components/icons/ArrowRightIcon";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
 import i18n from "@/i18n/i18n";
 import { ArrowLefttIconV2 } from "@/components/icons/ArrowLefttIconV2";
+import { useTheme } from "@/hooks/useTheme";
 
 interface CustomReportDayProps {
   month: string;
@@ -34,6 +35,7 @@ export const CustomReportDay: React.FC<CustomReportDayProps> = ({
 }) => {
   const { width } = useWindowDimensions();
   const { formatAmount } = useCurrencyFormatter();
+  const { isDark, theme } = useTheme();
   const currentLocale = i18n.language.split("-")[0];
 
   const getFontSize = (amount: number) => {
@@ -62,12 +64,23 @@ export const CustomReportDay: React.FC<CustomReportDayProps> = ({
       </TouchableOpacity>
       <View
         style={[
-          tw`flex-row bg-white rounded-2xl py-3 border border-[#EBEBEF] items-center justify-between`,
-          { width: cardWidth, paddingHorizontal: 12 },
+          tw`flex-row rounded-2xl py-3 items-center justify-between`,
+          {
+            width: cardWidth,
+            paddingHorizontal: 12,
+            backgroundColor: theme.surface,
+            borderWidth: 1,
+            borderColor: theme.border,
+          },
         ]}
       >
         <View style={tw`flex-1 items-center`}>
-          <Text style={tw`text-[13px] md:text-md font-semibold text-[#110627]`}>
+          <Text
+            style={[
+              tw`text-[13px] md:text-md font-semibold`,
+              { color: theme.textPrimary },
+            ]}
+          >
             {moment(month)
               .locale(currentLocale)
               .format("MMM YYYY")
@@ -75,16 +88,31 @@ export const CustomReportDay: React.FC<CustomReportDayProps> = ({
           </Text>
         </View>
 
-        <Text style={tw`text-2xl text-[#3C3C43]/10 font-light`}>|</Text>
+        <Text
+          style={[
+            tw`text-2xl font-light`,
+            { color: isDark ? "rgba(255,255,255,0.15)" : "rgba(60,60,67,0.1)" },
+          ]}
+        >
+          |
+        </Text>
 
         <View style={tw`flex-1 items-center`}>
-          <Text style={tw`text-[10px] text-black font-light`}>
+          <Text
+            style={[
+              tw`text-[10px] font-light`,
+              { color: theme.textSecondary },
+            ]}
+          >
             {translate("reportsCategoryScreen:total")}
           </Text>
           <Text
             style={[
-              tw`font-bold text-[#200066]`,
-              { fontSize: getFontSize(total) },
+              tw`font-bold`,
+              {
+                fontSize: getFontSize(total),
+                color: isDark ? "#C4A8FF" : "#200066",
+              },
             ]}
           >
             {formatAmount(total)}

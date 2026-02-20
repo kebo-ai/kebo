@@ -6,13 +6,12 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import tw from "twrnc";
-import { Screen } from "@/components";
 import { observer } from "mobx-react-lite";
 import { translate } from "@/i18n";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import moment from "moment";
 import IncomeExpenseBarChart from "@/components/common/CustomBarIncome";
 import { ArrowDownSimpleIcon } from "@/components/icons/ArrowDownSimpleIcon";
@@ -28,10 +27,11 @@ import CustomAlert from "@/components/common/CustomAlert";
 import { deleteCategoryService } from "@/services/CategoryService";
 import { showToast } from "@/components/ui/CustomToast";
 import { useStores } from "@/models/helpers/useStores";
-import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { load, save } from "@/utils/storage";
 import { REPORTS_INCOME_PERIOD } from "@/utils/storage/storage-keys";
+import { useTheme } from "@/hooks/useTheme";
+import { colors } from "@/theme/colors";
 
 interface ReportsIncomeScreenProps {}
 
@@ -75,6 +75,7 @@ const years = Array.from({ length: 12 }, (_, i) =>
 export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
   function ReportsIncomeScreen() {
     const router = useRouter();
+    const { theme } = useTheme();
     const { categoryStoreModel } = useStores();
     const [period, setPeriod] = useState<PeriodType>(periodOptions[1]);
     const [modalVisible, setModalVisible] = useState(false);
@@ -383,22 +384,29 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
 
       return (
         <View
-          style={tw`bg-[#FAFAFA] ${
-            Platform.OS === "android" ? "px-6" : "px-4"
-          }`}
+          style={[
+            tw`${Platform.OS === "android" ? "px-6" : "px-4"}`,
+            { backgroundColor: theme.background },
+          ]}
         >
           {allTransactions.length === 0 ? (
             <View
-              style={tw`border border-[#EBEBEF] bg-white py-6 rounded-[18px] items-center justify-center`}
+              style={[
+                tw`py-6 rounded-[18px] items-center justify-center`,
+                { borderWidth: 1, borderColor: theme.border, backgroundColor: theme.surface },
+              ]}
             >
               <KeboSadIconSvg width={60} height={60} />
-              <Text style={tw`text-[#606A84] text-center`}>
+              <Text style={[tw`text-center`, { color: theme.textSecondary }]}>
                 {translate("homeScreen:noTransactions")}
               </Text>
             </View>
           ) : (
             <View
-              style={tw`border border-[#EBEBEF] bg-white rounded-[18px] overflow-hidden`}
+              style={[
+                tw`rounded-[18px] overflow-hidden`,
+                { borderWidth: 1, borderColor: theme.border, backgroundColor: theme.surface },
+              ]}
             >
               {allTransactions.map((item) => (
                 <View key={item.id}>
@@ -425,11 +433,12 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
       currentDate,
       navigation,
       handleDelete,
+      theme,
     ]);
 
     return (
       <TouchableWithoutFeedback onPress={hideTooltip}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: theme.background }}>
           {tooltipVisible && (
             <TouchableWithoutFeedback onPress={hideTooltip}>
               <View
@@ -445,100 +454,104 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
               />
             </TouchableWithoutFeedback>
           )}
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={tw`flex-1`}
+          <Stack.Screen
+            options={{
+              headerShown: true,
+              title: translate("reportsIncomeScreen:reportsIncome"),
+              headerBackTitle: translate("navigator:reports"),
+              headerTransparent: true,
+              headerBlurEffect: theme.blurEffect,
+              headerTitleStyle: {
+                fontFamily: "SFUIDisplaySemiBold",
+                color: theme.headerTitle,
+              },
+              headerTintColor: colors.primary,
+            }}
+          />
+          <ScrollView
+            contentInsetAdjustmentBehavior="automatic"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={
+              Platform.OS === "android" ? { paddingBottom: 70 } : undefined
+            }
           >
-            <Screen
-              safeAreaEdges={["top"]}
-              preset="scroll"
-              backgroundColor="#FAFAFA"
-              statusBarBackgroundColor="#FAFAFA"
-              header={
-                <CustomHeaderSecondary
-                  onPress={() => router.back()}
-                  title={translate("reportsIncomeScreen:reportsIncome")}
-                />
-              }
-              contentContainerStyle={
-                Platform.OS === "android" ? { paddingBottom: 70 } : undefined
-              }
-            >
-              <View style={tw`px-6 pt-3`}>
-                <Text style={tw`text-md font-light text-[#110627]`}>
-                  {periodLabel}
-                </Text>
-                <View style={tw`flex-row items-center justify-between mb-2`}>
-                  <Text
-                    style={tw`text-3xl font-medium text-black`}
-                  >{`${formatAmount(balance)}`}</Text>
-                  <View style={tw`flex-row items-center`}>
-                    <TouchableOpacity
-                      style={tw`flex-row items-center bg-white border border-[#D3D3D3] rounded-2xl px-3 py-2`}
-                      onPress={() => setModalVisible(true)}
-                    >
-                      <Text style={tw`text-black text-xs font-medium mr-2`}>
-                        {translate(
-                          `reportsIncomeScreen:${period.value}` as any
-                        )}
-                      </Text>
-                      <ArrowDownSimpleIcon />
-                    </TouchableOpacity>
-                  </View>
+            <View style={tw`px-6 pt-3`}>
+              <Text style={[tw`text-md font-light`, { color: theme.textPrimary }]}>
+                {periodLabel}
+              </Text>
+              <View style={tw`flex-row items-center justify-between mb-2`}>
+                <Text
+                  style={[tw`text-3xl font-medium`, { color: theme.textPrimary }]}
+                >{`${formatAmount(balance)}`}</Text>
+                <View style={tw`flex-row items-center`}>
+                  <TouchableOpacity
+                    style={[
+                      tw`flex-row items-center rounded-2xl px-3 py-2`,
+                      { backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border },
+                    ]}
+                    onPress={() => setModalVisible(true)}
+                  >
+                    <Text style={[tw`text-xs font-medium mr-2`, { color: theme.textPrimary }]}>
+                      {translate(
+                        `reportsIncomeScreen:${period.value}` as any
+                      )}
+                    </Text>
+                    <ArrowDownSimpleIcon />
+                  </TouchableOpacity>
                 </View>
               </View>
-              <TouchableWithoutFeedback onPress={hideTooltip}>
-                <View style={tw`mt-1`}>
-                  <IncomeExpenseBarChart
-                    data={chartData}
-                    width={360}
-                    hideTooltip={hideTooltip}
-                    periodType={period.value as "year" | "month" | "week"}
-                    onPrev={handlePrevPeriod}
-                    onNext={handleNextPeriod}
-                    disablePrev={selectedYearIndex === 0}
-                    disableNext={selectedYearIndex === years.length + 1}
-                    onPressExpenses={() => {}}
-                    onPressIncome={() => {}}
-                    income={totalIncome}
-                    expenses={totalExpense}
-                  />
-                </View>
-              </TouchableWithoutFeedback>
-              <View style={tw`pt-6`}>{renderTransactions()}</View>
-              <CustomModal
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                onSelect={handleSelectPeriod}
-                selectedValue={period.value}
-                data={[
-                  {
-                    label: translate("reportsIncomeScreen:year"),
-                    value: "year",
-                  },
-                  {
-                    label: translate("reportsIncomeScreen:month"),
-                    value: "month",
-                  },
-                  {
-                    label: translate("reportsIncomeScreen:week"),
-                    value: "week",
-                  },
-                ]}
-                title={translate("reportsIncomeScreen:selectPeriod")}
-              />
-              <CustomAlert
-                visible={isDeleteAlertVisible}
-                title={translate("homeScreen:titleAlert")}
-                message={translate("components:categoryModal.deleteMessage")}
-                onConfirm={handleConfirmDelete}
-                onCancel={handleCloseDeleteAlert}
-                type="danger"
-                confirmText={translate("homeScreen:delete")}
-                cancelText={translate("homeScreen:cancel")}
-              />
-            </Screen>
-          </KeyboardAvoidingView>
+            </View>
+            <TouchableWithoutFeedback onPress={hideTooltip}>
+              <View style={tw`mt-1`}>
+                <IncomeExpenseBarChart
+                  data={chartData}
+                  width={360}
+                  hideTooltip={hideTooltip}
+                  periodType={period.value as "year" | "month" | "week"}
+                  onPrev={handlePrevPeriod}
+                  onNext={handleNextPeriod}
+                  disablePrev={selectedYearIndex === 0}
+                  disableNext={selectedYearIndex === years.length + 1}
+                  onPressExpenses={() => {}}
+                  onPressIncome={() => {}}
+                  income={totalIncome}
+                  expenses={totalExpense}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+            <View style={tw`pt-6`}>{renderTransactions()}</View>
+          </ScrollView>
+          <CustomModal
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+            onSelect={handleSelectPeriod}
+            selectedValue={period.value}
+            data={[
+              {
+                label: translate("reportsIncomeScreen:year"),
+                value: "year",
+              },
+              {
+                label: translate("reportsIncomeScreen:month"),
+                value: "month",
+              },
+              {
+                label: translate("reportsIncomeScreen:week"),
+                value: "week",
+              },
+            ]}
+            title={translate("reportsIncomeScreen:selectPeriod")}
+          />
+          <CustomAlert
+            visible={isDeleteAlertVisible}
+            title={translate("homeScreen:titleAlert")}
+            message={translate("components:categoryModal.deleteMessage")}
+            onConfirm={handleConfirmDelete}
+            onCancel={handleCloseDeleteAlert}
+            type="danger"
+            confirmText={translate("homeScreen:delete")}
+            cancelText={translate("homeScreen:cancel")}
+          />
         </View>
       </TouchableWithoutFeedback>
     );

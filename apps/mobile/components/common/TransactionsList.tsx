@@ -12,6 +12,7 @@ import { SvgUri } from "react-native-svg";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { RecurrenceIconHomeSvg } from "@/components/icons/RecurrenceIconHomeSvg";
 import { colors } from "@/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
 
 interface TransactionListProps {
@@ -30,6 +31,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   const isExpense = transaction.transaction_type === "Expense";
   const isLastItem = index === transactions.length - 1;
   const { formatAmount } = useCurrencyFormatter();
+  const { theme } = useTheme();
   const currentLocale = i18n.language.split("-")[0];
 
   const formatDate = (date: string) => {
@@ -65,8 +67,9 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     <Pressable onPress={() => handleEditTransaction(transaction)}>
       <View
         style={[
-          tw`py-4 px-4 bg-white`,
-          !isLastItem && tw`border-b border-[#EBEBEF]`,
+          tw`py-4 px-4`,
+          { backgroundColor: theme.surface },
+          !isLastItem && { borderBottomWidth: 1, borderBottomColor: theme.border },
         ]}
       >
         <View style={tw`flex-row justify-between items-center`}>
@@ -99,8 +102,9 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               </View>
               <View
                 style={[
-                  tw`absolute -bottom-1 -right-1 bg-white rounded-full`,
+                  tw`absolute -bottom-1 -right-1 rounded-full`,
                   {
+                    backgroundColor: theme.surface,
                     borderWidth: 1.3,
                     borderColor: isExpense ? colors.bgGray : colors.primary,
                   },
@@ -128,7 +132,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               <View style={tw`flex-row items-center`}>
                 <Text
                   weight="medium"
-                  style={tw`text-base text-[#110627]`}
+                  style={tw`text-base`}
+                  color={theme.textPrimary}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
@@ -142,7 +147,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               </View>
               <Text
                 weight="light"
-                style={tw`text-xs text-[#606A84]`}
+                style={tw`text-xs`}
+                color={theme.textSecondary}
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
@@ -153,22 +159,22 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           <View style={tw`items-end min-w-[100px]`}>
             <Text
               weight="bold"
-              style={tw`text-base ${
-                isExpense ? "text-[#606A84]" : "text-[#6934D2]"
-              }`}
+              style={tw`text-base`}
+              color={isExpense ? theme.textSecondary : colors.primary}
             >
               {isExpense ? "- " : ""}
               {formatAmount(Math.abs(transaction.amount))}
             </Text>
             <Text
               weight="normal"
-              style={tw`text-xs text-[#606A84] mt-0.5`}
+              style={tw`text-xs mt-0.5`}
+              color={theme.textSecondary}
             >
               {formatDate(transaction.date)}
             </Text>
           </View>
           <View style={tw`items-end pl-2 ml-1`}>
-            <MaterialIcons name="chevron-right" size={24} color="#6934D2" />
+            <MaterialIcons name="chevron-right" size={24} color={colors.primary} />
           </View>
         </View>
       </View>

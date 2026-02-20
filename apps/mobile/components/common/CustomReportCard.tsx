@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTheme } from "@/hooks/useTheme";
 import tw from "twrnc";
 
 interface CustomReportCardProps {
@@ -18,6 +19,12 @@ interface CustomReportCardProps {
   colorBottom?: string;
 }
 
+const darkGradients: Record<string, string> = {
+  "#D3C0FF": "#2A1A4E",
+  "#E4E6E9": "#1C1C2E",
+  "#F4F1FB": "#1C1C2E",
+};
+
 const CustomReportCard = ({
   title,
   subtitle,
@@ -27,10 +34,15 @@ const CustomReportCard = ({
   colorBottom = "#FAFAFA",
 }: CustomReportCardProps) => {
   const { width } = useWindowDimensions();
+  const { isDark, theme } = useTheme();
+
+  const resolvedTop = isDark ? (darkGradients[colorTop] ?? "#2A1A4E") : colorTop;
+  const resolvedBottom = isDark ? (darkGradients[colorBottom] ?? "#1C1C2E") : colorBottom;
+
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
       <LinearGradient
-        colors={[colorTop, colorBottom]}
+        colors={[resolvedTop, resolvedBottom]}
         style={tw`rounded-xl flex-row justify-between h-[100px]`}
       >
         <View
@@ -38,13 +50,15 @@ const CustomReportCard = ({
         >
           <Text
             weight="medium"
-            style={tw`text-[15px] text-[#110627]`}
+            style={tw`text-[15px]`}
+            color={theme.textPrimary}
           >
             {title}
           </Text>
           <Text
             weight="light"
-            style={tw`text-[14px] text-[#110627]`}
+            style={tw`text-[14px]`}
+            color={theme.textSecondary}
           >
             {subtitle}
           </Text>

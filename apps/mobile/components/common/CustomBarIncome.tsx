@@ -16,6 +16,7 @@ import TooltipOverlay from "./TooltipOverlay";
 import { useIsFocused } from "@react-navigation/native";
 import { ArrowRightIconSvg } from "@/components/icons/ArrowRightIcon";
 import { ArrowLefttIconV2 } from "@/components/icons/ArrowLefttIconV2";
+import { useTheme } from "@/hooks/useTheme";
 
 interface PeriodData {
   label: string;
@@ -56,6 +57,7 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
   disableNext,
 }) => {
   const isFocused = useIsFocused();
+  const { isDark, theme } = useTheme();
   const [tooltip, setTooltip] = useState<{
     visible: boolean;
     value: number;
@@ -218,7 +220,7 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
       {
         value: selectedType === "income" ? 0 : expenseValue,
         label: "",
-        frontColor: expenseColor,
+        frontColor: isDark ? "#C4A8FF" : expenseColor,
         barWidth,
         spacing: spacingValue,
         onPress: () => {
@@ -236,6 +238,12 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
       },
     ];
   });
+
+  const chartBg = isDark ? "rgba(196, 168, 255, 0.08)" : "rgba(196, 168, 255, 0.15)";
+  const rulesColor = isDark ? "rgba(196, 168, 255, 0.2)" : "#E6DAFD";
+  const inactiveButtonBg = theme.surface;
+  const inactiveButtonBorder = theme.border;
+  const darkExpenseColor = isDark ? "#C4A8FF" : expenseColor;
 
   return (
     <TouchableWithoutFeedback onPress={handleHideTooltip}>
@@ -274,16 +282,17 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
                   }
                 }}
                 style={[
-                  tw`flex-1 items-center rounded-2xl ml-2 px-2 py-2 border`,
+                  tw`flex-1 items-center rounded-2xl ml-2 px-2 py-2`,
                   {
                     backgroundColor:
                       selectedType === "expense" || selectedType === "both"
-                        ? expenseColor
-                        : "#FFFFFF",
+                        ? darkExpenseColor
+                        : inactiveButtonBg,
+                    borderWidth: 1,
                     borderColor:
                       selectedType === "expense" || selectedType === "both"
-                        ? expenseColor
-                        : "#D3D3D3",
+                        ? darkExpenseColor
+                        : inactiveButtonBorder,
                   },
                 ]}
               >
@@ -294,7 +303,7 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
                       color:
                         selectedType === "expense" || selectedType === "both"
                           ? "#FFFFFF"
-                          : expenseColor,
+                          : darkExpenseColor,
                     },
                   ]}
                 >
@@ -307,7 +316,7 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
                       color:
                         selectedType === "expense" || selectedType === "both"
                           ? "#FFFFFF"
-                          : expenseColor,
+                          : darkExpenseColor,
                     },
                   ]}
                 >
@@ -328,16 +337,17 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
                   }
                 }}
                 style={[
-                  tw`flex-1 items-center rounded-2xl ml-2 px-2 py-2 border`,
+                  tw`flex-1 items-center rounded-2xl ml-2 px-2 py-2`,
                   {
                     backgroundColor:
                       selectedType === "income" || selectedType === "both"
                         ? incomeColor
-                        : "#FFFFFF",
+                        : inactiveButtonBg,
+                    borderWidth: 1,
                     borderColor:
                       selectedType === "income" || selectedType === "both"
                         ? incomeColor
-                        : "#D3D3D3",
+                        : inactiveButtonBorder,
                   },
                 ]}
               >
@@ -389,8 +399,9 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
             <View style={tw`items-center px-4 pt-2`}>
               <View
                 style={[
-                  tw`bg-[#C4A8FF]/15 rounded-3xl py-3 px-1.5 w-full`,
+                  tw`rounded-3xl py-3 px-1.5 w-full`,
                   {
+                    backgroundColor: chartBg,
                     shadowColor: "#C4A8FF",
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.02,
@@ -421,12 +432,16 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
                         tw`text-[10px] uppercase font-light w-8 text-center`,
                         {
                           fontSize: periodType === "month" ? 9 : 10,
+                          color: theme.textSecondary,
                         },
                       ]}
-                      yAxisTextStyle={tw`text-black font-light text-[10px] text-center`}
+                      yAxisTextStyle={[
+                        tw`font-light text-[10px] text-center`,
+                        { color: theme.textSecondary },
+                      ]}
                       noOfSections={noOfSections}
                       xAxisThickness={1}
-                      xAxisColor="#E6DAFD"
+                      xAxisColor={rulesColor}
                       yAxisThickness={0}
                       yAxisLabelTexts={yAxisLabelTextsIncome}
                       maxValue={maxYValue}
@@ -435,7 +450,7 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
                       showGradient={false}
                       barBorderRadius={2}
                       rulesType="solid"
-                      rulesColor="#E6DAFD"
+                      rulesColor={rulesColor}
                       rulesThickness={1}
                       xAxisLabelTexts={data.map((item) =>
                         translateLabel(item.label)
@@ -443,7 +458,10 @@ const CustomBarIncome: React.FC<CustomBarIncomeProps> = ({
                     />
                   </View>
                   <Text
-                    style={tw`text-black text-[10px] font-light my-0.5 text-center`}
+                    style={[
+                      tw`text-[10px] font-light my-0.5 text-center`,
+                      { color: theme.textSecondary },
+                    ]}
                   >
                     {periodType === "month"
                       ? translate("reportsIncomeScreen:labelMonth")

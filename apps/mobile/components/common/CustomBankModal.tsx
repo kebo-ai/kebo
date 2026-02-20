@@ -28,6 +28,7 @@ import CustomAlert from "./CustomAlert";
 import { translate } from "@/i18n";
 import { useCurrencyFormatter, currencyMap } from "./CurrencyFormatter";
 import * as Localization from "expo-localization";
+import { useTheme } from "@/hooks/useTheme";
 
 interface BankOption {
   id: string;
@@ -77,6 +78,7 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
       transactionModel: { updateField },
     } = useStores();
     const { getSymbol, formatAmount } = useCurrencyFormatter();
+    const { theme } = useTheme();
 
     const [openRow, setOpenRow] = useState<string | null>(null);
     const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
@@ -263,7 +265,7 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
             }
           }}
           style={[
-            tw`my-1 bg-white`,
+            tw`my-1`,
             {
               height: 60,
               borderWidth: 1,
@@ -274,7 +276,8 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
                 !hideBankActions && openRow === data.item.id ? 0 : 20,
               borderColor: isSelected
                 ? colors.primary
-                : "rgba(96, 106, 132, 0.15)",
+                : theme.border,
+              backgroundColor: theme.surface,
               padding: 16,
               zIndex: 0,
             },
@@ -286,7 +289,7 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
                 source={{
                   uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}${data.item.icon_url}`,
                 }}
-                style={tw`w-7 h-7 bg-white rounded-full border border-[#6934D2]/15 mr-3`}
+                style={[tw`w-7 h-7 rounded-full border mr-3`, { backgroundColor: theme.surface, borderColor: theme.border }]}
                 resizeMode="contain"
               />
             ) : (
@@ -309,7 +312,7 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
                       letterSpacing: 0,
                       color: isSelected
                         ? colors.primary
-                        : "rgba(96, 106, 132, 1)",
+                        : theme.textPrimary,
                       flex: 1,
                     },
                   ]}
@@ -334,7 +337,7 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
                 style={[
                   {
                     fontSize: 12,
-                    color: "rgba(96, 106, 132, 0.5)",
+                    color: theme.textTertiary,
                     marginTop: 2,
                   },
                 ]}
@@ -349,7 +352,7 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
               <MaterialIcons
                 name={isSelected ? "check-circle" : "radio-button-unchecked"}
                 size={24}
-                color={isSelected ? colors.primary : "rgba(96, 106, 132, 0.5)"}
+                color={isSelected ? colors.primary : theme.textTertiary}
               />
             )}
             {!hideBankActions && (
@@ -381,7 +384,7 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
           <TouchableOpacity
             style={[
               tw`${
-                openRow === data.item.id ? `bg-[${colors.primary}]` : "bg-white"
+                openRow === data.item.id ? `bg-[${colors.primary}]` : `bg-[${theme.surface}]`
               } w-[65px] h-full justify-center items-center`,
             ]}
             onPress={() => {
@@ -409,7 +412,7 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
               tw`${
                 openRow === data.item.id
                   ? `bg-[${colors.secondary}]`
-                  : "bg-white"
+                  : `bg-[${theme.surface}]`
               } w-[65px] h-full justify-center items-center rounded-r-[20px]`,
             ]}
             onPress={() => handleDelete(data.item.id)}
@@ -431,7 +434,7 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
           disabled={isDeleting || isUpdating}
         >
           <View style={tw`flex-1 justify-end bg-black/50`}>
-            <View style={tw`bg-white p-4 rounded-t-3xl max-h-[70%]`}>
+            <View style={[tw`p-4 rounded-t-3xl max-h-[70%]`, { backgroundColor: theme.background }]}>
               <View style={tw`flex-row items-center justify-between mb-4`}>
                 <TouchableOpacity
                   onPress={() => {
@@ -447,20 +450,20 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
                     </Text>
                   )}
                 </TouchableOpacity>
-                <Text style={tw`text-lg font-medium text-center flex-1`}>
+                <Text style={[tw`text-lg font-medium text-center flex-1`, { color: theme.textPrimary }]}>
                   {translate("components:bankModal.selectAccount")}
                 </Text>
                 <TouchableOpacity
                   onPress={onClose}
                   style={tw`flex-1 items-end`}
                 >
-                  <Ionicons name="close" size={24} color={colors.primary} />
+                  <Ionicons name="close" size={24} color={theme.textSecondary} />
                 </TouchableOpacity>
               </View>
 
               {bankOptions.length === 0 ? (
                 <View style={tw`items-center justify-center py-10`}>
-                  <Text style={tw`text-base text-gray-500`}>
+                  <Text style={[tw`text-base`, { color: theme.textTertiary }]}>
                     {translate("components:bankModal.noAccounts")}
                   </Text>
                 </View>
@@ -534,7 +537,7 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
           <View
             style={[
               tw`absolute left-0 top-0 w-full h-full z-50 items-center justify-center`,
-              { backgroundColor: "rgba(255,255,255,0.7)" },
+              { backgroundColor: theme.background + "B3" },
             ]}
           >
             <ActivityIndicator size="large" color={colors.primary} />

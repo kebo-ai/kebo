@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { translate } from "@/i18n/translate";
+import { useTheme } from "@/hooks/useTheme";
 
 interface DataItem {
   label: string;
@@ -37,6 +38,8 @@ const CustomModal: React.FC<CustomModalProps> = ({
   data,
   title,
 }) => {
+  const { theme } = useTheme();
+
   const getDisplayValue = (item: DataItem): string => {
     if (isRecurrence) {
       return translate(item.label as any);
@@ -48,13 +51,13 @@ const CustomModal: React.FC<CustomModalProps> = ({
     <Modal visible={visible} transparent animationType="none">
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={tw`flex-1 justify-end bg-black/50`}>
-          <View style={tw`bg-white p-4 rounded-t-3xl max-h-[50%]`}>
+          <View style={[tw`p-4 rounded-t-3xl max-h-[50%]`, { backgroundColor: theme.background }]}>
             <View style={tw`flex-row items-center justify-between mb-4`}>
               <TouchableOpacity onPress={onClose} style={tw`ml-auto`}>
-                <Ionicons name="close" size={24} color={colors.primary} />
+                <Ionicons name="close" size={24} color={theme.textSecondary} />
               </TouchableOpacity>
               <View style={tw`absolute w-full items-center`}>
-                <Text style={tw`text-lg font-medium`}>{title}</Text>
+                <Text style={[tw`text-lg font-medium`, { color: theme.textPrimary }]}>{title}</Text>
               </View>
             </View>
             <FlatList
@@ -77,8 +80,8 @@ const CustomModal: React.FC<CustomModalProps> = ({
                         borderRightWidth: 0,
                         borderStyle: "solid",
                         borderColor: isLastItem
-                          ? "transparent" // no bottom line for last item
-                          : "rgba(96, 106, 132, 0.15)",
+                          ? "transparent"
+                          : theme.border,
                       },
                       pressed && {
                         backgroundColor: colors.primaryBg,
@@ -89,10 +92,8 @@ const CustomModal: React.FC<CustomModalProps> = ({
                       <Text
                         weight={pressed ? "semibold" : "light"}
                         style={[
-                          tw`text-base text-[${colors.textGray}] px-2`,
-                          pressed
-                            ? tw`text-[${colors.primary}]`
-                            : tw`text-[${colors.textGray}]`,
+                          tw`text-base px-2`,
+                          { color: pressed ? colors.primary : theme.textPrimary },
                         ]}
                       >
                         {getDisplayValue(item)}

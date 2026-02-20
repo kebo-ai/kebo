@@ -24,6 +24,7 @@ import CustomAlert from "./CustomAlert";
 import { deleteCategoryService } from "@/services/CategoryService";
 import { translate } from "@/i18n";
 import { translateCategoryName } from "@/utils/categoryTranslations";
+import { useTheme } from "@/hooks/useTheme";
 
 const ICON_SIZE = 50;
 
@@ -51,8 +52,8 @@ const AddCategoryButton = React.memo(({ onPress }: { onPress: () => void }) => (
   </TouchableOpacity>
 ));
 
-const AddButtonLabel = React.memo(() => (
-  <Text style={tw`text-xs text-[#606A84] mt-2 text-center`}>
+const AddButtonLabel = React.memo(({ color }: { color?: string }) => (
+  <Text style={[tw`text-xs mt-2 text-center`, { color: color || "#606A84" }]}>
     {translate("components:categoryModal.add")}
   </Text>
 ));
@@ -132,6 +133,7 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
       transactionModel,
       categoryStoreModel: { getCategories },
     } = useStores();
+    const { theme } = useTheme();
 
     const [showActions, setShowActions] = useState(false);
     const [editMode, setEditMode] = useState(false);
@@ -267,11 +269,11 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
           return (
             <View style={tw`items-center p-2 mb-4`}>
               <TouchableOpacity
-                style={tw`flex-row items-center bg-white p-3 rounded-lg w-full border ${
+                style={[tw`flex-row items-center p-3 rounded-lg w-full border ${
                   selectedCategories.some((cat) => cat.id === item.id)
                     ? `border-[${colors.primary}]`
-                    : "border-[#E5E5EA]"
-                }`}
+                    : `border-[${theme.border}]`
+                }`, { backgroundColor: theme.surface }]}
                 onPress={() => handleSelectCategory(item)}
               >
                 <View style={tw`flex-row items-center flex-1`}>
@@ -288,7 +290,7 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
                       />
                     )}
                   </View>
-                  <Text style={tw`text-base text-black`} numberOfLines={2}>
+                  <Text style={[tw`text-base`, { color: theme.textPrimary }]} numberOfLines={2}>
                     {translateCategoryName(item.name, item.id, item.icon_url)}
                   </Text>
                 </View>
@@ -296,7 +298,7 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
                   style={tw`w-6 h-6 rounded-full border-2 ${
                     selectedCategories.some((cat) => cat.id === item.id)
                       ? `border-[${colors.primary}]`
-                      : "border-[#E5E5EA]"
+                      : `border-[${theme.border}]`
                   } items-center justify-center`}
                 >
                   {selectedCategories.some((cat) => cat.id === item.id) && (
@@ -314,7 +316,7 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
             <View style={tw`w-[70px] h-[90px] items-center justify-center`}>
               <View>
                 <AddCategoryButton onPress={navigateToNewCategory} />
-                <AddButtonLabel />
+                <AddButtonLabel color={theme.textTertiary} />
               </View>
             </View>
           );
@@ -389,7 +391,7 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
             <View
               style={[
                 tw`absolute left-0 top-0 w-full h-full z-50 items-center justify-center`,
-                { backgroundColor: "rgba(255,255,255,0.7)" },
+                { backgroundColor: theme.background + "B3" },
               ]}
             >
               <ActivityIndicator size="large" color={colors.primary} />
@@ -398,11 +400,11 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
               </Text>
             </View>
           )}
-          <View style={tw`bg-white p-4 rounded-t-3xl h-[60%]`}>
+          <View style={[tw`p-4 rounded-t-3xl h-[60%]`, { backgroundColor: theme.background }]}>
             <View style={tw`flex-row justify-between items-center mb-4`}>
               {!hideActions && (
                 <TouchableOpacity onPress={toggleEditMode} style={tw`px-2`}>
-                  <Text style={[tw`text-base`, { color: colors.primary }]}>
+                  <Text style={[tw`text-base`, { color: theme.textSecondary }]}>
                     {editMode
                       ? translate("components:categoryModal.made")
                       : translate("components:categoryModal.edit")}
@@ -410,12 +412,12 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
                 </TouchableOpacity>
               )}
               <View>
-                <Text style={tw`text-lg font-medium`}>
+                <Text style={[tw`text-lg font-medium`, { color: theme.textPrimary }]}>
                   {translate("components:categoryModal.category")}
                 </Text>
               </View>
               <TouchableOpacity onPress={handleClose} style={tw`px-2`}>
-                <Ionicons name="close" size={24} color={colors.primary} />
+                <Ionicons name="close" size={24} color={theme.textSecondary} />
               </TouchableOpacity>
             </View>
             <GestureHandlerRootView style={tw`flex-1`}>

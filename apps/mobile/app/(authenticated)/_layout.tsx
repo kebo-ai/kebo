@@ -5,6 +5,7 @@ import { supabase } from "@/config/supabase";
 import { useTheme } from "@/hooks/useTheme";
 import { colors } from "@/theme/colors";
 import logger from "@/utils/logger";
+import { translate } from "@/i18n";
 
 const AuthenticatedLayout = observer(function AuthenticatedLayout() {
   const { theme } = useTheme();
@@ -32,15 +33,33 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
     };
   }, []);
 
-  // Still loading
   if (loading || token === undefined) {
     return null;
   }
 
-  // Not authenticated, redirect to welcome
   if (!token) {
     return <Redirect href="/(auth)/welcome" />;
   }
+
+  // Shared native header style for screens using Stack.Screen options
+  const nativeHeader = {
+    headerShown: true,
+    headerTransparent: true,
+    headerBlurEffect: theme.blurEffect,
+    headerBackTitle: translate("common:back"),
+    headerTintColor: colors.primary,
+    headerLargeTitleStyle: {
+      fontFamily: "SFUIDisplayBold",
+      color: theme.headerTitle,
+      fontSize: 20,
+    },
+    headerTitleStyle: {
+      fontFamily: "SFUIDisplaySemiBold",
+      color: theme.headerTitle,
+    },
+    headerStyle: { backgroundColor: theme.background },
+    contentStyle: { backgroundColor: theme.background },
+  } as const;
 
   return (
     <Stack
@@ -55,6 +74,32 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
         animationDuration: 200,
       }}
     >
+      {/* ── Tabs ── */}
+      <Stack.Screen name="(tabs)" />
+
+      {/* ── Full-screen modals (own header + close button) ── */}
+      <Stack.Screen
+        name="transaction"
+        options={{
+          presentation: "card",
+          animation: "slide_from_bottom",
+          animationDuration: 80,
+          gestureEnabled: false,
+          contentStyle: { backgroundColor: theme.background },
+        }}
+      />
+      <Stack.Screen
+        name="edit-transaction/[transactionId]"
+        options={{
+          presentation: "card",
+          animation: "slide_from_bottom",
+          animationDuration: 80,
+          gestureEnabled: false,
+          contentStyle: { backgroundColor: theme.background },
+        }}
+      />
+
+      {/* ── Native sheets ── */}
       <Stack.Screen
         name="selection-sheet"
         options={{
@@ -80,24 +125,6 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
         }}
       />
       <Stack.Screen
-        name="transaction"
-        options={{
-          presentation: "card",
-          animation: "slide_from_bottom",
-          animationDuration: 80,
-          headerShown: false,
-          gestureEnabled: false,
-          contentStyle: { backgroundColor: theme.background },
-        }}
-      />
-      <Stack.Screen
-        name="edit-transaction/[transactionId]"
-        options={{
-          presentation: "modal",
-          animation: "slide_from_bottom",
-        }}
-      />
-      <Stack.Screen
         name="new-category"
         options={{
           presentation: "formSheet",
@@ -105,83 +132,46 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
           sheetAllowedDetents: [0.75, 1.0],
         }}
       />
+
+      {/* ── Screens with native header (use Stack.Screen in component) ── */}
+      <Stack.Screen name="accounts" options={nativeHeader} />
+      <Stack.Screen name="edit-account/[accountId]" options={nativeHeader} />
+      <Stack.Screen name="language" options={nativeHeader} />
+      <Stack.Screen name="country" options={nativeHeader} />
+      <Stack.Screen name="number-format" options={nativeHeader} />
+      <Stack.Screen name="profile" options={nativeHeader} />
+      <Stack.Screen name="banner-features" options={nativeHeader} />
+      <Stack.Screen name="reports-income" options={nativeHeader} />
+      <Stack.Screen name="reports-category" options={nativeHeader} />
+      <Stack.Screen name="webview" options={nativeHeader} />
+      <Stack.Screen name="budget/[budgetId]" options={nativeHeader} />
+      <Stack.Screen name="budget-detail/[budgetId]" options={nativeHeader} />
+      <Stack.Screen name="budget/new" options={nativeHeader} />
+
+      {/* ── Screens with custom headers (headerShown: false, registered for routing) ── */}
       <Stack.Screen
-        name="reports-income"
-        options={{
-          headerShown: true,
-          headerTransparent: true,
-          headerBlurEffect: theme.blurEffect,
-          headerTintColor: colors.primary,
-          headerTitleStyle: {
-            fontFamily: "SFUIDisplaySemiBold",
-            color: theme.headerTitle,
-          },
-        }}
+        name="transactions"
+        options={{ contentStyle: { backgroundColor: theme.background } }}
       />
       <Stack.Screen
-        name="reports-category"
-        options={{
-          headerShown: true,
-          headerTransparent: true,
-          headerBlurEffect: theme.blurEffect,
-          headerTintColor: colors.primary,
-          headerTitleStyle: {
-            fontFamily: "SFUIDisplaySemiBold",
-            color: theme.headerTitle,
-          },
-        }}
+        name="account-balance"
+        options={{ contentStyle: { backgroundColor: theme.background } }}
       />
       <Stack.Screen
-        name="webview"
-        options={{
-          headerShown: true,
-          headerTransparent: true,
-          headerBlurEffect: theme.blurEffect,
-          headerTintColor: colors.primary,
-          headerTitleStyle: {
-            fontFamily: "SFUIDisplaySemiBold",
-            color: theme.headerTitle,
-          },
-        }}
+        name="select-bank"
+        options={{ contentStyle: { backgroundColor: theme.background } }}
       />
       <Stack.Screen
-        name="budget/[budgetId]"
-        options={{
-          headerShown: true,
-          headerTransparent: true,
-          headerBlurEffect: theme.blurEffect,
-          headerTintColor: colors.primary,
-          headerTitleStyle: {
-            fontFamily: "SFUIDisplaySemiBold",
-            color: theme.headerTitle,
-          },
-        }}
+        name="select-bank-type"
+        options={{ contentStyle: { backgroundColor: theme.background } }}
       />
       <Stack.Screen
-        name="budget-detail/[budgetId]"
-        options={{
-          headerShown: true,
-          headerTransparent: true,
-          headerBlurEffect: theme.blurEffect,
-          headerTintColor: colors.primary,
-          headerTitleStyle: {
-            fontFamily: "SFUIDisplaySemiBold",
-            color: theme.headerTitle,
-          },
-        }}
+        name="edit-profile"
+        options={{ contentStyle: { backgroundColor: theme.background } }}
       />
       <Stack.Screen
-        name="budget/new"
-        options={{
-          headerShown: true,
-          headerTransparent: true,
-          headerBlurEffect: theme.blurEffect,
-          headerTintColor: colors.primary,
-          headerTitleStyle: {
-            fontFamily: "SFUIDisplaySemiBold",
-            color: theme.headerTitle,
-          },
-        }}
+        name="create-budget-category"
+        options={{ contentStyle: { backgroundColor: theme.background } }}
       />
     </Stack>
   );

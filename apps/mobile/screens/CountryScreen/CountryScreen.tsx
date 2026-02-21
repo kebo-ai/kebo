@@ -6,6 +6,7 @@ import tw from "twrnc";
 import { Stack, useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 import { showToast } from "@/components/ui/CustomToast";
 import { useStores } from "@/models/helpers/useStores";
 import { translate } from "@/i18n";
@@ -19,7 +20,7 @@ const countries = [
   {
     code: "PE",
     name: "Peru",
-    flag: "🇵🇪",
+    flag: "\u{1F1F5}\u{1F1EA}",
     currency: "PEN",
     currencySymbol: "S/",
     currencyName: "Sol Peruano",
@@ -27,7 +28,7 @@ const countries = [
   {
     code: "CO",
     name: "Colombia",
-    flag: "🇨🇴",
+    flag: "\u{1F1E8}\u{1F1F4}",
     currency: "COP",
     currencySymbol: "$",
     currencyName: "Peso Colombiano",
@@ -35,7 +36,7 @@ const countries = [
   {
     code: "MX",
     name: "Mexico",
-    flag: "🇲🇽",
+    flag: "\u{1F1F2}\u{1F1FD}",
     currency: "MXN",
     currencySymbol: "$",
     currencyName: "Peso Mexicano",
@@ -43,7 +44,7 @@ const countries = [
   {
     code: "EC",
     name: "Ecuador",
-    flag: "🇪🇨",
+    flag: "\u{1F1EA}\u{1F1E8}",
     currency: "USD",
     currencySymbol: "$",
     currencyName: "Dolar Estadounidense",
@@ -51,7 +52,7 @@ const countries = [
   {
     code: "AR",
     name: "Argentina",
-    flag: "🇦🇷",
+    flag: "\u{1F1E6}\u{1F1F7}",
     currency: "ARS",
     currencySymbol: "$",
     currencyName: "Peso Argentino",
@@ -59,7 +60,7 @@ const countries = [
   {
     code: "VE",
     name: "Venezuela",
-    flag: "🇻🇪",
+    flag: "\u{1F1FB}\u{1F1EA}",
     currency: "VES",
     currencySymbol: "Bs.",
     currencyName: "Bolivar Soberano",
@@ -67,7 +68,7 @@ const countries = [
   {
     code: "ES",
     name: "Espana",
-    flag: "🇪🇸",
+    flag: "\u{1F1EA}\u{1F1F8}",
     currency: "EUR",
     currencySymbol: "E",
     currencyName: "Euro",
@@ -75,7 +76,7 @@ const countries = [
   {
     code: "CL",
     name: "Chile",
-    flag: "🇨🇱",
+    flag: "\u{1F1E8}\u{1F1F1}",
     currency: "CLP",
     currencySymbol: "$",
     currencyName: "Peso Chileno",
@@ -83,7 +84,7 @@ const countries = [
   {
     code: "US",
     name: "Estados Unidos",
-    flag: "🇺🇸",
+    flag: "\u{1F1FA}\u{1F1F8}",
     currency: "USD",
     currencySymbol: "$",
     currencyName: "Dolar Estadounidense",
@@ -91,7 +92,7 @@ const countries = [
   {
     code: "BO",
     name: "Bolivia",
-    flag: "🇧🇴",
+    flag: "\u{1F1E7}\u{1F1F4}",
     currency: "BOB",
     currencySymbol: "Bs",
     currencyName: "Boliviano",
@@ -99,7 +100,7 @@ const countries = [
   {
     code: "DO",
     name: "Republica Dominicana",
-    flag: "🇩🇴",
+    flag: "\u{1F1E9}\u{1F1F4}",
     currency: "DOP",
     currencySymbol: "RD$",
     currencyName: "Peso Dominicano",
@@ -107,7 +108,7 @@ const countries = [
   {
     code: "HN",
     name: "Honduras",
-    flag: "🇭🇳",
+    flag: "\u{1F1ED}\u{1F1F3}",
     currency: "HNL",
     currencySymbol: "L",
     currencyName: "Lempira",
@@ -115,7 +116,7 @@ const countries = [
   {
     code: "SV",
     name: "El Salvador",
-    flag: "🇸🇻",
+    flag: "\u{1F1F8}\u{1F1FB}",
     currency: "USD",
     currencySymbol: "$",
     currencyName: "Dolar Estadounidense",
@@ -123,7 +124,7 @@ const countries = [
   {
     code: "GT",
     name: "Guatemala",
-    flag: "🇬🇹",
+    flag: "\u{1F1EC}\u{1F1F9}",
     currency: "GTQ",
     currencySymbol: "Q",
     currencyName: "Quetzal",
@@ -131,7 +132,7 @@ const countries = [
   {
     code: "PY",
     name: "Paraguay",
-    flag: "🇵🇾",
+    flag: "\u{1F1F5}\u{1F1FE}",
     currency: "PYG",
     currencySymbol: "G",
     currencyName: "Guarani",
@@ -139,7 +140,7 @@ const countries = [
   {
     code: "CR",
     name: "Costa Rica",
-    flag: "🇨🇷",
+    flag: "\u{1F1E8}\u{1F1F7}",
     currency: "CRC",
     currencySymbol: "C",
     currencyName: "Colon Costarricense",
@@ -147,7 +148,7 @@ const countries = [
   {
     code: "PA",
     name: "Panama",
-    flag: "🇵🇦",
+    flag: "\u{1F1F5}\u{1F1E6}",
     currency: "PAB",
     currencySymbol: "B/.",
     currencyName: "Balboa",
@@ -155,7 +156,7 @@ const countries = [
   {
     code: "UY",
     name: "Uruguay",
-    flag: "🇺🇾",
+    flag: "\u{1F1FA}\u{1F1FE}",
     currency: "UYU",
     currencySymbol: "$U",
     currencyName: "Peso Uruguayo",
@@ -163,7 +164,7 @@ const countries = [
   {
     code: "BR",
     name: "Brasil",
-    flag: "🇧🇷",
+    flag: "\u{1F1E7}\u{1F1F7}",
     currency: "BRL",
     currencySymbol: "R$",
     currencyName: "Real Brasileno",
@@ -171,7 +172,7 @@ const countries = [
   {
     code: "NI",
     name: "Nicaragua",
-    flag: "🇳🇮",
+    flag: "\u{1F1F3}\u{1F1EE}",
     currency: "NIO",
     currencySymbol: "C$",
     currencyName: "Cordoba Nicaraguense",
@@ -182,6 +183,7 @@ export const CountryScreen: FC<CountryScreenProps> = observer(
   function CountryScreen() {
     const router = useRouter();
     const rootStore = useStores();
+    const { theme } = useTheme();
     const {
       profileModel,
       uiStoreModel: { showLoader, hideLoader },
@@ -246,21 +248,21 @@ export const CountryScreen: FC<CountryScreenProps> = observer(
             headerShown: true,
             headerLargeTitle: true,
             headerTransparent: true,
-            headerBlurEffect: "extraLight",
+            headerBlurEffect: theme.blurEffect,
             headerBackTitle: translate("common:back"),
             headerTintColor: colors.primary,
             title: translate("countryScreen:selectCountry"),
             headerLargeStyle: { backgroundColor: "transparent" },
             headerLargeTitleStyle: {
               fontFamily: "SFUIDisplayBold",
-              color: "#110627",
+              color: theme.headerTitle,
               fontSize: 20,
             },
             headerTitleStyle: {
               fontFamily: "SFUIDisplaySemiBold",
-              color: "#110627",
+              color: theme.headerTitle,
             },
-            contentStyle: { backgroundColor: "#FAFAFA" },
+            contentStyle: { backgroundColor: theme.background },
           }}
         />
         <ScrollView
@@ -268,21 +270,22 @@ export const CountryScreen: FC<CountryScreenProps> = observer(
           contentContainerStyle={tw`px-4 pt-4 pb-24`}
           showsVerticalScrollIndicator={false}
         >
-          <View style={tw`bg-white rounded-2xl overflow-hidden border border-[#EBEBEF]`}>
+          <View style={[tw`rounded-2xl overflow-hidden border`, { backgroundColor: theme.surface, borderColor: theme.border }]}>
             {countries.map((country, index) => (
               <TouchableOpacity
                 key={country.code}
-                style={tw`flex-row items-center p-4 ${
-                  index < countries.length - 1 ? "border-b border-[#EBEBEF]" : ""
-                }`}
+                style={[
+                  tw`flex-row items-center p-4`,
+                  index < countries.length - 1 && { borderBottomWidth: 1, borderBottomColor: theme.border },
+                ]}
                 onPress={() => handleCountryChange(country.code)}
               >
                 <Text style={tw`text-3xl mr-4`}>{country.flag}</Text>
                 <View style={tw`flex-1`}>
-                  <Text weight="medium" color="#110627">
+                  <Text weight="medium" color={theme.textPrimary}>
                     {country.name}
                   </Text>
-                  <Text type="xs" weight="light" color="#606A84">
+                  <Text type="xs" weight="light" color={theme.textSecondary}>
                     {country.currencyName} ({country.currencySymbol}{" "}
                     {country.currency})
                   </Text>

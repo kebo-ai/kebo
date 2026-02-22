@@ -364,7 +364,7 @@ export const NewCategoryScreen: React.FC = () => {
                 <TextInput
                   ref={inputRef}
                   style={[
-                    tw`h-[50px] flex-1 text-base bg-[${theme.surface}] border border-[${theme.border}] px-4 rounded-2xl`,
+                    tw`h-[50px] text-base bg-[${theme.surface}] border border-[${theme.border}] px-4 rounded-2xl`,
                     { fontFamily: "SFUIDisplaySemiBold", color: theme.textPrimary },
                   ]}
                   placeholderTextColor={theme.textTertiary}

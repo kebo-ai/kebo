@@ -1,5 +1,6 @@
 import { supabase } from "@/config/supabase";
 import { RootStore } from "@/models/RootStore";
+import { NumberFormatService } from "@/services/NumberFormatService";
 import logger from "./logger";
 
 export const isUserAuthenticated = async (): Promise<boolean> => {
@@ -50,6 +51,12 @@ export const getUserInfo = async (rootStore: RootStore): Promise<any | null> => 
     }
     logger.debug("profileData", profileData);
     rootStore.profileModel.setFromSupabase(userData.user, profileData);
+
+    // Restore locally-persisted number format (not stored in Supabase)
+    const savedFormat = await NumberFormatService.getSelectedFormat();
+    if (savedFormat) {
+      rootStore.profileModel.setNumberFormat(savedFormat);
+    }
 
     return {
       user: userData.user,

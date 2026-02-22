@@ -2,7 +2,7 @@ if (__DEV__) {
   require("./ReactotronConfig");
 }
 import { AppNavigator } from "@/navigators";
-import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary";
+import { ErrorBoundary } from "@/screens/error-screen/error-boundary";
 import moment from "moment";
 
 import "moment/locale/es";

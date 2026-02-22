@@ -22,11 +22,11 @@ import {
 import { colors } from "@/theme/colors";
 import { supabase } from "@/config/supabase";
 import { Animated } from "react-native";
-import { WebViewScreen } from "@/screens/WebViewScreen/WebViewScreen";
-import { LanguageScreen } from "@/screens/LanguageScreen/LanguageScreen";
-import { CountryScreen } from "@/screens/CountryScreen/CountryScreen";
+import { WebViewScreen } from "@/screens/web-view-screen/web-view-screen";
+import { LanguageScreen } from "@/screens/language-screen/language-screen";
+import { CountryScreen } from "@/screens/country-screen/country-screen";
 import { StatusBar } from "expo-status-bar";
-import { BannerFeaturesScreen } from "@/screens/BannerFeaturesScreen/BannerFeaturesScreen";
+import { BannerFeaturesScreen } from "@/screens/banner-features-screen/banner-features-screen";
 import { Category } from "@/models/category/category";
 
 interface BankOption {

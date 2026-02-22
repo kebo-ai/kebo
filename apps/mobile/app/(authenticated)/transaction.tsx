@@ -1,4 +1,4 @@
-import { TransactionScreen as TransactionScreenComponent } from "@/screens/TransactionScreen/TransactionScreen";
+import { TransactionScreen as TransactionScreenComponent } from "@/screens/transaction-screen/transaction-screen";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 export default function TransactionRoute() {

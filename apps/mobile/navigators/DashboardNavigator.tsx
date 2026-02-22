@@ -29,7 +29,7 @@ import { ReportsIconSvg } from "@/components/icons/reports-svg";
 import { translate } from "@/i18n";
 import { ChatbotIconSvg } from "@/components/icons/chat-bot-svg";
 import tw from "@/hooks/use-tailwind";
-import { TransactionScreen } from "@/screens/TransactionScreen/TransactionScreen";
+import { TransactionScreen } from "@/screens/transaction-screen/transaction-screen";
 import { useStores } from "@/models/helpers/use-stores";
 import { useCallback, useEffect } from "react";
 import * as Haptics from "expo-haptics";

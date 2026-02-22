@@ -1,1 +1,1 @@
-export { NewBudgetScreen as default } from "@/screens/NewBudgetScreen/NewBudgetScreen";
+export { NewBudgetScreen as default } from "@/screens/new-budget-screen/new-budget-screen";

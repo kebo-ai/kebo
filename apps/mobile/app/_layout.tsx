@@ -3,7 +3,7 @@ if (__DEV__) {
 }
 
 import { Stack } from "expo-router";
-import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary";
+import { ErrorBoundary } from "@/screens/error-screen/error-boundary";
 import moment from "moment";
 
 import "moment/locale/es";

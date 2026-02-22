@@ -12,10 +12,11 @@ interface UpdateProfileResponse {
   error?: string;
 }
 
-export const updateUserProfile = async (updates: { 
+export const updateUserProfile = async (updates: {
   full_name?: string;
   country?: string;
   currency?: string;
+  language?: string;
 }): Promise<UpdateProfileResponse> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();

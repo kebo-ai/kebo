@@ -71,6 +71,9 @@ export const ProfileModel = types
       self.country = country;
       self.currency = currency;
     },
+    setLanguage(language: string) {
+      self.language = language;
+    },
     setNumberFormat(format: string) {
       self.number_format = format;
     },

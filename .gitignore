@@ -26,6 +26,9 @@ yarn-debug.*
 yarn-error.*
 *.log
 
+# Claude Code
+.claude/
+
 # macOS
 .DS_Store
 *.pem

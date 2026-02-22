@@ -44,7 +44,9 @@
       ],
       "expo-font",
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      "expo-router",
+      "@react-native-community/datetimepicker"
     ],
     "extra": {
       "eas": {

@@ -1,0 +1,37 @@
+import React from "react";
+import {
+  Svg,
+  Path,
+  Circle,
+  G,
+  Defs,
+  ClipPath,
+  Rect,
+  Filter,
+  FeFlood,
+  FeBlend,
+  FeGaussianBlur,
+  Ellipse,
+} from "react-native-svg";
+import { colors } from "@/theme/colors";
+
+interface CalendarIconSvgProps {
+  width?: number;
+  height?: number;
+  color?: string;
+  isPressed?: boolean;
+}
+
+export const CalendarIconSvg: React.FC<CalendarIconSvgProps> = ({
+  width = 28,
+  height = 28,
+}) => (
+  <Svg width={width} height={height} viewBox="0 0 28 28" fill="none">
+    <Path
+      d="M10.1739 17.8261C10.1739 18.5913 10.8 19.2174 11.5652 19.2174H12.2609C13.0261 19.2174 13.6522 18.5913 13.6522 17.8261C13.6522 17.0609 13.0261 16.4348 12.2609 16.4348M12.2609 16.4348H11.5652M12.2609 16.4348C13.0261 16.4348 13.6522 15.8087 13.6522 15.0435C13.6522 14.2783 13.0261 13.6522 12.2609 13.6522H11.5652C10.8 13.6522 10.1739 14.2783 10.1739 15.0435M6 11.5652H22M19.2174 6V9.47826M8.78261 6V9.47826M17.1304 19.2174V13.6522L15.7391 15.0435M6.69565 8.08696H21.3043C21.6885 8.08696 22 8.39841 22 8.78261V21.3043C22 21.6885 21.6885 22 21.3043 22H6.69565C6.31145 22 6 21.6885 6 21.3043V8.78261C6 8.39841 6.31145 8.08696 6.69565 8.08696Z"
+      stroke="#6934D2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);

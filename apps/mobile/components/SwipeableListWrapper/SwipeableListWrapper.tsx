@@ -100,6 +100,8 @@ export function SwipeableListWrapper<T extends SwipeableItem>(props: SwipeableLi
         previewOpenDelay={3000}
         stopLeftSwipe={150}
         stopRightSwipe={-150}
+        scrollEnabled={false}
+        nestedScrollEnabled
       />
     );
   }

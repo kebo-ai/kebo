@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect, useRef, useMemo } from "react";
 import logger from "@/utils/logger";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
 import tw from "@/hooks/useTailwind";
 import {
@@ -11,18 +11,14 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
-import CustomHeader from "@/components/common/CustomHeader";
-import { FixedScreen } from "@/components/FixedScreen";
-import CustomButton from "@/components/common/CustomButton";
 import CustomListItemOption from "@/components/common/CustomListItemOption";
-import CustomModal from "@/components/common/CustomModal";
 import { useStores } from "@/models/helpers/useStores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { AccountModel } from "@/models/account/account";
 import { getUserInfo } from "@/utils/authUtils";
 import ModalAccountType from "@/components/ModalAccountType";
 import { AccountTypeSnapshotIn } from "@/models/account-type-store/account-type";
@@ -38,6 +34,8 @@ import {
 import { translate } from "@/i18n";
 import * as Localization from "expo-localization";
 import { AccountBalanceInput } from "@/components/AccountBalanceInput";
+import { useTheme } from "@/hooks/useTheme";
+import CustomButton from "@/components/common/CustomButton";
 
 interface BankOption {
   id: string;
@@ -90,6 +88,7 @@ const cloneAccountType = (accountType: any): SafeAccountType => {
 export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
   function AccountBalanceScreen() {
     const router = useRouter();
+    const { theme, isDark } = useTheme();
     const params = useLocalSearchParams<{
       selectedBank?: string;
       accountId?: string;
@@ -140,9 +139,6 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
       selectedBank.name?.toLowerCase() ===
         translate("modalAccount:cash").toLowerCase() ||
       selectedBank.name?.toLowerCase() === "efectivo";
-    logger.debug("isCashBank", isCashBank);
-    logger.debug("selectedBank", selectedBank.name);
-    logger.debug("translate", translate("modalAccount:cash"));
     const filteredAccountTypes = isCashBank
       ? accountTypes
       : accountTypes.filter(
@@ -406,7 +402,7 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
             "error",
             translate("accountBalanceScreen:accountErrorProcess")
           );
-          logger.error(error);
+          logger.error(error as string);
         } finally {
           hideLoader();
           resetForm();
@@ -415,7 +411,6 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
     });
 
     const translateType = (type: string | undefined) => {
-      logger.debug("type", type);
       switch (type) {
         case "Efectivo":
           return translate("modalAccount:cash");
@@ -427,7 +422,6 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
           return translate("modalAccount:creditCard");
         case "Cuenta Corriente":
           return translate("modalAccount:currentAccount");
-
         default:
           return type;
       }
@@ -435,30 +429,36 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
 
     return (
       <>
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            headerLargeTitle: false,
+            headerTransparent: true,
+            headerBlurEffect: theme.blurEffect,
+            headerBackTitle: translate("common:back"),
+            headerTintColor: colors.primary,
+            title: isEditing
+              ? translate("accountBalanceScreen:editAccount")
+              : translate("accountBalanceScreen:addAccount"),
+            headerTitleStyle: {
+              fontFamily: "SFUIDisplaySemiBold",
+              color: theme.headerTitle,
+            },
+            contentStyle: { backgroundColor: theme.background },
+          }}
+        />
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
           keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
         >
-          <FixedScreen
-            safeAreaEdges={["top"]}
-            backgroundColor="#FAFAFA"
-            statusBarBackgroundColor={colors.primary}
-            header={
-              <CustomHeader
-                onPress={() => router.back()}
-                title={
-                  isEditing
-                    ? translate("accountBalanceScreen:editAccount")
-                    : translate("accountBalanceScreen:addAccount")
-                }
-              />
-            }
-            contentContainerStyle={
-              Platform.OS === "android" ? { paddingBottom: 70 } : undefined
-            }
+          <ScrollView
+            contentInsetAdjustmentBehavior="automatic"
+            contentContainerStyle={tw`px-4 pt-4 pb-24`}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
-            <View style={tw`p-4 bg-white rounded-2xl shadow-md w-full`}>
+            <View style={[tw`p-4 rounded-2xl`, { backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border }]}>
               <AccountBalanceInput
                 ref={amountInputRef}
                 value={formik.values.balance}
@@ -471,21 +471,23 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
                 label={translate("accountBalanceScreen:accountBalance")}
               />
               <View
-                style={tw`flex-row items-center justify-between h-[60px]
-                border-t border-b border-[rgba(96,106,132,0.15)] border-solid`}
+                style={[
+                  tw`flex-row items-center justify-between h-[60px]`,
+                  { borderTopWidth: 1, borderBottomWidth: 1, borderColor: theme.border },
+                ]}
               >
                 <View style={tw`flex-row items-center gap-[9px]`}>
                   <Image
                     source={{
                       uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}${selectedBank.bank_url}`,
                     }}
-                    style={tw`w-[22px] h-[22px] border border-[#6934D2]/15 rounded-full bg-white`}
+                    style={[tw`w-[22px] h-[22px] rounded-full`, { borderWidth: 1, borderColor: theme.border, backgroundColor: theme.surface }]}
                     resizeMode="contain"
                   />
                   <Text
                     style={tw`text-base`}
                     weight="semibold"
-                    color="rgba(96, 106, 132, 1)"
+                    color={theme.textSecondary}
                   >
                     {selectedBank.name === "Banco Personalizado"
                       ? translate("components:bankModal.customBank")
@@ -511,8 +513,10 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
               </View>
               {!isCashBank && (
                 <View
-                  style={tw`flex-row items-center justify-between h-[60px]
-                  border-t border-b border-[rgba(96,106,132,0.15)] border-solid`}
+                  style={[
+                    tw`flex-row items-center justify-between h-[60px]`,
+                    { borderTopWidth: 1, borderBottomWidth: 1, borderColor: theme.border },
+                  ]}
                 >
                   <View style={tw`flex-row items-center`}>
                     <CustomListItemOption
@@ -531,18 +535,18 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
                 </View>
               )}
             </View>
-            <ModalAccountType
-              visible={modalVisible}
-              onClose={() => setModalVisible(false)}
-              onSelect={(selected) => {
-                formik.setFieldValue("accountType", cloneAccountType(selected));
-                setModalVisible(false);
-              }}
-              selectedValue={formik.values.accountType as any}
-              data={filteredAccountTypes}
-              title={translate("accountBalanceScreen:typeAccountTitle")}
-            />
-          </FixedScreen>
+          </ScrollView>
+          <ModalAccountType
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+            onSelect={(selected) => {
+              formik.setFieldValue("accountType", cloneAccountType(selected));
+              setModalVisible(false);
+            }}
+            selectedValue={formik.values.accountType as any}
+            data={filteredAccountTypes}
+            title={translate("accountBalanceScreen:typeAccountTitle")}
+          />
           <CustomButton
             variant="primary"
             isEnabled={!!(formik.isValid && formik.values.accountType.id)}

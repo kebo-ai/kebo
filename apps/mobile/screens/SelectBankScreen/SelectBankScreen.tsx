@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { useStores } from "@/models/helpers/useStores";
 import tw from "@/hooks/useTailwind";
@@ -12,11 +12,10 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
-import CustomHeader from "@/components/common/CustomHeader";
 import { SearchIconSvg } from "@/components/icons/SearchSvg";
-import { FixedScreen } from "@/components/FixedScreen";
 import * as Localization from "expo-localization";
 import { translate } from "@/i18n";
+import { useTheme } from "@/hooks/useTheme";
 
 interface Bank {
   id: string;
@@ -42,6 +41,7 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
       profileModel,
     } = useStores();
     const [searchQuery, setSearchQuery] = useState("");
+    const { theme, isDark } = useTheme();
 
     const isTransfer = params.isTransfer === "true";
     const transferType = params.transferType;
@@ -65,42 +65,60 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
     }, [searchQuery, userCountry]);
 
     return (
-      <FixedScreen
-        safeAreaEdges={["top"]}
-        backgroundColor="#FAFAFA"
-        statusBarBackgroundColor={colors.primary}
-        header={
-          <CustomHeader
-            onPress={() => router.back()}
-            title={translate("components:bankModal.addAccount")}
-          />
-        }
-      >
-        <View style={tw`flex-1`}>
-          <View style={tw`px-6`}>
+      <>
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            headerLargeTitle: false,
+            headerTransparent: true,
+            headerBlurEffect: theme.blurEffect,
+            headerBackTitle: translate("common:back"),
+            headerTintColor: colors.primary,
+            title: translate("components:bankModal.addAccount"),
+            headerLargeTitleStyle: {
+              fontFamily: "SFUIDisplayBold",
+              color: theme.headerTitle,
+            },
+            headerTitleStyle: {
+              fontFamily: "SFUIDisplaySemiBold",
+              color: theme.headerTitle,
+            },
+            contentStyle: { backgroundColor: theme.background },
+          }}
+        />
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={tw`px-4 pt-4 pb-24`}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={tw`px-2`}>
             <Text
-              style={tw`text-base mt-4`}
+              style={tw`text-base`}
               weight="medium"
-              color={colors.textGray}
+              color={theme.textPrimary}
             >
               {translate("components:bankModal.chooseBank")}
             </Text>
             <Text
-              style={tw`text-[14px]`}
+              style={tw`text-sm mt-1`}
               weight="light"
-              color="#606A8480"
+              color={theme.textTertiary}
             >
               {translate("components:bankModal.selectBank")}
             </Text>
             <View
-              style={tw`flex-row items-center my-4 h-[44px] rounded-[15px] border border-[#606A8426] bg-[${colors.white}] px-4 py-2 gap-2`}
+              style={[
+                tw`flex-row items-center my-4 h-[44px] rounded-2xl px-4 py-2 gap-2`,
+                { backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border },
+              ]}
             >
               <SearchIconSvg />
               <TextInput
                 placeholder={translate("components:bankModal.searchBank")}
+                placeholderTextColor={theme.textTertiary}
                 style={[
-                  tw`text-base text-[${colors.textGray}] leading-[21px] tracking-0 flex-1`,
-                  { fontFamily: "SFUIDisplayMedium" },
+                  tw`text-base leading-[21px] flex-1`,
+                  { fontFamily: "SFUIDisplayMedium", color: theme.textPrimary },
                 ]}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
@@ -108,12 +126,10 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
             </View>
           </View>
 
-          <ScrollView
-            style={tw`flex-1 px-6`}
-            contentContainerStyle={tw`pb-6`}
-            showsVerticalScrollIndicator={false}
+          <View
+            style={[tw`rounded-2xl overflow-hidden`, { borderWidth: 1, borderColor: theme.border, backgroundColor: theme.surface }]}
           >
-            {banks?.map((bank) => (
+            {banks?.map((bank, index) => (
               <TouchableOpacity
                 key={bank.id}
                 onPress={() => {
@@ -131,19 +147,22 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
                     },
                   });
                 }}
-                style={tw`flex-row items-center rounded h-[54px] gap-2 pl-2.5 mb-2`}
+                style={[
+                  tw`flex-row items-center h-[54px] gap-3 px-4`,
+                  index < (banks?.length ?? 0) - 1 && { borderBottomWidth: 1, borderBottomColor: theme.border },
+                ]}
               >
                 <Image
                   source={{
                     uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}${bank.bank_url}`,
                   }}
-                  style={tw`w-[22px] h-[22px] border border-[#6934D2]/15 rounded-full`}
+                  style={[tw`w-[22px] h-[22px] rounded-full`, { borderWidth: 1, borderColor: theme.border }]}
                   resizeMode="contain"
                 />
                 <Text
                   style={tw`text-base`}
                   weight="medium"
-                  color={colors.textGray}
+                  color={theme.textPrimary}
                 >
                   {bank.name === "Banco Personalizado"
                     ? translate("components:bankModal.customBank")
@@ -153,9 +172,9 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
                 </Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
-        </View>
-      </FixedScreen>
+          </View>
+        </ScrollView>
+      </>
     );
   }
 );

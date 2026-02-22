@@ -1,44 +1,42 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { match as matchLocale } from '@formatjs/intl-localematcher'
-import Negotiator from 'negotiator'
-import { i18n } from './i18n/config'
+import { type NextRequest, NextResponse } from "next/server"
+import { createServerClient } from "@supabase/ssr"
 
-function getLocale(request: NextRequest): string {
-  const negotiatorHeaders: Record<string, string> = {}
-  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value))
+export default function proxy(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
 
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages()
-  const locales: string[] = [...i18n.locales]
-
-  return matchLocale(languages, locales, i18n.defaultLocale)
-}
-
-export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl
-
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/images') ||
-    pathname.startsWith('/videos') ||
-    pathname.includes('.') 
-  ) {
-    return
-  }
-
-  const pathnameHasLocale = i18n.locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
+          supabaseResponse = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
   )
 
-  if (pathnameHasLocale) return
+  // Refresh session if expired
+  supabase.auth.getUser()
 
-  const locale = getLocale(request)
-  request.nextUrl.pathname = `/${locale}${pathname}`
-  return NextResponse.redirect(request.nextUrl)
+  return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/((?!_next|api|images|videos|.*\\..*).*)'],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|images|videos|fonts|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 }
-

@@ -17,7 +17,7 @@ import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import { standardHeader } from "@/theme/header-options";
 import CustomListItemOption from "@/components/common/CustomListItemOption";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { getUserInfo } from "@/utils/auth-utils";

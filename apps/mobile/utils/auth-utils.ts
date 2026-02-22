@@ -1,5 +1,5 @@
 import { supabase } from "@/config/supabase";
-import { RootStore } from "@/models/RootStore";
+import { RootStore } from "@/models/root-store";
 import { NumberFormatService } from "@/services/NumberFormatService";
 import logger from "./logger";
 

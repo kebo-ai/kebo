@@ -1,7 +1,7 @@
 import logger from "@/utils/logger";
 import { useFormik } from "formik";
 import moment from "moment";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { translate, TxKeyPath } from "@/i18n";
 import { RecurrenceType, RecurrenceCadenceEnum, TransactionType } from "@/types/transaction";
 import { showToast } from "@/components/ui/CustomToast";

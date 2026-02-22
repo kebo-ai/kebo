@@ -1,6 +1,6 @@
 import { cast, getRoot, flow, Instance, SnapshotIn, SnapshotOut, types, IAnyModelType } from "mobx-state-tree";
 import { CategoryModel, CategorySnapshotOut, Category } from "@/models/category/category";
-import { RootStore } from "@/models/RootStore";
+import { RootStore } from "@/models/root-store";
 import { createCategoryUser, getCategoriesUsers } from "@/services/CategoryService";
 import { getIcons as getIconsService } from "@/services/IconsService";
 import { IconModel, IconSnapshotOut } from "@/models/icon/icon";

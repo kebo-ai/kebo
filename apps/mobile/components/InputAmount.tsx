@@ -10,7 +10,7 @@ import {
 import tw from "@/hooks/useTailwind";
 import { colors } from "@/theme/colors";
 import { useCurrencyFormatter } from "./common/CurrencyFormatter";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 
 interface InputAmountProps {
   value: string;

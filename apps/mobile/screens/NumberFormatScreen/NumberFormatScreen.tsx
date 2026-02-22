@@ -8,7 +8,7 @@ import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
 import { standardHeader } from "@/theme/header-options";
 import { useTheme } from "@/hooks/useTheme";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
 import { NumberFormatService } from "@/services/NumberFormatService";
 

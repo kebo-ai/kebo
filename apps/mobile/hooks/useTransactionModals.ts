@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStores } from '@/models/helpers/useStores';
+import { useStores } from '@/models/helpers/use-stores';
 import { FormikProps } from 'formik';
 import { TransactionFormValues, TransactionType } from '@/types/transaction';
 import { ITransaction } from '@/models/transaction/transaction';

@@ -26,7 +26,7 @@ import * as Haptics from "expo-haptics";
 import CustomAlert from "@/components/common/CustomAlert";
 import { deleteCategoryService } from "@/services/CategoryService";
 import { showToast } from "@/components/ui/CustomToast";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { load, save } from "@/utils/storage";
 import { REPORTS_INCOME_PERIOD } from "@/utils/storage/storage-keys";

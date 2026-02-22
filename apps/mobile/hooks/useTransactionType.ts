@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { TransactionType } from '@/types/transaction';
-import { useStores } from '@/models/helpers/useStores';
+import { useStores } from '@/models/helpers/use-stores';
 import logger from '@/utils/logger';
 
 export const useTransactionType = (route: any) => {

@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 import { showToast } from "@/components/ui/CustomToast";
 import { translate } from "@/i18n";
 import { LanguageService } from "@/services/LanguageService";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { updateUserProfile } from "@/services/UserService";
 
 interface LanguageScreenProps {}

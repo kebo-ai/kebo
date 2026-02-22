@@ -30,7 +30,7 @@ import { translate } from "@/i18n";
 import { ChatbotIconSvg } from "@/components/icons/ChatBotSvg";
 import tw from "@/hooks/useTailwind";
 import { TransactionScreen } from "@/screens/TransactionScreen/TransactionScreen";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { useCallback, useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import React from "react";

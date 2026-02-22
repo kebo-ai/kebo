@@ -15,7 +15,7 @@ import { translate } from "@/i18n";
 import { Screen } from "@/components/Screen";
 import CustomHeader from "@/components/common/CustomHeader";
 import CustomIconModal from "@/components/common/CustomIconModal";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { IconModel } from "@/models/icon/icon";
 import CustomButton from "@/components/common/CustomButton";
 import {

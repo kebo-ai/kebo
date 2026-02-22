@@ -21,7 +21,7 @@ import { showToast } from "@/components/ui/CustomToast";
 import { Text, Button, Icon } from "@/components/ui";
 import DeleteAccountModal from "@/components/common/DeleteAccountModal";
 import CustomCategoryModal from "@/components/common/CustomCategoryModal";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
 import { updateUserProfile } from "@/services/UserService";
 import logger from "@/utils/logger";

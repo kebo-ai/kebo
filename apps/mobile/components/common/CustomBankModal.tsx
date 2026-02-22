@@ -17,7 +17,7 @@ import tw from "twrnc";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "@/theme/colors";
 import { navigate } from "@/navigators";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { observer } from "mobx-react-lite";
 import {
   deleteAccountService,

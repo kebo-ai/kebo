@@ -29,7 +29,7 @@ import { SwipeableItem } from "@/components/SwipeableList/SwipeableList";
 import * as Haptics from "expo-haptics";
 import { InteractionManager } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { AccountIconSvg } from "@/components/icons/AccountSvg";
 import { CalendarIconSvg } from "@/components/icons/CalendarSvg";
 import { MultiCategoryModal } from "@/components/common/MultiCategoryModal";

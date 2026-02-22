@@ -12,7 +12,7 @@ import * as Haptics from "expo-haptics";
 import { observer } from "mobx-react-lite";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { translate } from "@/i18n";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { useTheme } from "@/hooks/useTheme";
 import { useShakeAnimation } from "@/hooks/useShakeAnimation";
 import { useNumberEntry } from "@/hooks/useNumberEntry";

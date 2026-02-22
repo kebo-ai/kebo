@@ -1,7 +1,7 @@
 import logger from "@/utils/logger";
 import React, { useMemo } from "react";
 import * as Localization from "expo-localization";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 
 // Number format → separators mapping
 const FORMAT_SEPARATORS: Record<string, { thousands: string; decimal: string }> = {

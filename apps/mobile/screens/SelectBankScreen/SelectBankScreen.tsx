@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import tw from "@/hooks/useTailwind";
 import {
   View,

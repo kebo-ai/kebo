@@ -4,7 +4,7 @@ import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { Text } from "@/components/ui";
 import { translate } from "@/i18n";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 
 interface DataItem {
   label: string;

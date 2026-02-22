@@ -11,7 +11,7 @@ import tw from "twrnc";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { colors } from "@/theme/colors";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import moment from "moment";
 import "moment/locale/es";
 import i18n from "@/i18n/i18n";

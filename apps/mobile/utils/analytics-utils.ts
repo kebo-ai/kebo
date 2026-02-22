@@ -1,7 +1,7 @@
 import logger from "./logger";
 import { AnalyticsService } from "@/services/AnalyticsService";
 import { getUserInfo } from "@/utils/auth-utils";
-import { RootStore } from "@/models/RootStore";
+import { RootStore } from "@/models/root-store";
 
 export const initializeUserAnalytics = async (
   analytics: AnalyticsService,

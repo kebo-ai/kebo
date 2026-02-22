@@ -17,7 +17,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import {
   Category,
   CategorySnapshotIn,

@@ -9,7 +9,7 @@ import {
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { Text } from "@/components/ui";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { observer } from "mobx-react-lite";
 import { SvgUri } from "react-native-svg";
 import { translate } from "@/i18n";

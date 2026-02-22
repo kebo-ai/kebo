@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import { useTheme } from "@/hooks/useTheme";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import ModalAccountType from "@/components/ModalAccountType";

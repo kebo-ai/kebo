@@ -9,7 +9,7 @@ import { colors } from "@/theme/colors";
 import { largeTitleHeader } from "@/theme/header-options";
 import { useTheme } from "@/hooks/useTheme";
 import { showToast } from "@/components/ui/CustomToast";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
 import { updateUserProfile } from "@/services/UserService";
 import { getUserInfo } from "@/utils/auth-utils";

@@ -2,7 +2,7 @@ import React from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 const Loader = observer(() => {
   const {
     uiStoreModel: { isLoading },

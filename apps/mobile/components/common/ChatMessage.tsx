@@ -14,7 +14,7 @@ import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { translate } from "@/i18n";
 import { Ionicons } from "@expo/vector-icons";
-import { useStores } from "@/models/helpers/useStores";
+import { useStores } from "@/models/helpers/use-stores";
 import { showToast } from "@/components/ui/CustomToast";
 import { createReportThread } from "@/services/ChatService";
 import reactotron from "reactotron-react-native";

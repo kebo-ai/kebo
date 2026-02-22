@@ -90,7 +90,7 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
                 : undefined,
             });
           } else {
-            router.push(route as any);
+            router.navigate(route as any);
           }
         },
         goBack: () => router.back(),
@@ -226,17 +226,7 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
               ? translate("createBudgetCategoryScreen:categoryUpdated")
               : translate("createBudgetCategoryScreen:categoryAdded")
           );
-          if (isEditing) {
-            router.push({
-              pathname: "/(authenticated)/budget/[budgetId]",
-              params: {
-                budgetId: budgetId,
-                categoryId: currentSelectedCategory.id,
-              },
-            });
-          } else {
-            router.back();
-          }
+          router.back();
         } else {
           showToast(
             "error",

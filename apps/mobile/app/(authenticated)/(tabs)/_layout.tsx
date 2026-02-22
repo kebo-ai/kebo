@@ -59,7 +59,7 @@ export default function TabsLayout() {
         <Label>{translate("navigator:reports")}</Label>
         <Icon src={tabIcons.reports} />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="transaction-button" role="search">
+      <NativeTabs.Trigger name="transaction-button">
         <Label>{translate("navigator:newTransaction")}</Label>
         <Icon src={tabIcons.plus} />
       </NativeTabs.Trigger>

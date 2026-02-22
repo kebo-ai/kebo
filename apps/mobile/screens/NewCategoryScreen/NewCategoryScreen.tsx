@@ -4,15 +4,12 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
   ActivityIndicator,
-  Image,
 } from "react-native";
 import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { translate } from "@/i18n";
 import { Screen } from "@/components/Screen";
@@ -57,6 +54,7 @@ interface NewCategoryScreenParams {
 
 export const NewCategoryScreen: React.FC = () => {
   const router = useRouter();
+  const { theme, isDark } = useTheme();
   const routeParams = useLocalSearchParams<{
     isEditing?: string;
     isNew?: string;
@@ -76,6 +74,7 @@ export const NewCategoryScreen: React.FC = () => {
     useState<number>(0);
   const debounceTimer = useRef<NodeJS.Timeout>();
   const inputRef = useRef<TextInput>(null);
+  const isInitialized = useRef(false);
 
   const params: NewCategoryScreenParams = {
     isEditing: routeParams.isEditing === "true",
@@ -129,6 +128,7 @@ export const NewCategoryScreen: React.FC = () => {
     }),
 
     onSubmit: async (values) => {
+      setIsEmojiPickerVisible(false);
       try {
         let categoryId;
 
@@ -140,7 +140,6 @@ export const NewCategoryScreen: React.FC = () => {
           });
           categoryId = params?.categoryData?.id;
         } else {
-          Keyboard.dismiss();
           const category = await createCategory({
             type: values.type,
             name: values.name,
@@ -161,26 +160,7 @@ export const NewCategoryScreen: React.FC = () => {
           icon_url: values.icon_url,
         });
 
-        const previousScreen = params?.previousScreen;
-
-        if (previousScreen === "EditTransaction") {
-          router.back();
-        } else if (previousScreen === "CreateBudgetCategory") {
-          router.back();
-        } else if (previousScreen === "Budget") {
-          router.back();
-        } else {
-          router.push({
-            pathname: "/(authenticated)/transaction",
-            params: {
-              transactionType: transactionModel.transaction_type as
-                | "Income"
-                | "Expense"
-                | "Transfer",
-              fromCategoryScreen: "true",
-            },
-          });
-        }
+        router.back();
       } catch (error) {
         showToast("error", translate("components:newCategory.errorCategory"));
       }
@@ -188,21 +168,16 @@ export const NewCategoryScreen: React.FC = () => {
   });
 
   useEffect(() => {
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
     const initializeForm = async () => {
       await getIcons();
 
       setSuggestedIcons([]);
       setSelectedSuggestionIndex(0);
 
-      if (params?.isNew) {
-        formik.resetForm({
-          values: {
-            name: "",
-            icon_url: "kebo_icon",
-            type: transactionModel.transaction_type as CategoryFormValues["type"],
-          },
-        });
-      } else if (params?.isEditing && params?.categoryData) {
+      if (params?.isEditing && params?.categoryData) {
         const iconUrl = params.categoryData.icon_url;
         const foundIcon = icons.find((icon) => icon.url === iconUrl);
 
@@ -219,15 +194,6 @@ export const NewCategoryScreen: React.FC = () => {
               (transactionModel.transaction_type as CategoryFormValues["type"]),
           },
         });
-      } else {
-        setSelectedIcon(null);
-        formik.resetForm({
-          values: {
-            name: "",
-            icon_url: "kebo_icon",
-            type: transactionModel.transaction_type as CategoryFormValues["type"],
-          },
-        });
       }
 
       setTimeout(() => {
@@ -236,7 +202,7 @@ export const NewCategoryScreen: React.FC = () => {
     };
 
     initializeForm();
-  }, [routeParams]);
+  }, []);
 
   const handleIconSelect = (icon: Instance<typeof IconModel>) => {
     setSelectedIcon(icon);
@@ -289,15 +255,12 @@ export const NewCategoryScreen: React.FC = () => {
 
   return (
     <>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 2}
-      >
+      <View style={{ flex: 1 }}>
         <Screen
-          safeAreaEdges={["top", "bottom"]}
-          preset="scroll"
-          backgroundColor="#FAFAFA"
+          safeAreaEdges={["top"]}
+          preset="fixed"
+          style={{ flex: 1 }}
+          backgroundColor={theme.background}
           statusBarBackgroundColor={colors.primary}
           header={
             <CustomHeader
@@ -315,7 +278,7 @@ export const NewCategoryScreen: React.FC = () => {
               <Text
                 style={tw`mt-6 text-base text-center`}
                 weight="semibold"
-                color="#110627"
+                color={theme.textPrimary}
               >
                 {params?.isEditing
                   ? translate("components:newCategory.editCategory")
@@ -337,7 +300,7 @@ export const NewCategoryScreen: React.FC = () => {
                       <TouchableOpacity
                         key={index}
                         style={[
-                          tw`mx-2 border border-[#6934D226] w-[35px] h-[35px] rounded-xl items-center justify-center`,
+                          tw`mx-2 border border-[${colors.primaryBg}] w-[35px] h-[35px] rounded-xl items-center justify-center`,
                           selectedSuggestionIndex === index &&
                             tw`border-2 border-[${colors.primary}]`,
                         ]}
@@ -352,7 +315,7 @@ export const NewCategoryScreen: React.FC = () => {
               <View style={tw`items-center w-full mt-4`}>
                 <View style={tw`items-center`}>
                   <View
-                    style={tw`bg-[#6934D226] w-[76px] h-[76px] rounded-3xl items-center justify-center`}
+                    style={tw`bg-[${colors.primaryBg}] w-[76px] h-[76px] rounded-3xl items-center justify-center`}
                   >
                     {(() => {
                       logger.debug("Current icon_url:", formik.values.icon_url);
@@ -390,7 +353,7 @@ export const NewCategoryScreen: React.FC = () => {
                     onPress={() => {
                       setIsEmojiPickerVisible(true);
                     }}
-                    style={tw`absolute bottom-[-10px] right-[-10px] bg-[${colors.primary}] w-8 h-8 rounded-full items-center justify-center border-2 border-white`}
+                    style={tw`absolute bottom-[-10px] right-[-10px] bg-[${colors.primary}] w-8 h-8 rounded-full items-center justify-center border-2 border-[${theme.background}]`}
                   >
                     <EditIconSvg />
                   </TouchableOpacity>
@@ -401,10 +364,10 @@ export const NewCategoryScreen: React.FC = () => {
                 <TextInput
                   ref={inputRef}
                   style={[
-                    tw`h-[50px] flex-1 text-base  bg-[${colors.white}] text-[#606A84] border border-[#606A84]/15 px-4 rounded-2xl`,
-                    { fontFamily: "SFUIDisplaySemiBold" },
+                    tw`h-[50px] flex-1 text-base bg-[${theme.surface}] border border-[${theme.border}] px-4 rounded-2xl`,
+                    { fontFamily: "SFUIDisplaySemiBold", color: theme.textPrimary },
                   ]}
-                  placeholderTextColor="rgba(96,106,132,0.3)"
+                  placeholderTextColor={theme.textTertiary}
                   placeholder={translate("components:newCategory.nameCategory")}
                   value={formik.values.name}
                   onChangeText={handleNameChange}
@@ -430,22 +393,23 @@ export const NewCategoryScreen: React.FC = () => {
             />
           </View>
         </Screen>
-        <CustomButton
-          variant="primary"
-          isEnabled={
-            formik.isValid &&
-            formik.values.name !== "" &&
-            formik.values.icon_url !== ""
-          }
-          onPress={() => formik.handleSubmit()}
-          title={
-            params?.isEditing
-              ? translate("components:newCategory.saveChanges")
-              : translate("components:newCategory.continue")
-          }
-          adaptToKeyboard={true}
-        />
-      </KeyboardAvoidingView>
+        <View style={tw`px-6 pb-8`}>
+          <CustomButton
+            variant="primary"
+            isEnabled={
+              formik.isValid &&
+              formik.values.name !== "" &&
+              formik.values.icon_url !== ""
+            }
+            onPress={() => formik.handleSubmit()}
+            title={
+              params?.isEditing
+                ? translate("components:newCategory.saveChanges")
+                : translate("components:newCategory.continue")
+            }
+          />
+        </View>
+      </View>
       <EmojiKeyboard
         onEmojiSelected={(emoji: EmojiType) => handleEmojiSelect(emoji.emoji)}
         open={isEmojiPickerVisible}
@@ -456,12 +420,12 @@ export const NewCategoryScreen: React.FC = () => {
         allowMultipleSelections={false}
         theme={{
           backdrop: "rgba(0, 0, 0, 0.25)",
-          container: colors.white,
+          container: theme.surface,
           header: "transparent",
           category: {
             icon: colors.primary,
             iconActive: colors.white,
-            container: colors.white,
+            container: theme.surface,
             containerActive: colors.primary,
           },
           emoji: {

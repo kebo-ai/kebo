@@ -119,7 +119,7 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
         options={{
           presentation: "formSheet",
           sheetGrabberVisible: true,
-          sheetAllowedDetents: [0.75, 1.0],
+          sheetAllowedDetents: [1.0],
         }}
       />
 

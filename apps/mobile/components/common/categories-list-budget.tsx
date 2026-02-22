@@ -5,7 +5,7 @@ import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
 import { useCurrencyFormatter } from "./currency-formatter";
 import * as Haptics from "expo-haptics";
-import { SwipeableListWrapper } from "@/components";
+import { SwipeableListWrapper } from "@/components/swipeable-list-wrapper/swipeable-list-wrapper";
 import { colors } from "@/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { RowMap } from "react-native-swipe-list-view";

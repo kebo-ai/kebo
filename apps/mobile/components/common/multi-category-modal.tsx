@@ -8,7 +8,7 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import { useStores } from "@/models";
+import { useStores } from "@/models/helpers/use-stores";
 import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
 import { colors } from "@/theme";

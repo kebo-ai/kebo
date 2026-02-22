@@ -1,6 +1,6 @@
 import { ErrorInfo } from "react";
 import { Text } from "react-native";
-import { Screen } from "@/components";
+import { Screen } from "@/components/screen";
 
 export interface ErrorDetailsProps {
   error: Error;

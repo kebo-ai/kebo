@@ -21,7 +21,7 @@ import { ArrowUpIconSvg } from "@/components/icons/arrow-up-icon";
 import { MaterialIcons } from "@expo/vector-icons";
 import CustomAlert from "@/components/common/custom-alert";
 import { translate } from "@/i18n";
-import { SwipeableListWrapper } from "@/components";
+import { SwipeableListWrapper } from "@/components/swipeable-list-wrapper/swipeable-list-wrapper";
 import { RowMap } from "react-native-swipe-list-view";
 import CustomFilterModal from "@/components/common/custom-filter-modal";
 import CustomBankModal from "@/components/common/custom-bank-modal";

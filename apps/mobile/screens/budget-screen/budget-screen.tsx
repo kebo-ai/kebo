@@ -21,7 +21,7 @@ import { budgetService } from "@/services/budget-service";
 import { CategoryItem } from "@/components/common/category-item";
 import { BudgetResponse } from "@/types/transaction";
 import { Category } from "@/models/category/category";
-import { useStores } from "@/models";
+import { useStores } from "@/models/helpers/use-stores";
 import { showToast } from "@/components/ui/custom-toast";
 import CustomAlert from "@/components/common/custom-alert";
 import * as Haptics from "expo-haptics";

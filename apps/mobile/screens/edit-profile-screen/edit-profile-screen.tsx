@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect, useRef, useCallback } from "react";
 import { View, Text, TouchableOpacity, Image, TextInput } from "react-native";
 import tw from "twrnc";
-import { Screen } from "@/components";
+import { Screen } from "@/components/screen";
 import { useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";

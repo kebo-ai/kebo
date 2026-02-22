@@ -6,7 +6,26 @@ import {
   RouteProp,
 } from "@react-navigation/native";
 import { observer } from "mobx-react-lite";
-import * as Screens from "@/screens";
+import { SplashScreen } from "@/screens/splash-screen/splash-screen";
+import { TransactionScreen } from "@/screens/transaction-screen/transaction-screen";
+import { EditTransactionScreen } from "@/screens/edit-transaction-screen/edit-transaction-screen";
+import { NewBudgetScreen } from "@/screens/new-budget-screen/new-budget-screen";
+import { BudgetsScreen } from "@/screens/budgets-screen/budgets-screen";
+import { BudgetScreen } from "@/screens/budget-screen/budget-screen";
+import { CreateBudgetCategoryScreen } from "@/screens/create-budget-category-screen/create-budget-category-screen";
+import { BudgetDetailScreen } from "@/screens/budget-detail-screen/budget-detail-screen";
+import { NewCategoryScreen } from "@/screens/new-category-screen/new-category-screen";
+import { SelectBankScreen } from "@/screens/select-bank-screen/select-bank-screen";
+import { SelectBankTypeScreen } from "@/screens/select-bank-type-screen/select-bank-type-screen";
+import { AccountBalanceScreen } from "@/screens/account-balance-screen/account-balance-screen";
+import { EditAccountScreen } from "@/screens/edit-account-screen/edit-account-screen";
+import { EditProfileScreen } from "@/screens/edit-profile-screen/edit-profile-screen";
+import { ProfileScreen } from "@/screens/profile-screen/profile-screen";
+import { TransactionsScreen } from "@/screens/transactions-screen/transactions-screen";
+import { AccountsScreen } from "@/screens/accounts-screen/accounts-screen";
+import { ReportsIncomeScreen } from "@/screens/reports-income-screen/reports-income-screen";
+import { ReportsCategoryScreen } from "@/screens/reports-category-screen/reports-category-screen";
+import { WelcomeScreen } from "@/screens/welcome-screen/welcome-screen";
 import Config from "@/config";
 import { navigationRef, useBackButtonHandler } from "@/navigators/navigationUtilities";
 import { ComponentProps, useEffect, useState } from "react";
@@ -213,7 +232,7 @@ export const AppStack = observer(function AppStack() {
     <Stack.Navigator screenOptions={screenOptions} initialRouteName="Splash">
       <Stack.Screen
         name="Splash"
-        component={Screens.SplashScreen}
+        component={SplashScreen}
         options={{
           headerShown: false,
           gestureEnabled: true,
@@ -238,22 +257,22 @@ export const AppStack = observer(function AppStack() {
           />
           <Stack.Screen
             name="Transaction"
-            component={Screens.TransactionScreen}
+            component={TransactionScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="EditTransaction"
-            component={Screens.EditTransactionScreen}
+            component={EditTransactionScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="NewBudget"
-            component={Screens.NewBudgetScreen}
+            component={NewBudgetScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="Budgets"
-            component={Screens.BudgetsScreen}
+            component={BudgetsScreen}
             options={{
               ...defaultScreenOptions,
               animation: "slide_from_right",
@@ -261,7 +280,7 @@ export const AppStack = observer(function AppStack() {
           />
           <Stack.Screen
             name="Budget"
-            component={Screens.BudgetScreen}
+            component={BudgetScreen}
             options={{
               ...defaultScreenOptions,
               animation: "slide_from_right",
@@ -269,7 +288,7 @@ export const AppStack = observer(function AppStack() {
           />
           <Stack.Screen
             name="CreateBudgetCategory"
-            component={Screens.CreateBudgetCategoryScreen}
+            component={CreateBudgetCategoryScreen}
             options={{
               ...defaultScreenOptions,
               animation: "slide_from_right",
@@ -277,7 +296,7 @@ export const AppStack = observer(function AppStack() {
           />
           <Stack.Screen
             name="BudgetDetail"
-            component={Screens.BudgetDetailScreen}
+            component={BudgetDetailScreen}
             options={{
               ...defaultScreenOptions,
               animation: "slide_from_right",
@@ -285,47 +304,47 @@ export const AppStack = observer(function AppStack() {
           />
           <Stack.Screen
             name="NewCategoryScreen"
-            component={Screens.NewCategoryScreen}
+            component={NewCategoryScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="SelectBank"
-            component={Screens.SelectBankScreen}
+            component={SelectBankScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="SelectBankType"
-            component={Screens.SelectBankTypeScreen}
+            component={SelectBankTypeScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="AccountBalance"
-            component={Screens.AccountBalanceScreen}
+            component={AccountBalanceScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="EditAccountScreen"
-            component={Screens.EditAccountScreen}
+            component={EditAccountScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="EditProfile"
-            component={Screens.EditProfileScreen}
+            component={EditProfileScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="Profile"
-            component={Screens.ProfileScreen}
+            component={ProfileScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="Transactions"
-            component={Screens.TransactionsScreen}
+            component={TransactionsScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="Accounts"
-            component={Screens.AccountsScreen}
+            component={AccountsScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
@@ -340,12 +359,12 @@ export const AppStack = observer(function AppStack() {
           />
           <Stack.Screen
             name="ReportsIncomeScreen"
-            component={Screens.ReportsIncomeScreen}
+            component={ReportsIncomeScreen}
             options={{ gestureEnabled: true }}
           />
           <Stack.Screen
             name="ReportsCategoryScreen"
-            component={Screens.ReportsCategoryScreen}
+            component={ReportsCategoryScreen}
             options={{ gestureEnabled: true }}
           />
         </>
@@ -353,7 +372,7 @@ export const AppStack = observer(function AppStack() {
         <>
           <Stack.Screen
             name="Welcome"
-            component={Screens.WelcomeScreen}
+            component={WelcomeScreen}
             options={{ gestureEnabled: true }}
           />
         </>

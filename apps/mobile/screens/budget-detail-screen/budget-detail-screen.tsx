@@ -18,7 +18,7 @@ import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { budgetService } from "@/services/budget-service";
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 import { TransactionList } from "@/components/common/transactions-list";
-import { SwipeableListWrapper } from "@/components";
+import { SwipeableListWrapper } from "@/components/swipeable-list-wrapper/swipeable-list-wrapper";
 import * as Haptics from "expo-haptics";
 import CustomBudgetCategoryCard from "@/components/common/custom-budget-category-card";
 import { CategorySnapshotIn } from "@/models/category/category";

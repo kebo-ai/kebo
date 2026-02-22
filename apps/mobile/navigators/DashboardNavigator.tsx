@@ -15,12 +15,10 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppStackParamList, AppStackScreenProps } from "@/navigators/AppNavigator";
 import { TransactionType } from "@/types/transaction";
-import {
-  BudgetsScreen,
-  HomeScreen,
-  ReportsScreen,
-  ChatbotScreen,
-} from "@/screens";
+import { BudgetsScreen } from "@/screens/budgets-screen/budgets-screen";
+import { HomeScreen } from "@/screens/home-screen/home-screen";
+import { ReportsScreen } from "@/screens/reports-screen/reports-screen";
+import { ChatbotScreen } from "@/screens/chatbot-screen/chatbot-screen";
 import { colors } from "@/theme/colors";
 import { HomeIconSvg } from "@/components/icons/home-svg";
 import { BudgetIconSvg } from "@/components/icons/budget-svg";

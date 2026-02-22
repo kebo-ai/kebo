@@ -26,7 +26,7 @@ import { CategoryItem } from "@/components/common/category-item";
 import { showToast } from "@/components/ui/custom-toast";
 import { InputAmount } from "@/components/input-amount";
 import { budgetService } from "@/services/budget-service";
-import { useStores } from "@/models";
+import { useStores } from "@/models/helpers/use-stores";
 import CustomButton from "@/components/common/custom-button";
 import { colors } from "@/theme/colors";
 import CustomBudgetCategoryModal from "@/components/common/custom-budget-category-modal";

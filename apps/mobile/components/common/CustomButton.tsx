@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import tw from "twrnc";
 import { colors } from "@/theme";
-import { useAnalytics } from "@/hooks/useAnalytics";
-import { useTheme } from "@/hooks/useTheme";
+import { useAnalytics } from "@/hooks/use-analytics";
+import { useTheme } from "@/hooks/use-theme";
 
 type CustomButtonProps = {
   variant?: "primary" | "secondary";

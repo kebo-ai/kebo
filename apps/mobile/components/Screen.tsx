@@ -18,7 +18,7 @@ import { $styles } from "@/theme";
 import {
   ExtendedEdge,
   useSafeAreaInsetsStyle,
-} from "@/hooks/useSafeAreaInsetsStyle";
+} from "@/hooks/use-safe-area-insets-style";
 import CustomHeader from "./common/CustomHeader";
 
 export const DEFAULT_BOTTOM_OFFSET = 50;

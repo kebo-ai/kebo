@@ -18,8 +18,8 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { translate } from "@/i18n";
 import { colors } from "@/theme";
 import { largeTitleHeader } from "@/theme/header-options";
-import tw from "@/hooks/useTailwind";
-import { useTheme } from "@/hooks/useTheme";
+import tw from "@/hooks/use-tailwind";
+import { useTheme } from "@/hooks/use-theme";
 import {
   deleteAccountService,
   getAccountsWithBalance,

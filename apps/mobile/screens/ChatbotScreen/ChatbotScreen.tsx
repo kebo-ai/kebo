@@ -33,7 +33,7 @@ import { MessageType } from "@/components/common/ChatMessage";
 import { translate } from "@/i18n";
 import { colors } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { NewChatIconSvg } from "@/components/icons/NewChatIconSvg";
 
 interface Message {

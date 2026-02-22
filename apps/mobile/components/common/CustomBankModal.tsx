@@ -28,7 +28,7 @@ import CustomAlert from "./CustomAlert";
 import { translate } from "@/i18n";
 import { useCurrencyFormatter, currencyMap } from "./CurrencyFormatter";
 import * as Localization from "expo-localization";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface BankOption {
   id: string;

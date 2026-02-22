@@ -2,7 +2,7 @@ import { Redirect, Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { supabase } from "@/config/supabase";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { colors } from "@/theme/colors";
 import { standardHeader } from "@/theme/header-options";
 import logger from "@/utils/logger";

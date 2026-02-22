@@ -25,7 +25,7 @@ import tw from "twrnc";
 import moment from "moment";
 import "moment/locale/es";
 import { colors } from "@/theme/colors";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { Stack, useRouter } from "expo-router";
 import { useFocusEffect } from "expo-router";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
@@ -49,11 +49,11 @@ import { SwipeableListWrapper } from "@/components";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { RecurrenceIconHomeSvg } from "@/components/icons/RecurrenceIconHomeSvg";
 import { translateCategoryName } from "@/utils/category-translations";
-import { useReviewModal } from "@/hooks/useReviewModal";
+import { useReviewModal } from "@/hooks/use-review-modal";
 import CustomModalReview from "@/components/common/CustomModalReview";
 import { loadString, saveString } from "@/utils/storage/storage";
 import { BALANCE_VISIBILITY } from "@/utils/storage/storage-keys";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/use-analytics";
 import { initializeUserAnalytics } from "@/utils/analytics-utils";
 
 interface HomeScreenProps {}

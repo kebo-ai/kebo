@@ -3,7 +3,7 @@ import { View, Text, TouchableWithoutFeedback, Animated } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import tw from "twrnc";
 import TooltipOverlay from "./TooltipOverlay";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface CategoryData {
   id: string;

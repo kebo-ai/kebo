@@ -28,13 +28,13 @@ import { PlusIconSvg } from "@/components/icons/PlusSvg";
 import { ReportsIconSvg } from "@/components/icons/ReportsSvg";
 import { translate } from "@/i18n";
 import { ChatbotIconSvg } from "@/components/icons/ChatBotSvg";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { TransactionScreen } from "@/screens/TransactionScreen/TransactionScreen";
 import { useStores } from "@/models/helpers/use-stores";
 import { useCallback, useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import React from "react";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/use-analytics";
 import { registerAnalyticsService } from "@/navigators/navigationUtilities";
 import logger from "@/utils/logger";
 

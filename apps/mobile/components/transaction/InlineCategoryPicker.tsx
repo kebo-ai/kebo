@@ -5,7 +5,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import { SvgUri } from "react-native-svg";
 import { Text } from "@/components/ui";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { colors } from "@/theme/colors";
 import { Category } from "@/models/category/category";
 import { translateCategoryName } from "@/utils/category-translations";

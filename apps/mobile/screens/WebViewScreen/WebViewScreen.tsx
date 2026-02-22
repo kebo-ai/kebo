@@ -9,7 +9,7 @@ import { WebView } from "react-native-webview";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { observer } from "mobx-react-lite";
 import tw from "twrnc";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { colors } from "@/theme/colors";
 import { standardHeader } from "@/theme/header-options";
 import { translate } from "@/i18n";

@@ -9,7 +9,7 @@ import { colors } from "@/theme/colors";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
 import { translateCategoryName } from "@/utils/category-translations";
 import { useRoute } from "@react-navigation/native";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface ItemData {
   id: string;

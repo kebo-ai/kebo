@@ -11,10 +11,10 @@ import * as Haptics from "expo-haptics";
 import { observer } from "mobx-react-lite";
 import { translate } from "@/i18n";
 import { useStores } from "@/models/helpers/use-stores";
-import { useTheme } from "@/hooks/useTheme";
-import { useShakeAnimation } from "@/hooks/useShakeAnimation";
-import { useHighlightAnimation } from "@/hooks/useHighlightAnimation";
-import { useNumberEntry } from "@/hooks/useNumberEntry";
+import { useTheme } from "@/hooks/use-theme";
+import { useShakeAnimation } from "@/hooks/use-shake-animation";
+import { useHighlightAnimation } from "@/hooks/use-highlight-animation";
+import { useNumberEntry } from "@/hooks/use-number-entry";
 import { colors } from "@/theme/colors";
 import { CalendarPicker } from "@/components/common/CalendarPicker";
 import CustomBankModal from "@/components/common/CustomBankModal";
@@ -27,10 +27,10 @@ import {
   recurrenceDisplayValueMap,
   RecurrenceType,
 } from "@/types/transaction";
-import { useTransactionForm } from "@/hooks/useTransactionForm";
-import { useTransactionDates } from "@/hooks/useTransactionDates";
-import { useTransactionType } from "@/hooks/useTransactionType";
-import { useTransactionModals } from "@/hooks/useTransactionModals";
+import { useTransactionForm } from "@/hooks/use-transaction-form";
+import { useTransactionDates } from "@/hooks/use-transaction-dates";
+import { useTransactionType } from "@/hooks/use-transaction-type";
+import { useTransactionModals } from "@/hooks/use-transaction-modals";
 import { RootStore } from "@/models/root-store";
 import { ITransaction } from "@/models/transaction/transaction";
 import i18n from "@/i18n/i18n";

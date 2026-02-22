@@ -7,12 +7,12 @@ import {
 import { Calendar, DateData } from "react-native-calendars";
 import { format, isAfter, isBefore, addDays } from "date-fns";
 import { es, enUS } from "date-fns/locale";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
 import i18n from "@/i18n/i18n";
 import { Button } from "@/components/ui";
 import { colors } from "@/theme/colors";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface CalendarRangePickerProps {
   startDate: Date;

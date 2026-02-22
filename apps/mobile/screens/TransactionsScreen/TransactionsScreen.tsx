@@ -15,7 +15,7 @@ import { TransactionService } from "@/services/transaction-service";
 import tw from "twrnc";
 import moment from "moment";
 import { colors } from "@/theme/colors";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { BackIconSvg } from "@/components/icons/BackSvg";
 import { ArrowUpIconSvg } from "@/components/icons/ArrowUpIcon";
 import { MaterialIcons } from "@expo/vector-icons";

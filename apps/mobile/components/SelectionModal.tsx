@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, TouchableWithoutFeedback, View, TouchableOpacity, Text } from "react-native";
 import { translate } from "@/i18n";
 import { colors } from "@/theme";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { Ionicons } from "@expo/vector-icons";
 
 interface SelectionModalProps {

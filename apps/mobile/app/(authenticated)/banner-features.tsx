@@ -6,7 +6,7 @@ import { observer } from "mobx-react-lite";
 import { BannerService } from "@/services/banner-service";
 import CustomButton from "@/components/common/CustomButton";
 import { useRouter } from "expo-router";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { SvgUri } from "react-native-svg";
 import i18n from "@/i18n/i18n";
 import AppIntroSlider from "react-native-app-intro-slider";

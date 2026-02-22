@@ -8,8 +8,8 @@ import AuthButtons from "@/components/AuthButton";
 import { translate } from "@/i18n";
 import { ImageCustom } from "@/components/assets/Image";
 import tw from "twrnc";
-import { useTheme } from "@/hooks/useTheme";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useTheme } from "@/hooks/use-theme";
+import { useAnalytics } from "@/hooks/use-analytics";
 import { useEffect } from "react";
 
 WebBrowser.maybeCompleteAuthSession();

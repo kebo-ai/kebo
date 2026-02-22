@@ -12,7 +12,7 @@ import { ArrowRightIconSvg } from "@/components/icons/ArrowRightIcon";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
 import i18n from "@/i18n/i18n";
 import { ArrowLefttIconV2 } from "@/components/icons/ArrowLefttIconV2";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface CustomReportDayProps {
   month: string;

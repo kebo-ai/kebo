@@ -14,7 +14,7 @@ import {
 import {
   ExtendedEdge,
   useSafeAreaInsetsStyle,
-} from "@/hooks/useSafeAreaInsetsStyle";
+} from "@/hooks/use-safe-area-insets-style";
 
 interface FixedScreenProps {
   children?: ReactNode;

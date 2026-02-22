@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { View, Image, TouchableOpacity, ScrollView } from "react-native";
 import { Text } from "@/components/ui";
 import CustomButton from "@/components/common/CustomButton";
@@ -11,7 +11,7 @@ import { ManualSvg } from "@/components/icons/ManualSvg";
 import { UserSvg } from "@/components/icons/UserSvg";
 import { showToast } from "@/components/ui/CustomToast";
 import { translate } from "@/i18n";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface SelectBankTypeScreenProps {}
 

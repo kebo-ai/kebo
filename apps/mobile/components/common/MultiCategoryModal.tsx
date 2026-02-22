@@ -16,7 +16,7 @@ import { SvgUri } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { translateCategoryName } from "@/utils/category-translations";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = (width - 50) / 3;

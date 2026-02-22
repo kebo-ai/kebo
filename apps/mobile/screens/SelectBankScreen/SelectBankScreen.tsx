@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from "react";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { useStores } from "@/models/helpers/use-stores";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import {
   View,
   TextInput,
@@ -16,7 +16,7 @@ import { standardHeader } from "@/theme/header-options";
 import { SearchIconSvg } from "@/components/icons/SearchSvg";
 import * as Localization from "expo-localization";
 import { translate } from "@/i18n";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface Bank {
   id: string;

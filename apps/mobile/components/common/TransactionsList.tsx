@@ -7,12 +7,12 @@ import moment from "moment";
 import i18n from "@/i18n/i18n";
 import { translate } from "@/i18n";
 import { translateCategoryName } from "@/utils/category-translations";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { SvgUri } from "react-native-svg";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { RecurrenceIconHomeSvg } from "@/components/icons/RecurrenceIconHomeSvg";
 import { colors } from "@/theme";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
 
 interface TransactionListProps {

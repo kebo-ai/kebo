@@ -1,13 +1,13 @@
 import React from "react";
 import { View, TouchableOpacity } from "react-native";
 import { Text } from "@/components/ui";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
 import * as Haptics from "expo-haptics";
 import { SwipeableListWrapper } from "@/components";
 import { colors } from "@/theme";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { RowMap } from "react-native-swipe-list-view";
 import { MaterialIcons } from "@expo/vector-icons";
 import { InteractionManager } from "react-native";

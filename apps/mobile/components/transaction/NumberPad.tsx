@@ -3,10 +3,10 @@ import { View, StyleSheet } from "react-native";
 import { PressableScale } from "pressto";
 import { Ionicons } from "@expo/vector-icons";
 import { Text } from "@/components/ui";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { colors } from "@/theme/colors";
-import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
-import type { NumberEntryType } from "@/hooks/useNumberEntry";
+import { useKeyboardHeight } from "@/hooks/use-keyboard-height";
+import type { NumberEntryType } from "@/hooks/use-number-entry";
 
 interface NumberPadProps {
   entryType: NumberEntryType;

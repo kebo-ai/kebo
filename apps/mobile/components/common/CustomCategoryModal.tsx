@@ -24,7 +24,7 @@ import CustomAlert from "./CustomAlert";
 import { deleteCategoryService } from "@/services/category-service";
 import { translate } from "@/i18n";
 import { translateCategoryName } from "@/utils/category-translations";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 const ICON_SIZE = 50;
 

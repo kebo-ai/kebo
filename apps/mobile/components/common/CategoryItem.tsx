@@ -1,7 +1,7 @@
 import { TouchableOpacity, Text, View } from "react-native";
 import { Category } from "@/models/category/category";
 import { Icon } from "@/models/icon/icon";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { SvgUri } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/theme/colors";

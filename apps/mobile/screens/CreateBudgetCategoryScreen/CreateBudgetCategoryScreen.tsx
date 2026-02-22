@@ -19,7 +19,7 @@ import {
   Keyboard,
 } from "react-native";
 import { Text } from "@/components/ui";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
 import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
 import { CategoryItem } from "@/components/common/CategoryItem";
@@ -35,7 +35,7 @@ import {
   useCurrencyFormatter,
 } from "@/components/common/CurrencyFormatter";
 import { EditIconSvg } from "@/components/icons/EditIconSvg";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 interface CreateBudgetCategoryScreenProps {}
 

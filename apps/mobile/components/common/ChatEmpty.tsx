@@ -5,7 +5,7 @@ import tw from "twrnc";
 import { translate } from "@/i18n";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { KeboWiseThinkingSvg } from "@/components/icons/KeboWiseThinkingSvg";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { PressableScale } from "pressto";
 
 interface ChatEmptyProps {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, PanResponder, Animated, Image, Dimensions } from 'react-native';
-import tw from '@/hooks/useTailwind';
+import tw from '@/hooks/use-tailwind';
 import { colors } from '@/theme/colors';
 const { width: screenWidth } = Dimensions.get('window');
 

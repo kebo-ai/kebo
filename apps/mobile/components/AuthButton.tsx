@@ -23,7 +23,7 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import { useStores } from "@/models/helpers/use-stores";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/use-analytics";
 import { AUTH_EVENTS, EVENT_PROPERTIES } from "@/services/analytics-service";
 import logger from "@/utils/logger";
 

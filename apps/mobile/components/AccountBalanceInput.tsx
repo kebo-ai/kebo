@@ -10,10 +10,10 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui";
 import * as Localization from "expo-localization";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { colors } from "@/theme/colors";
 import { useCurrencyFormatter, currencyMap } from "./common/CurrencyFormatter";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 const locale = Localization.getLocales()[0]?.languageTag || "en-US";
 

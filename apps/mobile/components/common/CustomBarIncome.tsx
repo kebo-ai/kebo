@@ -16,7 +16,7 @@ import TooltipOverlay from "./TooltipOverlay";
 import { useIsFocused } from "@react-navigation/native";
 import { ArrowRightIconSvg } from "@/components/icons/ArrowRightIcon";
 import { ArrowLefttIconV2 } from "@/components/icons/ArrowLefttIconV2";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface PeriodData {
   label: string;

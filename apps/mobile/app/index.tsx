@@ -10,7 +10,7 @@ import {
 } from "@/utils/auth-utils";
 import { BannerService } from "@/services/banner-service";
 import i18n from "@/i18n/i18n";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/use-analytics";
 import logger from "@/utils/logger";
 import { colors } from "@/theme/colors";
 

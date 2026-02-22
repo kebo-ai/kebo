@@ -7,9 +7,9 @@ import Animated, {
   type SharedValue,
 } from "react-native-reanimated";
 import { Text } from "@/components/ui";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
-import type { NumberEntryType } from "@/hooks/useNumberEntry";
+import type { NumberEntryType } from "@/hooks/use-number-entry";
 
 interface AmountDisplayProps {
   entryType: NumberEntryType;

@@ -12,7 +12,7 @@ import {
 import { BannerService } from "@/services/banner-service";
 import i18n from "@/i18n/i18n";
 import { DynamicBanner } from "@/types/banner";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/use-analytics";
 import { ONBOARDING_EVENTS } from "@/services/analytics-service";
 
 interface SplashScreenProps extends AppStackScreenProps<"Splash"> {}

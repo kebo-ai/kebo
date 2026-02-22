@@ -14,7 +14,7 @@ import tw from "twrnc";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
 import { largeTitleHeader } from "@/theme/header-options";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { supabase } from "@/config/supabase";
 import { getUserInfo } from "@/utils/auth-utils";
 import { showToast } from "@/components/ui/CustomToast";
@@ -27,14 +27,14 @@ import { updateUserProfile } from "@/services/user-service";
 import logger from "@/utils/logger";
 import { EXTERNAL_URLS } from "@/config/urls";
 import { APP_VERSION } from "@/config/config.base";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/use-analytics";
 import {
   PROFILE_EVENTS,
   EVENT_PROPERTIES,
   ProfileEventName,
 } from "@/services/analytics-service";
 import { updateUserAnalyticsProperties } from "@/utils/analytics-utils";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications } from "@/hooks/use-notifications";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { PencilSvg } from "@/components/icons/PencilSvg";
 import { LanguageService } from "@/services/language-service";

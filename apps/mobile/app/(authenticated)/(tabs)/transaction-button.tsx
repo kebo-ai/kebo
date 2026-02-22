@@ -4,7 +4,7 @@ import { Keyboard } from "react-native";
 import { View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { TransactionType } from "@/types/transaction";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 export default function TransactionButton() {
   const router = useRouter();

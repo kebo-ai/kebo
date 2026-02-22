@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui";
 import { LinearGradient } from "expo-linear-gradient";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import tw from "twrnc";
 
 interface CustomReportCardProps {

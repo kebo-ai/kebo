@@ -22,7 +22,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { KeboWiseThinkingSvg } from "@/components/icons/KeboWiseThinkingSvg";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 export type MessageType = "user" | "bot";
 

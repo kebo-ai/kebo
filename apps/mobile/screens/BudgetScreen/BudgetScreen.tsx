@@ -11,8 +11,8 @@ import {
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import { standardHeader } from "@/theme/header-options";
-import { useTheme } from "@/hooks/useTheme";
-import tw from "@/hooks/useTailwind";
+import { useTheme } from "@/hooks/use-theme";
+import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { CategoriesListBudget } from "@/components/common/CategoriesListBudget";

@@ -23,7 +23,7 @@ import { SvgUri } from "react-native-svg";
 import { EndDateIconSvg } from "@/components/icons/EndDateSvg";
 import { translate } from "@/i18n";
 import { translateCategoryName } from "@/utils/category-translations";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface CustomListItemOptionProps {
   icon?:

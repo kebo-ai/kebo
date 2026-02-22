@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect, useRef, useMemo } from "react";
 import logger from "@/utils/logger";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import {
   View,
   Image,
@@ -35,7 +35,7 @@ import {
 import { translate } from "@/i18n";
 import * as Localization from "expo-localization";
 import { AccountBalanceInput } from "@/components/AccountBalanceInput";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import CustomButton from "@/components/common/CustomButton";
 
 interface BankOption {

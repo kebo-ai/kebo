@@ -12,8 +12,8 @@ import {
 import { Swipeable } from "react-native-gesture-handler";
 import { Text, Icon } from "@/components/ui";
 import { colors } from "@/theme/colors";
-import { useTheme } from "@/hooks/useTheme";
-import tw from "@/hooks/useTailwind";
+import { useTheme } from "@/hooks/use-theme";
+import tw from "@/hooks/use-tailwind";
 import { Ionicons } from "@expo/vector-icons";
 import { translate } from "@/i18n";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
@@ -27,7 +27,7 @@ import { load, save } from "@/utils/storage/storage";
 import { supabase } from "@/config/supabase";
 import logger from "@/utils/logger";
 import moment from "moment";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 interface BudgetOption {
   id: string;

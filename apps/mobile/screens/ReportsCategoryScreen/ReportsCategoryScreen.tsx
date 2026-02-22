@@ -27,7 +27,7 @@ import { deleteCategoryService } from "@/services/category-service";
 import { showToast } from "@/components/ui/CustomToast";
 import { CategoriesList } from "@/components/common/CategoriesList";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface ReportsCategoryScreenProps {}
 

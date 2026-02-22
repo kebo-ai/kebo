@@ -29,7 +29,7 @@ import { loadDateFnsLocale } from "@/utils/format-date";
 import CustomToast from "@/components/ui/CustomToast";
 import Loader from "@/components/ui/CustomLoader";
 import i18n from "@/i18n/i18n";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications } from "@/hooks/use-notifications";
 import * as Notifications from "expo-notifications";
 import { postHogClient } from "@/services/post-hog-client";
 import { StatusBar } from "expo-status-bar";

@@ -2,11 +2,11 @@ import React from "react";
 import { View, TouchableOpacity } from "react-native";
 import { Text } from "@/components/ui";
 import { translate } from "@/i18n";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "@/theme";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { PencilSvg } from "@/components/icons/PencilSvg";
 
 interface CategoryMetrics {

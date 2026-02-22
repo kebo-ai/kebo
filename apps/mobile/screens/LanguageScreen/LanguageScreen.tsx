@@ -7,7 +7,7 @@ import { Stack, useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
 import { largeTitleHeader } from "@/theme/header-options";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { useTranslation } from "react-i18next";
 import { showToast } from "@/components/ui/CustomToast";
 import { translate } from "@/i18n";

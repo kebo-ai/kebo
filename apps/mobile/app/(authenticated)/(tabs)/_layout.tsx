@@ -2,7 +2,7 @@ import { NativeTabs, Icon, Label } from "expo-router/unstable-native-tabs";
 import { colors } from "@/theme/colors";
 import { translate } from "@/i18n";
 import { useEffect } from "react";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/use-analytics";
 import { registerAnalyticsService } from "@/navigators/navigationUtilities";
 
 const tabIcons = {

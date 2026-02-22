@@ -13,7 +13,7 @@ import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { AccountTypeSnapshotIn } from "@/models/account-type-store/account-type";
 import { translate } from "@/i18n";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 interface ModalAccountTypeProps {
   visible: boolean;

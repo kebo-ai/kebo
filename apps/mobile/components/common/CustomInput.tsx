@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   TextInputProps,
 } from "react-native";
-import tw from "@/hooks/useTailwind";
-import { useTheme } from "@/hooks/useTheme";
+import tw from "@/hooks/use-tailwind";
+import { useTheme } from "@/hooks/use-theme";
 
 interface CustomInputProps extends TextInputProps {
   label: string;

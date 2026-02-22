@@ -2,10 +2,10 @@ import React, { useCallback } from "react";
 import { View, Modal, TouchableWithoutFeedback } from "react-native";
 import { Calendar, DateData } from "react-native-calendars";
 import { format } from "date-fns";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import i18n from "@/i18n/i18n";
 import { colors } from "@/theme/colors";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { Text } from "@/components/ui";
 
 interface CalendarPickerProps {

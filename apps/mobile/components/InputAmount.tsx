@@ -7,7 +7,7 @@ import {
   Pressable,
   Text,
 } from "react-native";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { colors } from "@/theme/colors";
 import { useCurrencyFormatter } from "./common/CurrencyFormatter";
 import { useStores } from "@/models/helpers/use-stores";

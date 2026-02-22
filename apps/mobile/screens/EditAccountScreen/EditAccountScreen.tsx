@@ -2,12 +2,12 @@ import logger from "@/utils/logger";
 import React, { FC, useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 import { useStores } from "@/models/helpers/use-stores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -18,8 +18,8 @@ import {
   updateAccountService,
 } from "@/services/account-service";
 import { translate } from "@/i18n";
-import { useNumberEntry } from "@/hooks/useNumberEntry";
-import { useShakeAnimation } from "@/hooks/useShakeAnimation";
+import { useNumberEntry } from "@/hooks/use-number-entry";
+import { useShakeAnimation } from "@/hooks/use-shake-animation";
 import { AmountDisplay } from "@/components/transaction/AmountDisplay";
 import { NumberPad } from "@/components/transaction/NumberPad";
 import { TransactionFieldRow } from "@/components/transaction/TransactionFieldRow";

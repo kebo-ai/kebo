@@ -3,7 +3,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 import tw from 'twrnc';
 import { colors } from '@/theme/colors';
-import { useReviewModal } from '@/hooks/useReviewModal';
+import { useReviewModal } from '@/hooks/use-review-modal';
 import CustomModalReview from './CustomModalReview';
 
 export const ReviewModalTest: React.FC = () => {

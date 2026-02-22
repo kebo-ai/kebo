@@ -3,7 +3,7 @@ import { TouchableOpacity, View, Text } from "react-native";
 import { colors } from "@/theme";
 import tw from "twrnc";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/hooks/use-theme";
 
 const FilterButton = ({
     icon,

@@ -30,7 +30,7 @@ import {
   RecurrenceCadenceEnum,
 } from "@/types/transaction";
 import { useFormik } from "formik";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
 import { TransactionService } from "@/services/transaction-service";
 import { useTransactionDates } from "@/hooks/use-transaction-dates";

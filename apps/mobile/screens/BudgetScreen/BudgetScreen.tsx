@@ -22,7 +22,7 @@ import { CategoryItem } from "@/components/common/CategoryItem";
 import { BudgetResponse } from "@/types/transaction";
 import { Category } from "@/models/category/category";
 import { useStores } from "@/models";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import CustomAlert from "@/components/common/CustomAlert";
 import * as Haptics from "expo-haptics";
 import moment from "moment";

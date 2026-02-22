@@ -17,7 +17,7 @@ import { largeTitleHeader } from "@/theme/header-options";
 import { useTheme } from "@/hooks/use-theme";
 import { supabase } from "@/config/supabase";
 import { getUserInfo } from "@/utils/auth-utils";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { Text, Button, Icon } from "@/components/ui";
 import DeleteAccountModal from "@/components/common/DeleteAccountModal";
 import CustomCategoryModal from "@/components/common/CustomCategoryModal";

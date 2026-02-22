@@ -25,7 +25,7 @@ import { CategoriesList } from "@/components/common/CategoriesList";
 import * as Haptics from "expo-haptics";
 import CustomAlert from "@/components/common/CustomAlert";
 import { deleteCategoryService } from "@/services/category-service";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { useStores } from "@/models/helpers/use-stores";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { load, save } from "@/utils/storage";

@@ -32,7 +32,7 @@ import {
   PanGestureHandler,
   State,
 } from "react-native-gesture-handler";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import CustomAlert from "./CustomAlert";
 import {
   deleteCategoryService,

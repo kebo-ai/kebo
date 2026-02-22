@@ -8,7 +8,7 @@ import { colors } from "@/theme/colors";
 import { BackBlackSvg } from "@/components/icons/BackBlackSvg";
 import { EditIconSvg } from "@/components/icons/EditIconSvg";
 import { getUserInfo } from "@/utils/auth-utils";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
 import { updateUserProfile } from "@/services/user-service";

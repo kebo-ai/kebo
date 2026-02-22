@@ -3,8 +3,8 @@ import { PressableScale } from "pressto";
 import React, { useEffect, useMemo, useRef } from "react";
 import { Animated, StyleSheet, useColorScheme, type ViewStyle } from "react-native";
 import { colors } from "@/theme/colors";
-import { Icon } from "./Icon";
-import { Text } from "./Text";
+import { Icon } from "./icon";
+import { Text } from "./text";
 import {
   type ButtonVariant,
   type ButtonColor,

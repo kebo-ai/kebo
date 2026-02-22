@@ -23,7 +23,7 @@ import * as Yup from "yup";
 import { getUserInfo } from "@/utils/auth-utils";
 import ModalAccountType from "@/components/ModalAccountType";
 import { AccountTypeSnapshotIn } from "@/models/account-type-store/account-type";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import {
   getAccountDetailService,
   updateAccountService,

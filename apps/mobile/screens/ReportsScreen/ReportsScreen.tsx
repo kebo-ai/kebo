@@ -3,7 +3,7 @@ import { FC } from "react";
 import { useRouter } from "expo-router";
 import { View, ScrollView } from "react-native";
 import { Text } from "@/components/ui";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import tw from "@/hooks/use-tailwind";
 import { useTheme } from "@/hooks/use-theme";
 import { translate } from "@/i18n";

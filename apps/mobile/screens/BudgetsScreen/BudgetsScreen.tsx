@@ -21,7 +21,7 @@ import CustomBudgetCard from "@/components/common/CustomBudgetCard";
 import { budgetService } from "@/services/budget-service";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import BudgetIntroSlider from "@/components/common/BudgetIntroSlider";
 import { load, save } from "@/utils/storage/storage";
 import { supabase } from "@/config/supabase";

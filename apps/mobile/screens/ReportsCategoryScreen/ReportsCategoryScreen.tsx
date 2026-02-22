@@ -24,7 +24,7 @@ import * as Haptics from "expo-haptics";
 import CustomAlert from "@/components/common/CustomAlert";
 import { ChartService } from "@/services/chart-service";
 import { deleteCategoryService } from "@/services/category-service";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { CategoriesList } from "@/components/common/CategoriesList";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { useTheme } from "@/hooks/use-theme";

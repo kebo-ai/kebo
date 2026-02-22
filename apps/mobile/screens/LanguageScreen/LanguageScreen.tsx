@@ -9,7 +9,7 @@ import { colors } from "@/theme/colors";
 import { largeTitleHeader } from "@/theme/header-options";
 import { useTheme } from "@/hooks/use-theme";
 import { useTranslation } from "react-i18next";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { translate } from "@/i18n";
 import { LanguageService } from "@/services/language-service";
 import { useStores } from "@/models/helpers/use-stores";

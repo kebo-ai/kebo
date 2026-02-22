@@ -36,7 +36,7 @@ import { MultiCategoryModal } from "@/components/common/MultiCategoryModal";
 import FilterButton from "@/components/common/FilterButton";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import i18n from "@/i18n/i18n";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { TransactionList } from "@/components/common/TransactionsList";
 import { CustomMonthModal } from "@/components/common/CustomMonthModal";
 import { CustomTypeModal } from "@/components/common/CustomTypeModal";

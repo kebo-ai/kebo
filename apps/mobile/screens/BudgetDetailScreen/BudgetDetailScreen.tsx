@@ -23,7 +23,7 @@ import * as Haptics from "expo-haptics";
 import CustomBudgetCategoryCard from "@/components/common/CustomBudgetCategoryCard";
 import { CategorySnapshotIn } from "@/models/category/category";
 import { TransactionService } from "@/services/transaction-service";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import CustomAlert from "@/components/common/CustomAlert";
 
 interface CategoryMetrics {

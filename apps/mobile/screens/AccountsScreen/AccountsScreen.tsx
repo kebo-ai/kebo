@@ -25,7 +25,7 @@ import {
   getAccountsWithBalance,
 } from "@/services/account-service";
 import { useStores } from "@/models/helpers/use-stores";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { Stack, useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";

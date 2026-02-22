@@ -12,7 +12,7 @@ import { useStores } from "@/models/helpers/use-stores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import ModalAccountType from "@/components/ModalAccountType";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import {
   getAccountDetailService,
   updateAccountService,

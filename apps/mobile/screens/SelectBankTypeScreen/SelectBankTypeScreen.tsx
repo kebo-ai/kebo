@@ -9,7 +9,7 @@ import { colors } from "@/theme/colors";
 import { standardHeader } from "@/theme/header-options";
 import { ManualSvg } from "@/components/icons/ManualSvg";
 import { UserSvg } from "@/components/icons/UserSvg";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { translate } from "@/i18n";
 import { useTheme } from "@/hooks/use-theme";
 

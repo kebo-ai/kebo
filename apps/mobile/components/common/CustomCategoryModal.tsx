@@ -19,7 +19,7 @@ import { SvgUri } from "react-native-svg";
 import { CategoryItem } from "./CategoryItem";
 import { observer } from "mobx-react-lite";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import CustomAlert from "./CustomAlert";
 import { deleteCategoryService } from "@/services/category-service";
 import { translate } from "@/i18n";

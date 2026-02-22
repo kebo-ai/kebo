@@ -11,7 +11,7 @@ import { AntDesign } from "@expo/vector-icons";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { useTranslation } from "react-i18next";
-import { IconCustom } from "./assets/Icon";
+import { IconCustom } from "./assets/icon";
 import { supabase } from "@/config/supabase";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";

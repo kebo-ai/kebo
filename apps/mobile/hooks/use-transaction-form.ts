@@ -4,7 +4,7 @@ import moment from "moment";
 import { useStores } from "@/models/helpers/use-stores";
 import { translate, TxKeyPath } from "@/i18n";
 import { RecurrenceType, RecurrenceCadenceEnum, TransactionType } from "@/types/transaction";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import i18n from "@/i18n/i18n";
 import { runInAction } from "mobx";
 

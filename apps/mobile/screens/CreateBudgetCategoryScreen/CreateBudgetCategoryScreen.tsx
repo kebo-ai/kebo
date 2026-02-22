@@ -23,7 +23,7 @@ import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
 import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
 import { CategoryItem } from "@/components/common/CategoryItem";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { InputAmount } from "@/components/InputAmount";
 import { budgetService } from "@/services/budget-service";
 import { useStores } from "@/models";

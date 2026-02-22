@@ -24,7 +24,7 @@ import {
   getIconSuggestions,
 } from "@/services/category-service";
 import { ArrowDownIconSvg } from "@/components/icons/ArrowDownIcon";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Instance } from "mobx-state-tree";

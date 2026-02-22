@@ -18,7 +18,7 @@ import * as Yup from "yup";
 import { colors } from "@/theme/colors";
 import { userSelfHardDelete } from "@/services/user-service";
 import { supabase } from "@/config/supabase";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { translate } from "@/i18n";
 import { useTranslation } from "react-i18next";
 import { useStores } from "@/models/helpers/use-stores";

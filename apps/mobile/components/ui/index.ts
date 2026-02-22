@@ -1,7 +1,7 @@
-export { Button } from "./Button";
-export { Text } from "./Text";
-export { Icon } from "./Icon";
-export type { TextType, TextWeight, TextProps } from "./Text";
+export { Button } from "./button";
+export { Text } from "./text";
+export { Icon } from "./icon";
+export type { TextType, TextWeight, TextProps } from "./text";
 export type {
   UISize,
   UIRadius,

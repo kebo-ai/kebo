@@ -32,7 +32,7 @@ const ensureValidMomentLocale = () => {
 };
 
 import { budgetService } from "@/services/budget-service";
-import { showToast } from "@/components/ui/CustomToast";
+import { showToast } from "@/components/ui/custom-toast";
 import { CalendarRangePicker } from "@/components/common/CalendarRangePicker";
 import { ArrowDownSimpleIcon } from "@/components/icons/ArrowDownSimpleIcon";
 

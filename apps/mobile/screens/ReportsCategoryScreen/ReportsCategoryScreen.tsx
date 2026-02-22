@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
-import { standardHeader } from "@/theme/headerOptions";
+import { standardHeader } from "@/theme/header-options";
 import { observer } from "mobx-react-lite";
 import { translate } from "@/i18n";
 import { Stack, useRouter } from "expo-router";

@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
-import { standardHeader } from "@/theme/headerOptions";
+import { standardHeader } from "@/theme/header-options";
 
 export default function ChatbotLayout() {
   const { theme } = useTheme();

@@ -32,7 +32,7 @@ import { load, save } from "@/utils/storage";
 import { REPORTS_INCOME_PERIOD } from "@/utils/storage/storage-keys";
 import { useTheme } from "@/hooks/useTheme";
 import { colors } from "@/theme/colors";
-import { standardHeader } from "@/theme/headerOptions";
+import { standardHeader } from "@/theme/header-options";
 
 interface ReportsIncomeScreenProps {}
 

@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 import { supabase } from "@/config/supabase";
 import { useTheme } from "@/hooks/useTheme";
 import { colors } from "@/theme/colors";
-import { standardHeader } from "@/theme/headerOptions";
+import { standardHeader } from "@/theme/header-options";
 import logger from "@/utils/logger";
 import { translate } from "@/i18n";
 

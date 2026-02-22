@@ -10,7 +10,7 @@ import {
 import { Text, Button } from "@/components/ui";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { colors } from "@/theme/colors";
-import { standardHeader } from "@/theme/headerOptions";
+import { standardHeader } from "@/theme/header-options";
 import { useTheme } from "@/hooks/useTheme";
 import { translate } from "@/i18n";
 import { TxKeyPath } from "@/i18n";

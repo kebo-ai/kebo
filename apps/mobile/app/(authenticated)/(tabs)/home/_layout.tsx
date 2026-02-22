@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
-import { largeTitleHeader } from "@/theme/headerOptions";
+import { largeTitleHeader } from "@/theme/header-options";
 
 export default function HomeLayout() {
   const { theme } = useTheme();

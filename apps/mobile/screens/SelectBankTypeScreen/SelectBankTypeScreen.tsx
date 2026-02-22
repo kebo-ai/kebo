@@ -6,7 +6,7 @@ import { View, Image, TouchableOpacity, ScrollView } from "react-native";
 import { Text } from "@/components/ui";
 import CustomButton from "@/components/common/CustomButton";
 import { colors } from "@/theme/colors";
-import { standardHeader } from "@/theme/headerOptions";
+import { standardHeader } from "@/theme/header-options";
 import { ManualSvg } from "@/components/icons/ManualSvg";
 import { UserSvg } from "@/components/icons/UserSvg";
 import { showToast } from "@/components/ui/CustomToast";

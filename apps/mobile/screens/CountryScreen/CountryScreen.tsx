@@ -6,7 +6,7 @@ import tw from "twrnc";
 import { Stack, useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
-import { largeTitleHeader } from "@/theme/headerOptions";
+import { largeTitleHeader } from "@/theme/header-options";
 import { useTheme } from "@/hooks/useTheme";
 import { showToast } from "@/components/ui/CustomToast";
 import { useStores } from "@/models/helpers/useStores";

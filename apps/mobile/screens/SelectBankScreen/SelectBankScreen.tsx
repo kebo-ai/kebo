@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
-import { standardHeader } from "@/theme/headerOptions";
+import { standardHeader } from "@/theme/header-options";
 import { SearchIconSvg } from "@/components/icons/SearchSvg";
 import * as Localization from "expo-localization";
 import { translate } from "@/i18n";

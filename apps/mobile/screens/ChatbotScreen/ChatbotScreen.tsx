@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   Pressable,
+  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -76,12 +77,18 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       });
     }, [navigation, messages.length]);
 
+    // iOS tab bar ~49px, Android Material bottom nav ~64px
+    const tabBarOffset = Platform.OS === "ios" ? 50 : 80;
+
     // Track keyboard height for dynamic content padding
+    // iOS fires keyboardWillShow/Hide, Android fires keyboardDidShow/Hide
     useEffect(() => {
-      const showListener = Keyboard.addListener("keyboardWillShow", (e) => {
+      const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+      const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+      const showListener = Keyboard.addListener(showEvent, (e) => {
         setKeyboardHeight(e.endCoordinates.height);
       });
-      const hideListener = Keyboard.addListener("keyboardWillHide", () => {
+      const hideListener = Keyboard.addListener(hideEvent, () => {
         setKeyboardHeight(0);
       });
       return () => {
@@ -219,7 +226,7 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
     const inputAreaHeight = 70;
     const bottomPadding = keyboardHeight > 0
       ? keyboardHeight + inputAreaHeight // keyboard open: content clears keyboard + input
-      : inputAreaHeight + insets.bottom + 50; // keyboard closed: content clears tab bar + input
+      : inputAreaHeight + insets.bottom + tabBarOffset; // keyboard closed: content clears tab bar + input
 
     return (
       <Pressable style={[tw`flex-1`, { backgroundColor: theme.background }]} onPress={Keyboard.dismiss}>
@@ -276,11 +283,11 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
         <KeyboardStickyView
           style={{
             position: "absolute",
-            bottom: insets.bottom + 50,
+            bottom: insets.bottom + tabBarOffset,
             left: 0,
             right: 0,
           }}
-          offset={{ opened: insets.bottom + 50, closed: 0 }}
+          offset={{ opened: insets.bottom + tabBarOffset, closed: 0 }}
         >
           <ChatInput
             onSendMessage={handleSendMessage}

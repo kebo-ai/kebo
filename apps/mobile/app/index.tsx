@@ -1,6 +1,6 @@
 import { Redirect } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, BackHandler, Animated } from "react-native";
+import { View, BackHandler, Animated, useColorScheme } from "react-native";
 import LottieView from "lottie-react-native";
 import { observer } from "mobx-react-lite";
 import { ImageCustom } from "@/components/assets/Image";
@@ -12,10 +12,14 @@ import { BannerService } from "@/services/BannerService";
 import i18n from "@/i18n/i18n";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import logger from "@/utils/logger";
+import { colors } from "@/theme/colors";
 
 const SplashIndex = observer(function SplashIndex() {
   const animation = useRef<LottieView>(null);
   const analytics = useAnalytics();
+  const scheme = useColorScheme();
+  const isDark = scheme === "dark";
+  const bgColor = isDark ? colors.dark.background : colors.light.background;
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isTimeoutCompleted, setIsTimeoutCompleted] = useState(false);
   const [bannerData, setBannerData] = useState<{
@@ -87,17 +91,18 @@ const SplashIndex = observer(function SplashIndex() {
   }
 
   return (
-    <Animated.View style={[styles.animationContainer, { opacity: fadeAnim }]}>
+    <Animated.View style={[styles.animationContainer, { opacity: fadeAnim, backgroundColor: bgColor }]}>
       <LottieView
         ref={animation}
-        style={{ width: 650, height: 250 }}
+        style={{ width: "100%", height: 250 }}
+        resizeMode="contain"
         source={require("../assets/animations/splashAnimation.json")}
         autoPlay
         loop={false}
       />
       <View>
         <ImageCustom
-          icon={"keboLogoHeader"}
+          icon={isDark ? "keboLogoHeaderDark" : "keboLogoHeader"}
           size={{ width: 256, height: 116 }}
         />
       </View>
@@ -105,13 +110,12 @@ const SplashIndex = observer(function SplashIndex() {
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   animationContainer: {
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
     flex: 1,
   },
-});
+};
 
 export default SplashIndex;

@@ -8,7 +8,7 @@ import AuthButtons from "@/components/AuthButton";
 import { translate } from "@/i18n";
 import { ImageCustom } from "@/components/assets/Image";
 import tw from "twrnc";
-import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useEffect } from "react";
 
@@ -18,6 +18,7 @@ interface WelcomeScreenProps {}
 
 export const WelcomeScreen: FC<WelcomeScreenProps> = observer(
   function WelcomeScreen() {
+    const { isDark, theme } = useTheme();
     const analytics = useAnalytics();
 
     useEffect(() => {
@@ -26,26 +27,31 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(
     }, [analytics]);
 
     return (
-      <Screen safeAreaEdges={["top"]} preset="scroll" statusBarStyle={"dark"}>
+      <Screen
+        safeAreaEdges={["top"]}
+        preset="scroll"
+        statusBarStyle={isDark ? "light" : "dark"}
+        backgroundColor={theme.background}
+      >
         <View style={tw`px-6`}>
           <View style={tw`mt-6`}>
             <ImageCustom
-              icon={"keboLogoHeader"}
+              icon={isDark ? "keboLogoHeaderDark" : "keboLogoHeader"}
               size={{ width: 130, height: 58 }}
             />
           </View>
           <View style={tw`mt-[111px]`}>
             <Text
-              style={tw`text-[32px]`}
-              weight="bold"
-              color={colors.secondary}
+              type="title"
+              color={theme.textPrimary}
             >
               {translate("welcomeScreen:title")}
             </Text>
             <View style={tw`h-4`} />
             <Text
-              style={tw`text-base text-black`}
+              style={tw`text-base`}
               weight="light"
+              color={theme.textSecondary}
             >
               {translate("welcomeScreen:subtitle")}
             </Text>

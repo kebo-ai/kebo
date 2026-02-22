@@ -85,6 +85,7 @@ export function ImageCustom(props: ImagesProps) {
 
 export const imageRegistry = {
   keboLogoHeader: require("../../assets/images/kebo-app-logo-header.png"),
+  keboLogoHeaderDark: require("../../assets/images/kebo-app-logo-header-dark.png"),
   successToast: require("../../assets/images/success-toast.png"),
   errorToast: require("../../assets/images/error-toast.png"),
   warningToast: require("../../assets/images/warning-toast.png"),

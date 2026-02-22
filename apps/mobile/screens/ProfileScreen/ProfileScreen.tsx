@@ -136,9 +136,14 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
           [EVENT_PROPERTIES.PROFILE_SECTION]: "account_management",
         });
 
+        try {
+          await GoogleSignin.revokeAccess();
+        } catch {
+          // Ignore — user may have signed in with Apple
+        }
         await GoogleSignin.signOut();
 
-        const { error } = await supabase.auth.signOut();
+        const { error } = await supabase.auth.signOut({ scope: "global" });
         if (error) {
           analytics.trackLogout(false, error);
           throw error;

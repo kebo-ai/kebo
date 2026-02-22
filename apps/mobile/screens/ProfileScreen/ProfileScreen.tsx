@@ -23,7 +23,7 @@ import DeleteAccountModal from "@/components/common/DeleteAccountModal";
 import CustomCategoryModal from "@/components/common/CustomCategoryModal";
 import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
-import { updateUserProfile } from "@/services/UserService";
+import { updateUserProfile } from "@/services/user-service";
 import logger from "@/utils/logger";
 import { EXTERNAL_URLS } from "@/config/urls";
 import { APP_VERSION } from "@/config/config.base";
@@ -32,12 +32,12 @@ import {
   PROFILE_EVENTS,
   EVENT_PROPERTIES,
   ProfileEventName,
-} from "@/services/AnalyticsService";
+} from "@/services/analytics-service";
 import { updateUserAnalyticsProperties } from "@/utils/analytics-utils";
 import { useNotifications } from "@/hooks/useNotifications";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { PencilSvg } from "@/components/icons/PencilSvg";
-import { LanguageService } from "@/services/LanguageService";
+import { LanguageService } from "@/services/language-service";
 import * as StoreReview from "expo-store-review";
 
 let DeviceInfo: any = null;

@@ -11,9 +11,9 @@ import { useTheme } from "@/hooks/useTheme";
 import { useTranslation } from "react-i18next";
 import { showToast } from "@/components/ui/CustomToast";
 import { translate } from "@/i18n";
-import { LanguageService } from "@/services/LanguageService";
+import { LanguageService } from "@/services/language-service";
 import { useStores } from "@/models/helpers/use-stores";
-import { updateUserProfile } from "@/services/UserService";
+import { updateUserProfile } from "@/services/user-service";
 
 interface LanguageScreenProps {}
 

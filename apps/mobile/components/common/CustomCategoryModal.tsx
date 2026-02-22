@@ -21,7 +21,7 @@ import { observer } from "mobx-react-lite";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { showToast } from "@/components/ui/CustomToast";
 import CustomAlert from "./CustomAlert";
-import { deleteCategoryService } from "@/services/CategoryService";
+import { deleteCategoryService } from "@/services/category-service";
 import { translate } from "@/i18n";
 import { translateCategoryName } from "@/utils/category-translations";
 import { useTheme } from "@/hooks/useTheme";

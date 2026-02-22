@@ -22,7 +22,7 @@ import {
   createCategoryUser,
   updateCategoryService,
   getIconSuggestions,
-} from "@/services/CategoryService";
+} from "@/services/category-service";
 import { ArrowDownIconSvg } from "@/components/icons/ArrowDownIcon";
 import { showToast } from "@/components/ui/CustomToast";
 import { useFormik } from "formik";

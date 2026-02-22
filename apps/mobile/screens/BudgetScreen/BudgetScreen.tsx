@@ -17,7 +17,7 @@ import { translate } from "@/i18n";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { CategoriesListBudget } from "@/components/common/CategoriesListBudget";
 import CustomBudgetCard from "@/components/common/CustomBudgetCard";
-import { budgetService } from "@/services/BudgetService";
+import { budgetService } from "@/services/budget-service";
 import { CategoryItem } from "@/components/common/CategoryItem";
 import { BudgetResponse } from "@/types/transaction";
 import { Category } from "@/models/category/category";

@@ -16,7 +16,7 @@ import tw from "twrnc";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { colors } from "@/theme/colors";
-import { userSelfHardDelete } from "@/services/UserService";
+import { userSelfHardDelete } from "@/services/user-service";
 import { supabase } from "@/config/supabase";
 import { showToast } from "@/components/ui/CustomToast";
 import { translate } from "@/i18n";

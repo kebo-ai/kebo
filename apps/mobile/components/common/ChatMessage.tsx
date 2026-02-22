@@ -16,7 +16,7 @@ import { translate } from "@/i18n";
 import { Ionicons } from "@expo/vector-icons";
 import { useStores } from "@/models/helpers/use-stores";
 import { showToast } from "@/components/ui/CustomToast";
-import { createReportThread } from "@/services/ChatService";
+import { createReportThread } from "@/services/chat-service";
 import reactotron from "reactotron-react-native";
 import { useFormik } from "formik";
 import * as Yup from "yup";

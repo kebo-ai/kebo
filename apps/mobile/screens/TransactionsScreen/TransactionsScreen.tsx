@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui";
 import { Screen } from "@/components/Screen";
-import { TransactionService } from "@/services/TransactionService";
+import { TransactionService } from "@/services/transaction-service";
 import tw from "twrnc";
 import moment from "moment";
 import { colors } from "@/theme/colors";

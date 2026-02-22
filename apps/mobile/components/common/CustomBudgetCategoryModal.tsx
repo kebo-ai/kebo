@@ -37,7 +37,7 @@ import CustomAlert from "./CustomAlert";
 import {
   deleteCategoryService,
   getCategoriesUsers,
-} from "@/services/CategoryService";
+} from "@/services/category-service";
 import { translate } from "@/i18n";
 import { translateCategoryName } from "@/utils/category-translations";
 

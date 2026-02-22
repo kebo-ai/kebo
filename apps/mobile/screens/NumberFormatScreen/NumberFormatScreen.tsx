@@ -10,7 +10,7 @@ import { standardHeader } from "@/theme/header-options";
 import { useTheme } from "@/hooks/useTheme";
 import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
-import { NumberFormatService } from "@/services/NumberFormatService";
+import { NumberFormatService } from "@/services/number-format-service";
 
 const FORMAT_OPTIONS = [
   "1,234.56",

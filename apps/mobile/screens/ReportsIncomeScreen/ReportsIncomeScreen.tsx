@@ -19,12 +19,12 @@ import CustomModal from "@/components/common/CustomModal";
 import {
   ChartService,
   IncomeExpenseReportResponse,
-} from "@/services/ChartService";
+} from "@/services/chart-service";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
 import { CategoriesList } from "@/components/common/CategoriesList";
 import * as Haptics from "expo-haptics";
 import CustomAlert from "@/components/common/CustomAlert";
-import { deleteCategoryService } from "@/services/CategoryService";
+import { deleteCategoryService } from "@/services/category-service";
 import { showToast } from "@/components/ui/CustomToast";
 import { useStores } from "@/models/helpers/use-stores";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";

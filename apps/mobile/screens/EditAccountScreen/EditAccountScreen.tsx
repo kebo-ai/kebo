@@ -16,7 +16,7 @@ import { showToast } from "@/components/ui/CustomToast";
 import {
   getAccountDetailService,
   updateAccountService,
-} from "@/services/AccountService";
+} from "@/services/account-service";
 import { translate } from "@/i18n";
 import { useNumberEntry } from "@/hooks/useNumberEntry";
 import { useShakeAnimation } from "@/hooks/useShakeAnimation";

@@ -11,7 +11,7 @@ import { getUserInfo } from "@/utils/auth-utils";
 import { showToast } from "@/components/ui/CustomToast";
 import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
-import { updateUserProfile } from "@/services/UserService";
+import { updateUserProfile } from "@/services/user-service";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import CustomButton from "@/components/common/CustomButton";
 import CustomHeader from "@/components/common/CustomHeader";

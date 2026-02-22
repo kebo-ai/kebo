@@ -20,7 +20,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { Text, Icon } from "@/components/ui";
-import { TransactionService } from "@/services/TransactionService";
+import { TransactionService } from "@/services/transaction-service";
 import tw from "twrnc";
 import moment from "moment";
 import "moment/locale/es";

@@ -1,6 +1,6 @@
 import { supabase } from "@/config/supabase";
 import { RootStore } from "@/models/root-store";
-import { NumberFormatService } from "@/services/NumberFormatService";
+import { NumberFormatService } from "@/services/number-format-service";
 import logger from "./logger";
 
 export const isUserAuthenticated = async (): Promise<boolean> => {

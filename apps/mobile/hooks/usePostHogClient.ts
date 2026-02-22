@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { postHogClient } from '@/services/PostHogClient';
+import { postHogClient } from '@/services/post-hog-client';
 
 export const usePostHogClient = () => {
   const capture = useCallback((eventName: string, properties?: Record<string, any>) => {

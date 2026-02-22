@@ -12,7 +12,7 @@ import { colors } from "@/theme/colors";
 import { translate } from "@/i18n";
 import { KeboCongratulation } from "@/components/icons/KeboCongratulation";
 import * as StoreReview from "expo-store-review";
-import { ReviewService } from "@/services/ReviewService";
+import { ReviewService } from "@/services/review-service";
 import logger from "@/utils/logger";
 
 interface CustomModalReviewProps {

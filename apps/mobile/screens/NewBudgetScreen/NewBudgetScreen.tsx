@@ -31,7 +31,7 @@ const ensureValidMomentLocale = () => {
   }
 };
 
-import { budgetService } from "@/services/BudgetService";
+import { budgetService } from "@/services/budget-service";
 import { showToast } from "@/components/ui/CustomToast";
 import { CalendarRangePicker } from "@/components/common/CalendarRangePicker";
 import { ArrowDownSimpleIcon } from "@/components/icons/ArrowDownSimpleIcon";

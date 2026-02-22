@@ -27,7 +27,7 @@ import { showToast } from "@/components/ui/CustomToast";
 import {
   getAccountDetailService,
   updateAccountService,
-} from "@/services/AccountService";
+} from "@/services/account-service";
 import {
   currencyMap,
   useCurrencyFormatter,

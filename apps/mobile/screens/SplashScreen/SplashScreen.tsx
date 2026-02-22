@@ -9,11 +9,11 @@ import {
   isUserAuthenticated,
   subscribeAuthChanges,
 } from "@/utils/auth-utils";
-import { BannerService } from "@/services/BannerService";
+import { BannerService } from "@/services/banner-service";
 import i18n from "@/i18n/i18n";
 import { DynamicBanner } from "@/types/banner";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { ONBOARDING_EVENTS } from "@/services/AnalyticsService";
+import { ONBOARDING_EVENTS } from "@/services/analytics-service";
 
 interface SplashScreenProps extends AppStackScreenProps<"Splash"> {}
 

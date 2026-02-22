@@ -31,7 +31,7 @@ import Loader from "@/components/ui/CustomLoader";
 import i18n from "@/i18n/i18n";
 import { useNotifications } from "@/hooks/useNotifications";
 import * as Notifications from "expo-notifications";
-import { postHogClient } from "@/services/PostHogClient";
+import { postHogClient } from "@/services/post-hog-client";
 import { StatusBar } from "expo-status-bar";
 import { colors } from "@/theme/colors";
 import * as Haptics from "expo-haptics";

@@ -23,7 +23,7 @@ import { useTheme } from "@/hooks/useTheme";
 import {
   deleteAccountService,
   getAccountsWithBalance,
-} from "@/services/AccountService";
+} from "@/services/account-service";
 import { useStores } from "@/models/helpers/use-stores";
 import { showToast } from "@/components/ui/CustomToast";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";

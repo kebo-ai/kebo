@@ -26,7 +26,7 @@ import { ChatMessage } from "@/components/common/ChatMessage";
 import { ChatEmpty } from "@/components/common/ChatEmpty";
 
 // Services
-import { ChatService } from "@/services/ChatService";
+import { ChatService } from "@/services/chat-service";
 
 // Types
 import { MessageType } from "@/components/common/ChatMessage";

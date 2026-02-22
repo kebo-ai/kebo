@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, Dimensions, ActivityIndicator, Image } from "react-native";
 import { Text } from "@/components/ui";
 import { observer } from "mobx-react-lite";
-import { BannerService } from "@/services/BannerService";
+import { BannerService } from "@/services/banner-service";
 import CustomButton from "@/components/common/CustomButton";
 import { useRouter } from "expo-router";
 import tw from "@/hooks/useTailwind";

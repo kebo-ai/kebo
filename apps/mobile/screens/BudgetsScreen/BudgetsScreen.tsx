@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { translate } from "@/i18n";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import CustomBudgetCard from "@/components/common/CustomBudgetCard";
-import { budgetService } from "@/services/BudgetService";
+import { budgetService } from "@/services/budget-service";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { showToast } from "@/components/ui/CustomToast";

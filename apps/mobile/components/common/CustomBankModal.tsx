@@ -22,7 +22,7 @@ import { observer } from "mobx-react-lite";
 import {
   deleteAccountService,
   getAccountsWithBalance,
-} from "@/services/AccountService";
+} from "@/services/account-service";
 import { showToast } from "@/components/ui/CustomToast";
 import CustomAlert from "./CustomAlert";
 import { translate } from "@/i18n";

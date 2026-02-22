@@ -11,7 +11,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { showToast } from "@/components/ui/CustomToast";
 import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
-import { updateUserProfile } from "@/services/UserService";
+import { updateUserProfile } from "@/services/user-service";
 import { getUserInfo } from "@/utils/auth-utils";
 import * as Localization from "expo-localization";
 

@@ -25,7 +25,7 @@ import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
 import { CategoryItem } from "@/components/common/CategoryItem";
 import { showToast } from "@/components/ui/CustomToast";
 import { InputAmount } from "@/components/InputAmount";
-import { budgetService } from "@/services/BudgetService";
+import { budgetService } from "@/services/budget-service";
 import { useStores } from "@/models";
 import CustomButton from "@/components/common/CustomButton";
 import { colors } from "@/theme/colors";

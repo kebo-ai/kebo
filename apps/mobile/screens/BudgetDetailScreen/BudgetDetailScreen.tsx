@@ -15,14 +15,14 @@ import { useTheme } from "@/hooks/useTheme";
 import tw from "@/hooks/useTailwind";
 import { translate } from "@/i18n";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
-import { budgetService } from "@/services/BudgetService";
+import { budgetService } from "@/services/budget-service";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
 import { TransactionList } from "@/components/common/TransactionsList";
 import { SwipeableListWrapper } from "@/components";
 import * as Haptics from "expo-haptics";
 import CustomBudgetCategoryCard from "@/components/common/CustomBudgetCategoryCard";
 import { CategorySnapshotIn } from "@/models/category/category";
-import { TransactionService } from "@/services/TransactionService";
+import { TransactionService } from "@/services/transaction-service";
 import { showToast } from "@/components/ui/CustomToast";
 import CustomAlert from "@/components/common/CustomAlert";
 

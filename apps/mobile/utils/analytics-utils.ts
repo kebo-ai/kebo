@@ -1,5 +1,5 @@
 import logger from "./logger";
-import { AnalyticsService } from "@/services/AnalyticsService";
+import { AnalyticsService } from "@/services/analytics-service";
 import { getUserInfo } from "@/utils/auth-utils";
 import { RootStore } from "@/models/root-store";
 

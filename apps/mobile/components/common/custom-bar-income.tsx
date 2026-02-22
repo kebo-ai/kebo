@@ -11,8 +11,8 @@ import {
 import { BarChart } from "react-native-gifted-charts";
 import tw from "twrnc";
 import { translate } from "@/i18n";
-import { useCurrencyFormatter } from "./CurrencyFormatter";
-import TooltipOverlay from "./TooltipOverlay";
+import { useCurrencyFormatter } from "./currency-formatter";
+import TooltipOverlay from "./tooltip-overlay";
 import { useIsFocused } from "@react-navigation/native";
 import { ArrowRightIconSvg } from "@/components/icons/arrow-right-icon";
 import { ArrowLefttIconV2 } from "@/components/icons/arrow-leftt-icon-v2";

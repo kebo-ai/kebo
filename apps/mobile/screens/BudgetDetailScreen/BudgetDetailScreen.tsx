@@ -16,15 +16,15 @@ import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
 import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { budgetService } from "@/services/budget-service";
-import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
-import { TransactionList } from "@/components/common/TransactionsList";
+import { useCurrencyFormatter } from "@/components/common/currency-formatter";
+import { TransactionList } from "@/components/common/transactions-list";
 import { SwipeableListWrapper } from "@/components";
 import * as Haptics from "expo-haptics";
-import CustomBudgetCategoryCard from "@/components/common/CustomBudgetCategoryCard";
+import CustomBudgetCategoryCard from "@/components/common/custom-budget-category-card";
 import { CategorySnapshotIn } from "@/models/category/category";
 import { TransactionService } from "@/services/transaction-service";
 import { showToast } from "@/components/ui/custom-toast";
-import CustomAlert from "@/components/common/CustomAlert";
+import CustomAlert from "@/components/common/custom-alert";
 
 interface CategoryMetrics {
   budget_line_id: string;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Dimensions, TouchableWithoutFeedback } from "react-native";
 import tw from "twrnc";
-import { useCurrencyFormatter } from "./CurrencyFormatter";
+import { useCurrencyFormatter } from "./currency-formatter";
 
 interface TooltipOverlayProps {
   visible: boolean;

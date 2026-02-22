@@ -24,7 +24,7 @@ import {
   CategorySnapshotOut,
 } from "@/models/category/category";
 import { SvgUri } from "react-native-svg";
-import { CategoryItem } from "./CategoryItem";
+import { CategoryItem } from "./category-item";
 import { observer } from "mobx-react-lite";
 import { MotiView } from "moti";
 import {
@@ -33,7 +33,7 @@ import {
   State,
 } from "react-native-gesture-handler";
 import { showToast } from "@/components/ui/custom-toast";
-import CustomAlert from "./CustomAlert";
+import CustomAlert from "./custom-alert";
 import {
   deleteCategoryService,
   getCategoriesUsers,

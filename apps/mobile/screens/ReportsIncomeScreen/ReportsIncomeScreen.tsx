@@ -13,17 +13,17 @@ import { observer } from "mobx-react-lite";
 import { translate } from "@/i18n";
 import { Stack, useRouter } from "expo-router";
 import moment from "moment";
-import IncomeExpenseBarChart from "@/components/common/CustomBarIncome";
+import IncomeExpenseBarChart from "@/components/common/custom-bar-income";
 import { ArrowDownSimpleIcon } from "@/components/icons/arrow-down-simple-icon";
-import CustomModal from "@/components/common/CustomModal";
+import CustomModal from "@/components/common/custom-modal";
 import {
   ChartService,
   IncomeExpenseReportResponse,
 } from "@/services/chart-service";
-import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
-import { CategoriesList } from "@/components/common/CategoriesList";
+import { useCurrencyFormatter } from "@/components/common/currency-formatter";
+import { CategoriesList } from "@/components/common/categories-list";
 import * as Haptics from "expo-haptics";
-import CustomAlert from "@/components/common/CustomAlert";
+import CustomAlert from "@/components/common/custom-alert";
 import { deleteCategoryService } from "@/services/category-service";
 import { showToast } from "@/components/ui/custom-toast";
 import { useStores } from "@/models/helpers/use-stores";

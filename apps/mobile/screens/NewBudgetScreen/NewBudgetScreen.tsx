@@ -15,7 +15,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { translate } from "@/i18n";
 import { TxKeyPath } from "@/i18n";
 import tw from "@/hooks/use-tailwind";
-import CustomInput from "@/components/common/CustomInput";
+import CustomInput from "@/components/common/custom-input";
 import { useFormik } from "formik";
 import moment from "moment";
 import "moment/locale/es";
@@ -33,7 +33,7 @@ const ensureValidMomentLocale = () => {
 
 import { budgetService } from "@/services/budget-service";
 import { showToast } from "@/components/ui/custom-toast";
-import { CalendarRangePicker } from "@/components/common/CalendarRangePicker";
+import { CalendarRangePicker } from "@/components/common/calendar-range-picker";
 import { ArrowDownSimpleIcon } from "@/components/icons/arrow-down-simple-icon";
 
 interface NewBudgetScreenProps {}

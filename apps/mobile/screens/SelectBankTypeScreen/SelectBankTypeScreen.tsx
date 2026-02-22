@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 import tw from "@/hooks/use-tailwind";
 import { View, Image, TouchableOpacity, ScrollView } from "react-native";
 import { Text } from "@/components/ui";
-import CustomButton from "@/components/common/CustomButton";
+import CustomButton from "@/components/common/custom-button";
 import { colors } from "@/theme/colors";
 import { standardHeader } from "@/theme/header-options";
 import { ManualSvg } from "@/components/icons/manual-svg";

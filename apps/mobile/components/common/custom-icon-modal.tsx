@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { Icon } from "@/models/icon/icon";
-import { CategoryItem } from "./CategoryItem";
+import { CategoryItem } from "./category-item";
 import { translate } from "@/i18n";
 
 interface CustomIconModalProps {

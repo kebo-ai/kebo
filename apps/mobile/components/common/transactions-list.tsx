@@ -13,7 +13,7 @@ import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { RecurrenceIconHomeSvg } from "@/components/icons/recurrence-icon-home-svg";
 import { colors } from "@/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { useCurrencyFormatter } from "./CurrencyFormatter";
+import { useCurrencyFormatter } from "./currency-formatter";
 
 interface TransactionListProps {
   transaction: any;

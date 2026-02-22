@@ -16,7 +16,7 @@ import {
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import { standardHeader } from "@/theme/header-options";
-import CustomListItemOption from "@/components/common/CustomListItemOption";
+import CustomListItemOption from "@/components/common/custom-list-item-option";
 import { useStores } from "@/models/helpers/use-stores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -31,12 +31,12 @@ import {
 import {
   currencyMap,
   useCurrencyFormatter,
-} from "@/components/common/CurrencyFormatter";
+} from "@/components/common/currency-formatter";
 import { translate } from "@/i18n";
 import * as Localization from "expo-localization";
 import { AccountBalanceInput } from "@/components/AccountBalanceInput";
 import { useTheme } from "@/hooks/use-theme";
-import CustomButton from "@/components/common/CustomButton";
+import CustomButton from "@/components/common/custom-button";
 
 interface BankOption {
   id: string;

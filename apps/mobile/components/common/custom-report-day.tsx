@@ -9,7 +9,7 @@ import tw from "twrnc";
 import { translate } from "@/i18n";
 import moment from "moment";
 import { ArrowRightIconSvg } from "@/components/icons/arrow-right-icon";
-import { useCurrencyFormatter } from "./CurrencyFormatter";
+import { useCurrencyFormatter } from "./currency-formatter";
 import i18n from "@/i18n/i18n";
 import { ArrowLefttIconV2 } from "@/components/icons/arrow-leftt-icon-v2";
 import { useTheme } from "@/hooks/use-theme";

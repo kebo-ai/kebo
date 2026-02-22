@@ -10,10 +10,10 @@
 // import { colors } from "@/theme/colors";
 // import { translate } from "@/i18n";
 // import { supabase } from "@/config/supabase";
-// import CustomButton from "@/components/common/CustomButton";
+// import CustomButton from "@/components/common/custom-button";
 // import { AppStackScreenProps } from "@/navigators/AppNavigator";
-// import CustomHeader from "@/components/common/CustomHeader";
-// import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
+// import CustomHeader from "@/components/common/custom-header";
+// import CustomHeaderSecondary from "@/components/common/custom-header-secondary";
 
 // interface BudgetOnboardingScreenProps
 //   extends AppStackScreenProps<"OnboarningBudget"> {}

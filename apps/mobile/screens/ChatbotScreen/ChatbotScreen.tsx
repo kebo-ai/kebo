@@ -21,15 +21,15 @@ import moment from "moment";
 import * as Haptics from "expo-haptics";
 
 // Components
-import { ChatInput } from "@/components/common/ChatInput";
-import { ChatMessage } from "@/components/common/ChatMessage";
-import { ChatEmpty } from "@/components/common/ChatEmpty";
+import { ChatInput } from "@/components/common/chat-input";
+import { ChatMessage } from "@/components/common/chat-message";
+import { ChatEmpty } from "@/components/common/chat-empty";
 
 // Services
 import { ChatService } from "@/services/chat-service";
 
 // Types
-import { MessageType } from "@/components/common/ChatMessage";
+import { MessageType } from "@/components/common/chat-message";
 import { translate } from "@/i18n";
 import { colors } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";

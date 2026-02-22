@@ -13,11 +13,11 @@ import { useTheme } from "@/hooks/use-theme";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { translate } from "@/i18n";
 import { Screen } from "@/components/Screen";
-import CustomHeader from "@/components/common/CustomHeader";
-import CustomIconModal from "@/components/common/CustomIconModal";
+import CustomHeader from "@/components/common/custom-header";
+import CustomIconModal from "@/components/common/custom-icon-modal";
 import { useStores } from "@/models/helpers/use-stores";
 import { IconModel } from "@/models/icon/icon";
-import CustomButton from "@/components/common/CustomButton";
+import CustomButton from "@/components/common/custom-button";
 import {
   createCategoryUser,
   updateCategoryService,

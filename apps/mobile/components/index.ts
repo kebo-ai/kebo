@@ -1,5 +1,5 @@
 export * from "./Screen"
-export * from "./common/CustomButton"
-export * from "./common/CustomInput"
+export * from "./common/custom-button"
+export * from "./common/custom-input"
 export * from "./SwipeableList/SwipeableList"
 export * from "./SwipeableListWrapper/SwipeableListWrapper"

@@ -21,19 +21,19 @@ import {
 import { Text } from "@/components/ui";
 import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
-import CustomHeaderSecondary from "@/components/common/CustomHeaderSecondary";
-import { CategoryItem } from "@/components/common/CategoryItem";
+import CustomHeaderSecondary from "@/components/common/custom-header-secondary";
+import { CategoryItem } from "@/components/common/category-item";
 import { showToast } from "@/components/ui/custom-toast";
 import { InputAmount } from "@/components/InputAmount";
 import { budgetService } from "@/services/budget-service";
 import { useStores } from "@/models";
-import CustomButton from "@/components/common/CustomButton";
+import CustomButton from "@/components/common/custom-button";
 import { colors } from "@/theme/colors";
-import CustomBudgetCategoryModal from "@/components/common/CustomBudgetCategoryModal";
+import CustomBudgetCategoryModal from "@/components/common/custom-budget-category-modal";
 import {
   currencyMap,
   useCurrencyFormatter,
-} from "@/components/common/CurrencyFormatter";
+} from "@/components/common/currency-formatter";
 import { EditIconSvg } from "@/components/icons/edit-icon-svg";
 import { useAnalytics } from "@/hooks/use-analytics";
 

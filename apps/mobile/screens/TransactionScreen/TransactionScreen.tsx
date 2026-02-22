@@ -16,10 +16,10 @@ import { useShakeAnimation } from "@/hooks/use-shake-animation";
 import { useHighlightAnimation } from "@/hooks/use-highlight-animation";
 import { useNumberEntry } from "@/hooks/use-number-entry";
 import { colors } from "@/theme/colors";
-import { CalendarPicker } from "@/components/common/CalendarPicker";
-import CustomBankModal from "@/components/common/CustomBankModal";
-import CustomCategoryModal from "@/components/common/CustomCategoryModal";
-import CustomModal from "@/components/common/CustomModal";
+import { CalendarPicker } from "@/components/common/calendar-picker";
+import CustomBankModal from "@/components/common/custom-bank-modal";
+import CustomCategoryModal from "@/components/common/custom-category-modal";
+import CustomModal from "@/components/common/custom-modal";
 import {
   TransactionType,
   TransactionScreenProps,
@@ -36,7 +36,7 @@ import { ITransaction } from "@/models/transaction/transaction";
 import i18n from "@/i18n/i18n";
 import logger from "@/utils/logger";
 
-import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
+import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 import { NumberPad } from "@/components/transaction/NumberPad";
 import { AmountDisplay } from "@/components/transaction/AmountDisplay";
 import { TransactionTypeToggle } from "@/components/transaction/TransactionTypeToggle";

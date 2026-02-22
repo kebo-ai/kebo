@@ -24,9 +24,9 @@ import {
   getAccountsWithBalance,
 } from "@/services/account-service";
 import { showToast } from "@/components/ui/custom-toast";
-import CustomAlert from "./CustomAlert";
+import CustomAlert from "./custom-alert";
 import { translate } from "@/i18n";
-import { useCurrencyFormatter, currencyMap } from "./CurrencyFormatter";
+import { useCurrencyFormatter, currencyMap } from "./currency-formatter";
 import * as Localization from "expo-localization";
 import { useTheme } from "@/hooks/use-theme";
 

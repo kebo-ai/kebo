@@ -18,10 +18,10 @@ import { useShakeAnimation } from "@/hooks/use-shake-animation";
 import { useNumberEntry } from "@/hooks/use-number-entry";
 import { colors } from "@/theme/colors";
 import { Text } from "@/components/ui";
-import { CalendarPicker } from "@/components/common/CalendarPicker";
-import CustomBankModal from "@/components/common/CustomBankModal";
-import CustomCategoryModal from "@/components/common/CustomCategoryModal";
-import CustomModal from "@/components/common/CustomModal";
+import { CalendarPicker } from "@/components/common/calendar-picker";
+import CustomBankModal from "@/components/common/custom-bank-modal";
+import CustomCategoryModal from "@/components/common/custom-category-modal";
+import CustomModal from "@/components/common/custom-modal";
 import {
   TransactionType,
   recurrenceDisplayMap,
@@ -31,7 +31,7 @@ import {
 } from "@/types/transaction";
 import { useFormik } from "formik";
 import { showToast } from "@/components/ui/custom-toast";
-import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
+import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 import { TransactionService } from "@/services/transaction-service";
 import { useTransactionDates } from "@/hooks/use-transaction-dates";
 import { CategorySnapshotIn } from "@/models/category/category";

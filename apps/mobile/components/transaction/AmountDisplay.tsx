@@ -8,7 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { Text } from "@/components/ui";
 import { useTheme } from "@/hooks/use-theme";
-import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
+import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 import type { NumberEntryType } from "@/hooks/use-number-entry";
 
 interface AmountDisplayProps {

@@ -3,7 +3,7 @@ import { View, TouchableOpacity } from "react-native";
 import { Text } from "@/components/ui";
 import { translate } from "@/i18n";
 import tw from "@/hooks/use-tailwind";
-import { useCurrencyFormatter } from "./CurrencyFormatter";
+import { useCurrencyFormatter } from "./currency-formatter";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "@/theme";
 import { useTheme } from "@/hooks/use-theme";

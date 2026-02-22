@@ -9,7 +9,7 @@ import {
 import { Text } from "@/components/ui";
 import AppIntroSlider from "react-native-app-intro-slider";
 import { colors } from "@/theme/colors";
-import CustomButton from "./CustomButton";
+import CustomButton from "./custom-button";
 import { translate } from "@/i18n/translate";
 
 interface Slide {

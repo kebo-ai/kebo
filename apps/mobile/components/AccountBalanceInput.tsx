@@ -12,7 +12,7 @@ import { Text } from "@/components/ui";
 import * as Localization from "expo-localization";
 import tw from "@/hooks/use-tailwind";
 import { colors } from "@/theme/colors";
-import { useCurrencyFormatter, currencyMap } from "./common/CurrencyFormatter";
+import { useCurrencyFormatter, currencyMap } from "./common/currency-formatter";
 import { useTheme } from "@/hooks/use-theme";
 
 const locale = Localization.getLocales()[0]?.languageTag || "en-US";

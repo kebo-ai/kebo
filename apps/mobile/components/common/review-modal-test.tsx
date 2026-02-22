@@ -4,7 +4,7 @@ import { View, TouchableOpacity, Text } from 'react-native';
 import tw from 'twrnc';
 import { colors } from '@/theme/colors';
 import { useReviewModal } from '@/hooks/use-review-modal';
-import CustomModalReview from './CustomModalReview';
+import CustomModalReview from './custom-modal-review';
 
 export const ReviewModalTest: React.FC = () => {
   const {

@@ -23,7 +23,7 @@ import { useShakeAnimation } from "@/hooks/use-shake-animation";
 import { AmountDisplay } from "@/components/transaction/AmountDisplay";
 import { NumberPad } from "@/components/transaction/NumberPad";
 import { TransactionFieldRow } from "@/components/transaction/TransactionFieldRow";
-import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
+import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 
 // Interface for safe account type to use with formik
 interface SafeAccountType {

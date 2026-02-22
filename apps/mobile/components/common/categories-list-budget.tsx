@@ -3,7 +3,7 @@ import { View, TouchableOpacity } from "react-native";
 import { Text } from "@/components/ui";
 import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
-import { useCurrencyFormatter } from "./CurrencyFormatter";
+import { useCurrencyFormatter } from "./currency-formatter";
 import * as Haptics from "expo-haptics";
 import { SwipeableListWrapper } from "@/components";
 import { colors } from "@/theme";

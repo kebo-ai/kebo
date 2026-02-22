@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import { TextInputProps, Platform } from "react-native";
 import CurrencyInput from "react-native-currency-input";
 import tw from "@/hooks/use-tailwind";
-import { useCurrencyFormatter } from "./common/CurrencyFormatter";
+import { useCurrencyFormatter } from "./common/currency-formatter";
 
 interface InputAmountBudgetProps {
   value: string;

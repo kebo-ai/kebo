@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import tw from "@/hooks/use-tailwind";
 import { colors } from "@/theme/colors";
-import { useCurrencyFormatter } from "./common/CurrencyFormatter";
+import { useCurrencyFormatter } from "./common/currency-formatter";
 import { useStores } from "@/models/helpers/use-stores";
 
 interface InputAmountProps {

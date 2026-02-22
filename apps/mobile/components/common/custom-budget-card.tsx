@@ -7,7 +7,7 @@ import { colors } from "@/theme";
 import { useTheme } from "@/hooks/use-theme";
 import tw from "@/hooks/use-tailwind";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useCurrencyFormatter } from "./CurrencyFormatter";
+import { useCurrencyFormatter } from "./currency-formatter";
 import * as Haptics from "expo-haptics";
 import moment from "moment";
 import "moment/locale/es";

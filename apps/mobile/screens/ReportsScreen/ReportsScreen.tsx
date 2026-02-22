@@ -7,7 +7,7 @@ import { showToast } from "@/components/ui/custom-toast";
 import tw from "@/hooks/use-tailwind";
 import { useTheme } from "@/hooks/use-theme";
 import { translate } from "@/i18n";
-import CustomReportCard from "@/components/common/CustomReportCard";
+import CustomReportCard from "@/components/common/custom-report-card";
 import { EXTERNAL_URLS } from "@/config/urls";
 
 interface ReportsScreenProps {}

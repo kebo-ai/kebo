@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TouchableWithoutFeedback, Animated } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 import tw from "twrnc";
-import TooltipOverlay from "./TooltipOverlay";
+import TooltipOverlay from "./tooltip-overlay";
 import { useTheme } from "@/hooks/use-theme";
 
 interface CategoryData {

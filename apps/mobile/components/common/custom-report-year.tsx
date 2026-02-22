@@ -4,7 +4,7 @@ import tw from "twrnc";
 import moment from "moment";
 import { translate } from "@/i18n/translate";
 import { ArrowRightIconSvg } from "@/components/icons/arrow-right-icon";
-import { useCurrencyFormatter } from "./CurrencyFormatter";
+import { useCurrencyFormatter } from "./currency-formatter";
 import { ArrowLefttIconV2 } from "@/components/icons/arrow-leftt-icon-v2";
 
 interface CustomReportYearProps {

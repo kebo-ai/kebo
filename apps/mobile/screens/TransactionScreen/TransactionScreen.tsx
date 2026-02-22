@@ -1,10 +1,10 @@
 import React, { FC, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   View,
-  SafeAreaView,
   StyleSheet,
   Keyboard,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableScale } from "pressto";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -338,7 +338,7 @@ export const TransactionScreen: FC<TransactionScreenProps> = observer(
     }, [icon_url]);
 
     return (
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]} edges={["top", "bottom"]}>
         {/* Header */}
         <View style={styles.header}>
           <PressableScale

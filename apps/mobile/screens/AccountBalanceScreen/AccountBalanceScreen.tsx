@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
+import { standardHeader } from "@/theme/headerOptions";
 import CustomListItemOption from "@/components/common/CustomListItemOption";
 import { useStores } from "@/models/helpers/useStores";
 import { useFormik } from "formik";
@@ -431,19 +432,12 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
       <>
         <Stack.Screen
           options={{
+            ...standardHeader(theme),
             headerShown: true,
-            headerLargeTitle: false,
-            headerTransparent: true,
-            headerBlurEffect: theme.blurEffect,
             headerBackTitle: translate("common:back"),
-            headerTintColor: colors.primary,
             title: isEditing
               ? translate("accountBalanceScreen:editAccount")
               : translate("accountBalanceScreen:addAccount"),
-            headerTitleStyle: {
-              fontFamily: "SFUIDisplaySemiBold",
-              color: theme.headerTitle,
-            },
             contentStyle: { backgroundColor: theme.background },
           }}
         />

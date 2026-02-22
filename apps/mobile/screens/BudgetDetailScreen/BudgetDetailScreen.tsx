@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
+import { standardHeader } from "@/theme/headerOptions";
 import { useTheme } from "@/hooks/useTheme";
 import tw from "@/hooks/useTailwind";
 import { translate } from "@/i18n";
@@ -227,17 +228,11 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
     }, []);
 
     const headerOptions = {
+      ...standardHeader(theme),
       headerShown: true,
       title: translate("budgetScreen:detailCategory"),
       headerBackTitle: translate("budgetScreen:detailBudget"),
-      headerTintColor: colors.primary,
-      headerTitleStyle: {
-        fontFamily: "SFUIDisplaySemiBold",
-        color: theme.headerTitle,
-      },
-      headerTransparent: true,
-      headerBlurEffect: theme.blurEffect,
-    } as const;
+    };
 
     const { category_metrics, transactions } = categoryDetails ?? {};
 

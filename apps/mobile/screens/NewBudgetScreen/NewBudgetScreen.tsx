@@ -10,6 +10,7 @@ import {
 import { Text, Button } from "@/components/ui";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { colors } from "@/theme/colors";
+import { standardHeader } from "@/theme/headerOptions";
 import { useTheme } from "@/hooks/useTheme";
 import { translate } from "@/i18n";
 import { TxKeyPath } from "@/i18n";
@@ -179,18 +180,12 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
     <>
       <Stack.Screen
         options={{
+          ...standardHeader(theme),
           headerShown: true,
           title: isEditing
             ? translate("newBudgetScreen:editBudget")
             : translate("newBudgetScreen:createBudget"),
           headerBackTitle: translate("budgetScreen:budget"),
-          headerTintColor: colors.primary,
-          headerTitleStyle: {
-            fontFamily: "SFUIDisplaySemiBold",
-            color: theme.headerTitle,
-          },
-          headerTransparent: true,
-          headerBlurEffect: theme.blurEffect,
         }}
       />
       <KeyboardAvoidingView

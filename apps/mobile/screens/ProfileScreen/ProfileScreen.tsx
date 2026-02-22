@@ -13,6 +13,7 @@ import {
 import tw from "twrnc";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
+import { largeTitleHeader } from "@/theme/headerOptions";
 import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/config/supabase";
 import { getUserInfo } from "@/utils/authUtils";
@@ -297,23 +298,10 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
       <>
         <Stack.Screen
           options={{
+            ...largeTitleHeader(theme),
             headerShown: true,
-            headerLargeTitle: true,
-            headerTransparent: true,
-            headerBlurEffect: theme.blurEffect,
-            headerTintColor: colors.primary,
             headerBackTitle: translate("common:back"),
             title: translate("profileScreen:profile"),
-            headerLargeStyle: { backgroundColor: "transparent" },
-            headerLargeTitleStyle: {
-              fontFamily: "SFUIDisplayBold",
-              color: theme.headerTitle,
-              fontSize: 20,
-            },
-            headerTitleStyle: {
-              fontFamily: "SFUIDisplaySemiBold",
-              color: theme.headerTitle,
-            },
             contentStyle: { backgroundColor: theme.background },
           }}
         />

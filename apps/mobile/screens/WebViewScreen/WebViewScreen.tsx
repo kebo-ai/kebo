@@ -11,6 +11,7 @@ import { observer } from "mobx-react-lite";
 import tw from "twrnc";
 import { useTheme } from "@/hooks/useTheme";
 import { colors } from "@/theme/colors";
+import { standardHeader } from "@/theme/headerOptions";
 import { translate } from "@/i18n";
 
 interface WebViewScreenProps {}
@@ -72,16 +73,10 @@ export const WebViewScreen: FC<WebViewScreenProps> = observer(
       <View style={{ flex: 1, backgroundColor: theme.background }}>
         <Stack.Screen
           options={{
+            ...standardHeader(theme),
             headerShown: true,
             title,
             headerBackTitle: translate("navigator:reports"),
-            headerTransparent: true,
-            headerBlurEffect: theme.blurEffect,
-            headerTitleStyle: {
-              fontFamily: "SFUIDisplaySemiBold",
-              color: theme.headerTitle,
-            },
-            headerTintColor: colors.primary,
           }}
         />
         {isLoading && (

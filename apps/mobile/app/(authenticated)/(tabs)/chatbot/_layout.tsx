@@ -1,22 +1,12 @@
 import { Stack } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
+import { standardHeader } from "@/theme/headerOptions";
 
 export default function ChatbotLayout() {
-  const { theme, colors } = useTheme();
+  const { theme } = useTheme();
 
   return (
-    <Stack
-      screenOptions={{
-        headerLargeTitle: false,
-        headerTransparent: true,
-        headerBlurEffect: theme.blurEffect,
-        headerTitleStyle: {
-          fontFamily: "SFUIDisplaySemiBold",
-          color: theme.headerTitle,
-        },
-        headerTintColor: colors.primary,
-      }}
-    >
+    <Stack screenOptions={standardHeader(theme)}>
       <Stack.Screen name="index" options={{ title: "Kebo Wise" }} />
     </Stack>
   );

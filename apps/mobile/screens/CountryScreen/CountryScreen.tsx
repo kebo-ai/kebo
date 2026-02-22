@@ -6,6 +6,7 @@ import tw from "twrnc";
 import { Stack, useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
+import { largeTitleHeader } from "@/theme/headerOptions";
 import { useTheme } from "@/hooks/useTheme";
 import { showToast } from "@/components/ui/CustomToast";
 import { useStores } from "@/models/helpers/useStores";
@@ -245,23 +246,10 @@ export const CountryScreen: FC<CountryScreenProps> = observer(
       <>
         <Stack.Screen
           options={{
+            ...largeTitleHeader(theme),
             headerShown: true,
-            headerLargeTitle: true,
-            headerTransparent: true,
-            headerBlurEffect: theme.blurEffect,
             headerBackTitle: translate("common:back"),
-            headerTintColor: colors.primary,
             title: translate("countryScreen:selectCountry"),
-            headerLargeStyle: { backgroundColor: "transparent" },
-            headerLargeTitleStyle: {
-              fontFamily: "SFUIDisplayBold",
-              color: theme.headerTitle,
-              fontSize: 20,
-            },
-            headerTitleStyle: {
-              fontFamily: "SFUIDisplaySemiBold",
-              color: theme.headerTitle,
-            },
             contentStyle: { backgroundColor: theme.background },
           }}
         />

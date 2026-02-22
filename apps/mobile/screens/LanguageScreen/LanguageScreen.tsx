@@ -6,11 +6,14 @@ import tw from "twrnc";
 import { Stack, useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
+import { largeTitleHeader } from "@/theme/headerOptions";
 import { useTheme } from "@/hooks/useTheme";
 import { useTranslation } from "react-i18next";
 import { showToast } from "@/components/ui/CustomToast";
 import { translate } from "@/i18n";
 import { LanguageService } from "@/services/LanguageService";
+import { useStores } from "@/models/helpers/useStores";
+import { updateUserProfile } from "@/services/UserService";
 
 interface LanguageScreenProps {}
 
@@ -40,6 +43,7 @@ export const LanguageScreen: FC<LanguageScreenProps> = observer(
     const router = useRouter();
     const { i18n } = useTranslation();
     const { theme } = useTheme();
+    const { profileModel } = useStores();
 
     const handleLanguageChange = async (langCode: string) => {
       try {
@@ -50,6 +54,8 @@ export const LanguageScreen: FC<LanguageScreenProps> = observer(
         );
 
         if (saveSuccess) {
+          profileModel.setLanguage(langCode);
+          updateUserProfile({ language: langCode });
           showToast("success", translate("languageScreen:sucessLanguage"));
           router.back();
         } else {
@@ -65,23 +71,10 @@ export const LanguageScreen: FC<LanguageScreenProps> = observer(
       <>
         <Stack.Screen
           options={{
+            ...largeTitleHeader(theme),
             headerShown: true,
-            headerLargeTitle: true,
-            headerTransparent: true,
-            headerBlurEffect: theme.blurEffect,
             headerBackTitle: translate("common:back"),
-            headerTintColor: colors.primary,
             title: translate("languageScreen:selectLanguage"),
-            headerLargeStyle: { backgroundColor: "transparent" },
-            headerLargeTitleStyle: {
-              fontFamily: "SFUIDisplayBold",
-              color: theme.headerTitle,
-              fontSize: 20,
-            },
-            headerTitleStyle: {
-              fontFamily: "SFUIDisplaySemiBold",
-              color: theme.headerTitle,
-            },
             contentStyle: { backgroundColor: theme.background },
           }}
         />

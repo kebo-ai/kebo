@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
+import { standardHeader } from "@/theme/headerOptions";
 import { observer } from "mobx-react-lite";
 import { translate } from "@/i18n";
 import { Stack, useRouter } from "expo-router";
@@ -280,16 +281,10 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
           )}
           <Stack.Screen
             options={{
+              ...standardHeader(theme),
               headerShown: true,
               title: translate("reportsCategoryScreen:reportsCategoryTitle"),
               headerBackTitle: translate("navigator:reports"),
-              headerTransparent: true,
-              headerBlurEffect: theme.blurEffect,
-              headerTitleStyle: {
-                fontFamily: "SFUIDisplaySemiBold",
-                color: theme.headerTitle,
-              },
-              headerTintColor: colors.primary,
             }}
           />
           <ScrollView

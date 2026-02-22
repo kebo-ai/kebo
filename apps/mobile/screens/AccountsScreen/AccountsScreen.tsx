@@ -17,6 +17,7 @@ import { SwipeListView } from "react-native-swipe-list-view";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { translate } from "@/i18n";
 import { colors } from "@/theme";
+import { largeTitleHeader } from "@/theme/headerOptions";
 import tw from "@/hooks/useTailwind";
 import { useTheme } from "@/hooks/useTheme";
 import {
@@ -445,23 +446,10 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
       <>
         <Stack.Screen
           options={{
+            ...largeTitleHeader(theme),
             headerShown: true,
-            headerLargeTitle: true,
-            headerTransparent: true,
-            headerBlurEffect: theme.blurEffect,
             headerBackTitle: translate("common:back"),
-            headerTintColor: colors.primary,
             title: translate("accountScreen:myAccounts"),
-            headerLargeStyle: { backgroundColor: "transparent" },
-            headerLargeTitleStyle: {
-              fontFamily: "SFUIDisplayBold",
-              color: theme.headerTitle,
-              fontSize: 20,
-            },
-            headerTitleStyle: {
-              fontFamily: "SFUIDisplaySemiBold",
-              color: theme.headerTitle,
-            },
             contentStyle: { backgroundColor: theme.background },
             headerRight: () => (
               <TouchableOpacity

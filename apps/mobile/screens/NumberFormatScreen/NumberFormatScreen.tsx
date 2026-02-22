@@ -6,9 +6,11 @@ import tw from "twrnc";
 import { Stack, useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
+import { standardHeader } from "@/theme/headerOptions";
 import { useTheme } from "@/hooks/useTheme";
 import { useStores } from "@/models/helpers/useStores";
 import { translate } from "@/i18n";
+import { NumberFormatService } from "@/services/NumberFormatService";
 
 const FORMAT_OPTIONS = [
   "1,234.56",
@@ -25,6 +27,7 @@ export const NumberFormatScreen = observer(function NumberFormatScreen() {
 
   const handleSelect = (format: string) => {
     profileModel.setNumberFormat(format);
+    NumberFormatService.saveSelectedFormat(format);
     router.back();
   };
 
@@ -32,16 +35,10 @@ export const NumberFormatScreen = observer(function NumberFormatScreen() {
     <>
       <Stack.Screen
         options={{
+          ...standardHeader(theme),
           headerShown: true,
-          headerTransparent: true,
-          headerBlurEffect: theme.blurEffect,
           headerBackTitle: translate("common:back"),
-          headerTintColor: colors.primary,
           title: translate("profileScreen:numberFormat"),
-          headerTitleStyle: {
-            fontFamily: "SFUIDisplaySemiBold",
-            color: theme.headerTitle,
-          },
           contentStyle: { backgroundColor: theme.background },
         }}
       />

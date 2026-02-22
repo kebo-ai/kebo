@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
+import { standardHeader } from "@/theme/headerOptions";
 import { SearchIconSvg } from "@/components/icons/SearchSvg";
 import * as Localization from "expo-localization";
 import { translate } from "@/i18n";
@@ -68,21 +69,10 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
       <>
         <Stack.Screen
           options={{
+            ...standardHeader(theme),
             headerShown: true,
-            headerLargeTitle: false,
-            headerTransparent: true,
-            headerBlurEffect: theme.blurEffect,
             headerBackTitle: translate("common:back"),
-            headerTintColor: colors.primary,
             title: translate("components:bankModal.addAccount"),
-            headerLargeTitleStyle: {
-              fontFamily: "SFUIDisplayBold",
-              color: theme.headerTitle,
-            },
-            headerTitleStyle: {
-              fontFamily: "SFUIDisplaySemiBold",
-              color: theme.headerTitle,
-            },
             contentStyle: { backgroundColor: theme.background },
           }}
         />

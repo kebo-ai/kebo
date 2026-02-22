@@ -4,6 +4,7 @@ import { observer } from "mobx-react-lite";
 import { supabase } from "@/config/supabase";
 import { useTheme } from "@/hooks/useTheme";
 import { colors } from "@/theme/colors";
+import { standardHeader } from "@/theme/headerOptions";
 import logger from "@/utils/logger";
 import { translate } from "@/i18n";
 
@@ -44,22 +45,11 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
   // Shared native header style for screens using Stack.Screen options
   const nativeHeader = {
     headerShown: true,
-    headerTransparent: true,
-    headerBlurEffect: theme.blurEffect,
+    ...standardHeader(theme),
     headerBackTitle: translate("common:back"),
-    headerTintColor: colors.primary,
-    headerLargeTitleStyle: {
-      fontFamily: "SFUIDisplayBold",
-      color: theme.headerTitle,
-      fontSize: 20,
-    },
-    headerTitleStyle: {
-      fontFamily: "SFUIDisplaySemiBold",
-      color: theme.headerTitle,
-    },
     headerStyle: { backgroundColor: theme.background },
     contentStyle: { backgroundColor: theme.background },
-  } as const;
+  };
 
   return (
     <Stack

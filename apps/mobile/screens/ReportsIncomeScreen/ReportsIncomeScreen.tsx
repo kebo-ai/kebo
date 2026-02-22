@@ -32,6 +32,7 @@ import { load, save } from "@/utils/storage";
 import { REPORTS_INCOME_PERIOD } from "@/utils/storage/storage-keys";
 import { useTheme } from "@/hooks/useTheme";
 import { colors } from "@/theme/colors";
+import { standardHeader } from "@/theme/headerOptions";
 
 interface ReportsIncomeScreenProps {}
 
@@ -456,16 +457,10 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
           )}
           <Stack.Screen
             options={{
+              ...standardHeader(theme),
               headerShown: true,
               title: translate("reportsIncomeScreen:reportsIncome"),
               headerBackTitle: translate("navigator:reports"),
-              headerTransparent: true,
-              headerBlurEffect: theme.blurEffect,
-              headerTitleStyle: {
-                fontFamily: "SFUIDisplaySemiBold",
-                color: theme.headerTitle,
-              },
-              headerTintColor: colors.primary,
             }}
           />
           <ScrollView

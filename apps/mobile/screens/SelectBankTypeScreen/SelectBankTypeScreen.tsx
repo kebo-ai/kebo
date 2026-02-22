@@ -6,6 +6,7 @@ import { View, Image, TouchableOpacity, ScrollView } from "react-native";
 import { Text } from "@/components/ui";
 import CustomButton from "@/components/common/CustomButton";
 import { colors } from "@/theme/colors";
+import { standardHeader } from "@/theme/headerOptions";
 import { ManualSvg } from "@/components/icons/ManualSvg";
 import { UserSvg } from "@/components/icons/UserSvg";
 import { showToast } from "@/components/ui/CustomToast";
@@ -36,17 +37,10 @@ export const SelectBankTypeScreen: FC<SelectBankTypeScreenProps> = observer(
       <>
         <Stack.Screen
           options={{
+            ...standardHeader(theme),
             headerShown: true,
-            headerLargeTitle: false,
-            headerTransparent: true,
-            headerBlurEffect: theme.blurEffect,
             headerBackTitle: translate("common:back"),
-            headerTintColor: colors.primary,
             title: translate("selectBankScreen:addAccountTitle"),
-            headerTitleStyle: {
-              fontFamily: "SFUIDisplaySemiBold",
-              color: theme.headerTitle,
-            },
             contentStyle: { backgroundColor: theme.background },
           }}
         />

@@ -6,12 +6,14 @@ import tw from "@/hooks/useTailwind";
 import i18n from "@/i18n/i18n";
 import { colors } from "@/theme/colors";
 import { useTheme } from "@/hooks/useTheme";
+import { Text } from "@/components/ui";
 
 interface CalendarPickerProps {
   selectedDate?: Date;
   onDateChange: (date: Date) => void;
   isVisible: boolean;
   onClose: () => void;
+  title?: string;
 }
 
 export const CalendarPicker: React.FC<CalendarPickerProps> = ({
@@ -19,6 +21,7 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
   onDateChange,
   isVisible,
   onClose,
+  title,
 }) => {
   const { theme } = useTheme();
   const currentDate = selectedDate ?? new Date();
@@ -50,6 +53,16 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
             <View
               style={tw`bg-[${theme.surface}] rounded-2xl p-6 w-full max-w-sm`}
             >
+              {title && (
+                <Text
+                  type="sm"
+                  weight="medium"
+                  color={theme.textSecondary}
+                  style={tw`text-center mb-3`}
+                >
+                  {title}
+                </Text>
+              )}
               <Calendar
                 key={theme.surface}
                 current={format(currentDate, "yyyy-MM-dd")}

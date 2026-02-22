@@ -743,6 +743,7 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
           isVisible={isEndDatePickerVisible}
           onDateChange={handleEndDateConfirm}
           onClose={() => setEndDatePickerVisibility(false)}
+          title={translate("transactionScreen:recurrenceEndHint")}
         />
 
         <CustomModal

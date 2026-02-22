@@ -177,6 +177,7 @@ const en = {
     date: "Date:",
     recurrence: "Recurrence",
     endDate: "End date",
+    recurrenceEndHint: "When should this recurrence end?",
     ready: "Ready",
     delete: "Delete",
     cancel: "Cancel",

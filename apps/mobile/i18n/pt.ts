@@ -178,6 +178,7 @@ const pt = {
     date: "Data:",
     recurrence: "Recorrência",
     endDate: "Data final",
+    recurrenceEndHint: "Quando essa recorrência deve terminar?",
     ready: "Pronto",
     delete: "Excluir",
     cancel: "Cancelar",

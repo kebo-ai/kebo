@@ -178,6 +178,7 @@ const es = {
     date: "Fecha:",
     recurrence: "Repetición",
     endDate: "Fecha de finalización",
+    recurrenceEndHint: "¿Cuándo debe terminar esta recurrencia?",
     ready: "Listo",
     delete: "Eliminar",
     cancel: "Cancelar",

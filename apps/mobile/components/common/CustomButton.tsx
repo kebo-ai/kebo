@@ -12,6 +12,7 @@ import {
 import tw from "twrnc";
 import { colors } from "@/theme";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { useTheme } from "@/hooks/useTheme";
 
 type CustomButtonProps = {
   variant?: "primary" | "secondary";
@@ -37,6 +38,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   enableAnalytics = false,
 }) => {
   const analytics = useAnalytics();
+  const { theme } = useTheme();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
@@ -80,7 +82,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
           bottom: keyboardHeight,
           left: 0,
           right: 0,
-          backgroundColor: "#FAFAFA",
+          backgroundColor: theme.background,
           paddingTop: 10,
           ...containerStyle,
         };
@@ -88,7 +90,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         return {
           ...tw`px-6`,
           paddingBottom: marginAboveKeyboard + 10,
-          backgroundColor: "#FAFAFA",
+          backgroundColor: theme.background,
           ...containerStyle,
         };
       }

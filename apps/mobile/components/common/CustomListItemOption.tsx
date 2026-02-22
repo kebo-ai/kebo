@@ -23,6 +23,7 @@ import { SvgUri } from "react-native-svg";
 import { EndDateIconSvg } from "@/components/icons/EndDateSvg";
 import { translate } from "@/i18n";
 import { translateCategoryName } from "@/utils/categoryTranslations";
+import { useTheme } from "@/hooks/useTheme";
 
 interface CustomListItemOptionProps {
   icon?:
@@ -73,6 +74,8 @@ const CustomListItemOption: React.FC<CustomListItemOptionProps> = observer(
     returnKeyType = "default",
     categoryId,
   }) => {
+    const { theme } = useTheme();
+
     const renderDefaultIcon = () => {
       switch (icon) {
         case "category":
@@ -107,7 +110,7 @@ const CustomListItemOption: React.FC<CustomListItemOptionProps> = observer(
           <View style={tw`w-7 h-7 items-center justify-center overflow-hidden`}>
             <Image
               source={{ uri: iconUrl }}
-              style={tw`w-full h-full bg-white border border-[#6934D2]/15 rounded-lg`}
+              style={[tw`w-full h-full rounded-lg`, { backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border }]}
               resizeMode="contain"
             />
           </View>
@@ -158,17 +161,19 @@ const CustomListItemOption: React.FC<CustomListItemOptionProps> = observer(
     return (
       <TouchableOpacity
         onPress={icon === "note" ? undefined : onPress}
-        style={tw`flex-row items-center py-3 ${
-          showBorder ? "border-b border-gray-200" : ""
-        }`}
+        style={[
+          tw`flex-row items-center py-3`,
+          showBorder && { borderBottomWidth: 1, borderBottomColor: theme.border },
+        ]}
         disabled={icon === "note"}
         activeOpacity={1}
       >
         {icon && (
           <View
-            style={tw`mr-3 ${
-              !isImage ? "bg-[#6934D226] " : ""
-            } rounded-lg w-7 h-7 items-center justify-center border border-[#6934D2]/15`}
+            style={[
+              tw`mr-3 rounded-lg w-7 h-7 items-center justify-center`,
+              !isImage && { backgroundColor: "rgba(105, 52, 210, 0.15)", borderWidth: 1, borderColor: "rgba(105, 52, 210, 0.15)" },
+            ]}
           >
             {labelSelected ? renderSelectedIcon() : renderDefaultIcon()}
           </View>
@@ -177,12 +182,14 @@ const CustomListItemOption: React.FC<CustomListItemOptionProps> = observer(
           {icon === "note" ? (
             <TextInput
               style={[
-                tw`flex-1 text-[#606A84] text-base`,
+                tw`flex-1 text-base`,
                 {
                   fontFamily: "SFUIDisplayLight",
+                  color: theme.textSecondary,
                 },
               ]}
               placeholder={label}
+              placeholderTextColor={theme.textTertiary}
               value={inputValue}
               onChangeText={setInputValue}
               returnKeyType={returnKeyType}
@@ -197,14 +204,16 @@ const CustomListItemOption: React.FC<CustomListItemOptionProps> = observer(
                     ? "medium"
                     : "light"
                 }
-                style={tw`text-[${colors.textGray}] text-base`}
+                style={tw`text-base`}
+                color={theme.textSecondary}
               >
                 {renderLabel()}
               </Text>
               {translatedLabelSelected && (
                 <Text
                   weight="semibold"
-                  style={tw`text-[${colors.textGray}] text-base flex-1`}
+                  style={tw`text-base flex-1`}
+                  color={theme.textPrimary}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >

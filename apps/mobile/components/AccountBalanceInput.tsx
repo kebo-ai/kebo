@@ -13,6 +13,7 @@ import * as Localization from "expo-localization";
 import tw from "@/hooks/useTailwind";
 import { colors } from "@/theme/colors";
 import { useCurrencyFormatter, currencyMap } from "./common/CurrencyFormatter";
+import { useTheme } from "@/hooks/useTheme";
 
 const locale = Localization.getLocales()[0]?.languageTag || "en-US";
 
@@ -56,6 +57,7 @@ export const AccountBalanceInput = forwardRef<
 
   const inputRef = useRef<TextInput>(null);
   const { getSymbol, region } = useCurrencyFormatter();
+  const { theme } = useTheme();
 
   const [displayValue, setDisplayValue] = useState<string>(
     value?.toString() || "0"
@@ -348,14 +350,16 @@ export const AccountBalanceInput = forwardRef<
     <Pressable
       onPress={focusInput}
       style={[
-        tw`h-[120px] border border-[rgba(96,106,132,0.15)] border-solid rounded-xl px-[22px] py-[19px]`,
+        tw`h-[120px] rounded-xl px-[22px] py-[19px]`,
+        { borderWidth: 1, borderColor: theme.border },
         containerStyle,
       ]}
     >
       {label && (
         <Text
           weight="light"
-          style={tw`text-textGray text-sm flex-row items-center mb-2`}
+          style={tw`text-sm flex-row items-center mb-2`}
+          color={theme.textSecondary}
         >
           {label}
         </Text>
@@ -369,25 +373,21 @@ export const AccountBalanceInput = forwardRef<
           onFocus={handleFocus}
           keyboardType="decimal-pad"
           showSoftInputOnFocus={true}
-          // selectionColor={colors.primary}
           selectionColor={"transparent"}
           style={[
             tw`absolute ml-16 w-full h-full`,
             {
               color: "transparent",
               backgroundColor: "transparent",
-              // fontSize: 32,
-              // fontWeight: "300",
             },
           ]}
           caretHidden={Platform.OS === "android"}
-          // caretHidden={false}
           selection={selection}
           {...restProps}
         />
         <Text
           weight="light"
-          color="rgba(96, 106, 132, 1)"
+          color={theme.textSecondary}
           style={[
             tw`text-4xl`,
             style,

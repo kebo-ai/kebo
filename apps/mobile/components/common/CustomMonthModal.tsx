@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { translate } from "@/i18n";
+import { useTheme } from "@/hooks/useTheme";
 
 interface MonthData {
   label: string;
@@ -41,6 +42,8 @@ export const CustomMonthModal: React.FC<CustomMonthModalProps> = ({
   groupedMonths,
   sortedYears,
 }) => {
+  const { theme } = useTheme();
+
   return (
     <Modal
       visible={visible}
@@ -50,14 +53,14 @@ export const CustomMonthModal: React.FC<CustomMonthModalProps> = ({
     >
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={tw`flex-1 justify-end bg-black/50`}>
-          <View style={tw`bg-white p-4 rounded-t-3xl max-h-[50%]`}>
+          <View style={[tw`p-4 rounded-t-3xl max-h-[50%]`, { backgroundColor: theme.surface }]}>
             <View style={tw`flex-row justify-between items-center mb-4`}>
               <TouchableOpacity onPress={onClear} style={tw`flex-1`}>
                 <Text style={tw`text-[${colors.primary}] font-medium`}>
                   {translate("transactionScreen:transactions.clear")}
                 </Text>
               </TouchableOpacity>
-              <Text style={tw`text-lg font-medium text-center flex-1`}>
+              <Text style={[tw`text-lg font-medium text-center flex-1`, { color: theme.textPrimary }]}>
                 {translate("transactionScreen:transactions.selectMonth")}
               </Text>
               <TouchableOpacity onPress={onClose} style={tw`flex-1 items-end`}>
@@ -70,17 +73,17 @@ export const CustomMonthModal: React.FC<CustomMonthModalProps> = ({
               renderItem={({ item: [year, months] }) => (
                 <View>
                   <Text
-                    style={tw`text-base font-medium px-4 py-2 text-[#606A84]`}
+                    style={[tw`text-base font-medium px-4 py-2`, { color: theme.textSecondary }]}
                   >
                     {year}
                   </Text>
                   {months.map((month) => (
                     <TouchableOpacity
                       key={month.value}
-                      style={tw`py-3 flex-row px-8 border-b border-[#EBEBEF] items-center justify-between`}
+                      style={[tw`py-3 flex-row px-8 items-center justify-between`, { borderBottomWidth: 1, borderBottomColor: theme.border }]}
                       onPress={() => onSelect(month.value)}
                     >
-                      <Text style={tw`text-base`}>{month.label}</Text>
+                      <Text style={[tw`text-base`, { color: theme.textPrimary }]}>{month.label}</Text>
                       {selectedMonths.includes(month.value) && (
                         <Ionicons
                           name="checkmark-circle"

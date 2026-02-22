@@ -13,6 +13,7 @@ import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { AccountTypeSnapshotIn } from "@/models/account-type-store/account-type";
 import { translate } from "@/i18n";
+import { useTheme } from "@/hooks/useTheme";
 
 interface ModalAccountTypeProps {
   visible: boolean;
@@ -48,17 +49,25 @@ const ModalAccountType: React.FC<ModalAccountTypeProps> = ({
   data,
   title,
 }) => {
+  const { theme } = useTheme();
+
   return (
     <Modal visible={visible} transparent animationType="none">
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={tw`flex-1 justify-end bg-black/50`}>
-          <View style={tw`bg-white p-4 rounded-t-3xl max-h-[50%]`}>
+          <View style={[tw`p-4 rounded-t-3xl max-h-[50%]`, { backgroundColor: theme.surface }]}>
             <View style={tw`flex-row items-center justify-between mb-4`}>
               <TouchableOpacity onPress={onClose} style={tw`ml-auto`}>
                 <Ionicons name="close" size={24} color={colors.primary} />
               </TouchableOpacity>
               <View style={tw`absolute w-full items-center`}>
-                <Text style={tw`text-lg font-medium`}>{title}</Text>
+                <Text
+                  style={tw`text-lg`}
+                  weight="medium"
+                  color={theme.textPrimary}
+                >
+                  {title}
+                </Text>
               </View>
             </View>
 
@@ -72,14 +81,10 @@ const ModalAccountType: React.FC<ModalAccountTypeProps> = ({
                     onClose();
                   }}
                   style={({ pressed }) => [
-                    tw`text-base p-4 rounded-[20px] my-1`,
+                    tw`p-4 rounded-[20px] my-1`,
                     {
-                      borderWidth: 1,
-                      borderTopWidth: 0,
-                      borderLeftWidth: 0,
-                      borderRightWidth: 0,
-                      borderStyle: "solid",
-                      borderColor: "rgba(96, 106, 132, 0.15)",
+                      borderBottomWidth: 1,
+                      borderColor: theme.border,
                     },
                     pressed && {
                       backgroundColor: colors.primaryBg,
@@ -89,12 +94,8 @@ const ModalAccountType: React.FC<ModalAccountTypeProps> = ({
                   {({ pressed }) => (
                     <Text
                       weight={pressed ? "semibold" : "light"}
-                      style={[
-                        tw`text-base text-[${colors.textGray}] px-2`,
-                        pressed
-                          ? tw`text-[${colors.primary}]`
-                          : tw`text-[${colors.textGray}]`,
-                      ]}
+                      style={tw`text-base px-2`}
+                      color={pressed ? colors.primary : theme.textSecondary}
                     >
                       {translateType(item.type_name)}
                     </Text>

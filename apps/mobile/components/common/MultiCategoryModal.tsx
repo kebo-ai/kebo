@@ -14,8 +14,9 @@ import { useTranslation } from "react-i18next";
 import { colors } from "@/theme";
 import { SvgUri } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
-import tw from "twrnc"; 
+import tw from "twrnc";
 import { translateCategoryName } from "@/utils/categoryTranslations";
+import { useTheme } from "@/hooks/useTheme";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = (width - 50) / 3;
@@ -38,6 +39,7 @@ export const MultiCategoryModal = observer(
   }: MultiCategoryModalProps) => {
     const { categoryStoreModel } = useStores();
     const { t: translate } = useTranslation();
+    const { theme } = useTheme();
     const [tempSelectedCategories, setTempSelectedCategories] =
       useState<{ id: string; name: string }[]>(selectedCategories);
 
@@ -93,13 +95,13 @@ export const MultiCategoryModal = observer(
                 )}
               </View>
             </TouchableOpacity>
-            <Text style={tw`text-xs text-center mt-2 text-[#606A84]`}>
+            <Text style={[tw`text-xs text-center mt-2`, { color: theme.textSecondary }]}>
               {translateCategoryName(item.name, item.id, item.icon_url)}
             </Text>
           </View>
         );
       },
-      [tempSelectedCategories, handleSelectCategory]
+      [tempSelectedCategories, handleSelectCategory, theme]
     );
 
     return (
@@ -111,7 +113,7 @@ export const MultiCategoryModal = observer(
       >
         <View style={tw`flex-1 justify-end bg-black/50`}>
           <View
-            style={tw`bg-white rounded-t-3xl max-h-[60%]`}
+            style={[tw`rounded-t-3xl max-h-[60%]`, { backgroundColor: theme.surface }]}
           >
             <View
               style={tw`flex-row justify-between items-center p-5 px-4`}
@@ -124,7 +126,7 @@ export const MultiCategoryModal = observer(
                   {translate("transactionScreen:transactions:clear")}
                 </Text>
               </TouchableOpacity>
-              <Text style={tw`text-lg font-medium text-center flex-1`}>
+              <Text style={[tw`text-lg font-medium text-center flex-1`, { color: theme.textPrimary }]}>
                 {translate("transactionScreen:transactions:categories")}
               </Text>
               <TouchableOpacity
@@ -134,7 +136,7 @@ export const MultiCategoryModal = observer(
                 <Ionicons name="close" size={24} color={colors.primary} />
               </TouchableOpacity>
             </View>
-            <ScrollView 
+            <ScrollView
               style={tw`px-5`}
               showsVerticalScrollIndicator={false}
             >

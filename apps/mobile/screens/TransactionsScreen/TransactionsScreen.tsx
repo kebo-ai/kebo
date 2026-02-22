@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Text } from "@/components/ui";
-import { Screen } from "@/components/Screen";
+import { Screen } from "@/components/screen";
 import { TransactionService } from "@/services/transaction-service";
 import tw from "twrnc";
 import moment from "moment";
@@ -25,7 +25,7 @@ import { SwipeableListWrapper } from "@/components";
 import { RowMap } from "react-native-swipe-list-view";
 import CustomFilterModal from "@/components/common/custom-filter-modal";
 import CustomBankModal from "@/components/common/custom-bank-modal";
-import { SwipeableItem } from "@/components/SwipeableList/SwipeableList";
+import { SwipeableItem } from "@/components/swipeable-list/swipeable-list";
 import * as Haptics from "expo-haptics";
 import { InteractionManager } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";

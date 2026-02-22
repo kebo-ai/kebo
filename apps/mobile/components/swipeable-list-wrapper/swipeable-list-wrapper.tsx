@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, ListRenderItemInfo } from 'react-native';
 import { SwipeListView, RowMap } from 'react-native-swipe-list-view';
-import { SwipeableList, SwipeableItem } from '../SwipeableList/SwipeableList';
+import { SwipeableList, SwipeableItem } from '../SwipeableList/swipeable-list';
 import tw from 'twrnc';
 
 // Base props interface that both components share

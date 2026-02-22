@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "expo-router";
-import { Screen } from "@/components/Screen";
+import { Screen } from "@/components/screen";
 import {
   View,
   TouchableOpacity,
@@ -24,7 +24,7 @@ import { translate } from "@/i18n";
 import CustomHeaderSecondary from "@/components/common/custom-header-secondary";
 import { CategoryItem } from "@/components/common/category-item";
 import { showToast } from "@/components/ui/custom-toast";
-import { InputAmount } from "@/components/InputAmount";
+import { InputAmount } from "@/components/input-amount";
 import { budgetService } from "@/services/budget-service";
 import { useStores } from "@/models";
 import CustomButton from "@/components/common/custom-button";

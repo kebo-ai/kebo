@@ -12,7 +12,7 @@ import { colors } from "@/theme/colors";
 import { useTheme } from "@/hooks/use-theme";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { translate } from "@/i18n";
-import { Screen } from "@/components/Screen";
+import { Screen } from "@/components/screen";
 import CustomHeader from "@/components/common/custom-header";
 import CustomIconModal from "@/components/common/custom-icon-modal";
 import { useStores } from "@/models/helpers/use-stores";

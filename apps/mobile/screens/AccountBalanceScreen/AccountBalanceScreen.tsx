@@ -21,7 +21,7 @@ import { useStores } from "@/models/helpers/use-stores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { getUserInfo } from "@/utils/auth-utils";
-import ModalAccountType from "@/components/ModalAccountType";
+import ModalAccountType from "@/components/modal-account-type";
 import { AccountTypeSnapshotIn } from "@/models/account-type-store/account-type";
 import { showToast } from "@/components/ui/custom-toast";
 import {
@@ -34,7 +34,7 @@ import {
 } from "@/components/common/currency-formatter";
 import { translate } from "@/i18n";
 import * as Localization from "expo-localization";
-import { AccountBalanceInput } from "@/components/AccountBalanceInput";
+import { AccountBalanceInput } from "@/components/account-balance-input";
 import { useTheme } from "@/hooks/use-theme";
 import CustomButton from "@/components/common/custom-button";
 

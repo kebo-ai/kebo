@@ -324,10 +324,9 @@ const CATEGORIES = {
       { old: "components/Screen.tsx", new: "components/screen.tsx" },
       { old: "components/SelectionModal.tsx", new: "components/selection-modal.tsx" },
       { old: "components/Tooltip.tsx", new: "components/tooltip.tsx" },
-      // Files inside directories
-      { old: "components/SwipeableList/SwipeableList.tsx", new: "components/swipeable-list/swipeable-list.tsx" },
-      { old: "components/SwipeableListWrapper/SwipeableListWrapper.tsx", new: "components/swipeable-list-wrapper/swipeable-list-wrapper.tsx" },
-      { old: "components/SwipeableListWrapper/README.md", new: "components/swipeable-list-wrapper/README.md" },
+      // Files inside directories (rename in-place first, dir rename handles the rest)
+      { old: "components/SwipeableList/SwipeableList.tsx", new: "components/SwipeableList/swipeable-list.tsx" },
+      { old: "components/SwipeableListWrapper/SwipeableListWrapper.tsx", new: "components/SwipeableListWrapper/swipeable-list-wrapper.tsx" },
     ],
     dirs: [
       { old: "components/SwipeableList", new: "components/swipeable-list" },
@@ -345,39 +344,39 @@ const CATEGORIES = {
 
   screens: {
     files: [
-      // Each screen directory has files inside that need renaming
-      { old: "screens/AccountBalanceScreen/AccountBalanceScreen.tsx", new: "screens/account-balance-screen/account-balance-screen.tsx" },
-      { old: "screens/AccountsScreen/AccountsScreen.tsx", new: "screens/accounts-screen/accounts-screen.tsx" },
-      { old: "screens/BannerFeaturesScreen/BannerFeaturesScreen.tsx", new: "screens/banner-features-screen/banner-features-screen.tsx" },
-      { old: "screens/BudgetDetailScreen/BudgetDetailScreen.tsx", new: "screens/budget-detail-screen/budget-detail-screen.tsx" },
-      { old: "screens/BudgetOnboardingScreen/BudgetOnboardingScreen.tsx", new: "screens/budget-onboarding-screen/budget-onboarding-screen.tsx" },
-      { old: "screens/BudgetScreen/BudgetScreen.tsx", new: "screens/budget-screen/budget-screen.tsx" },
-      { old: "screens/BudgetsScreen/BudgetsScreen.tsx", new: "screens/budgets-screen/budgets-screen.tsx" },
-      { old: "screens/ChatbotScreen/ChatbotScreen.tsx", new: "screens/chatbot-screen/chatbot-screen.tsx" },
-      { old: "screens/CountryScreen/CountryScreen.tsx", new: "screens/country-screen/country-screen.tsx" },
-      { old: "screens/CreateBudgetCategoryScreen/CreateBudgetCategoryScreen.tsx", new: "screens/create-budget-category-screen/create-budget-category-screen.tsx" },
-      { old: "screens/EditAccountScreen/EditAccountScreen.tsx", new: "screens/edit-account-screen/edit-account-screen.tsx" },
-      { old: "screens/EditProfileScreen/EditProfileScreen.tsx", new: "screens/edit-profile-screen/edit-profile-screen.tsx" },
-      { old: "screens/EditTransactionScreen/EditTransactionScreen.tsx", new: "screens/edit-transaction-screen/edit-transaction-screen.tsx" },
-      { old: "screens/ErrorScreen/ErrorBoundary.tsx", new: "screens/error-screen/error-boundary.tsx" },
-      { old: "screens/ErrorScreen/ErrorDetails.tsx", new: "screens/error-screen/error-details.tsx" },
-      { old: "screens/HomeScreen/HomeScreen.tsx", new: "screens/home-screen/home-screen.tsx" },
-      { old: "screens/LanguageScreen/LanguageScreen.tsx", new: "screens/language-screen/language-screen.tsx" },
-      { old: "screens/ListBankScreen/ListBankScreen.tsx", new: "screens/list-bank-screen/list-bank-screen.tsx" },
-      { old: "screens/NewBudgetScreen/NewBudgetScreen.tsx", new: "screens/new-budget-screen/new-budget-screen.tsx" },
-      { old: "screens/NewCategoryScreen/NewCategoryScreen.tsx", new: "screens/new-category-screen/new-category-screen.tsx" },
-      { old: "screens/NumberFormatScreen/NumberFormatScreen.tsx", new: "screens/number-format-screen/number-format-screen.tsx" },
-      { old: "screens/ProfileScreen/ProfileScreen.tsx", new: "screens/profile-screen/profile-screen.tsx" },
-      { old: "screens/ReportsCategoryScreen/ReportsCategoryScreen.tsx", new: "screens/reports-category-screen/reports-category-screen.tsx" },
-      { old: "screens/ReportsIncomeScreen/ReportsIncomeScreen.tsx", new: "screens/reports-income-screen/reports-income-screen.tsx" },
-      { old: "screens/ReportsScreen/ReportsScreen.tsx", new: "screens/reports-screen/reports-screen.tsx" },
-      { old: "screens/SelectBankScreen/SelectBankScreen.tsx", new: "screens/select-bank-screen/select-bank-screen.tsx" },
-      { old: "screens/SelectBankTypeScreen/SelectBankTypeScreen.tsx", new: "screens/select-bank-type-screen/select-bank-type-screen.tsx" },
-      { old: "screens/SplashScreen/SplashScreen.tsx", new: "screens/splash-screen/splash-screen.tsx" },
-      { old: "screens/TransactionScreen/TransactionScreen.tsx", new: "screens/transaction-screen/transaction-screen.tsx" },
-      { old: "screens/TransactionsScreen/TransactionsScreen.tsx", new: "screens/transactions-screen/transactions-screen.tsx" },
-      { old: "screens/WebViewScreen/WebViewScreen.tsx", new: "screens/web-view-screen/web-view-screen.tsx" },
-      { old: "screens/WelcomeScreen/WelcomeScreen.tsx", new: "screens/welcome-screen/welcome-screen.tsx" },
+      // Rename files in-place within old directories first; dir rename handles the rest
+      { old: "screens/AccountBalanceScreen/AccountBalanceScreen.tsx", new: "screens/AccountBalanceScreen/account-balance-screen.tsx" },
+      { old: "screens/AccountsScreen/AccountsScreen.tsx", new: "screens/AccountsScreen/accounts-screen.tsx" },
+      { old: "screens/BannerFeaturesScreen/BannerFeaturesScreen.tsx", new: "screens/BannerFeaturesScreen/banner-features-screen.tsx" },
+      { old: "screens/BudgetDetailScreen/BudgetDetailScreen.tsx", new: "screens/BudgetDetailScreen/budget-detail-screen.tsx" },
+      { old: "screens/BudgetOnboardingScreen/BudgetOnboardingScreen.tsx", new: "screens/BudgetOnboardingScreen/budget-onboarding-screen.tsx" },
+      { old: "screens/BudgetScreen/BudgetScreen.tsx", new: "screens/BudgetScreen/budget-screen.tsx" },
+      { old: "screens/BudgetsScreen/BudgetsScreen.tsx", new: "screens/BudgetsScreen/budgets-screen.tsx" },
+      { old: "screens/ChatbotScreen/ChatbotScreen.tsx", new: "screens/ChatbotScreen/chatbot-screen.tsx" },
+      { old: "screens/CountryScreen/CountryScreen.tsx", new: "screens/CountryScreen/country-screen.tsx" },
+      { old: "screens/CreateBudgetCategoryScreen/CreateBudgetCategoryScreen.tsx", new: "screens/CreateBudgetCategoryScreen/create-budget-category-screen.tsx" },
+      { old: "screens/EditAccountScreen/EditAccountScreen.tsx", new: "screens/EditAccountScreen/edit-account-screen.tsx" },
+      { old: "screens/EditProfileScreen/EditProfileScreen.tsx", new: "screens/EditProfileScreen/edit-profile-screen.tsx" },
+      { old: "screens/EditTransactionScreen/EditTransactionScreen.tsx", new: "screens/EditTransactionScreen/edit-transaction-screen.tsx" },
+      { old: "screens/ErrorScreen/ErrorBoundary.tsx", new: "screens/ErrorScreen/error-boundary.tsx" },
+      { old: "screens/ErrorScreen/ErrorDetails.tsx", new: "screens/ErrorScreen/error-details.tsx" },
+      { old: "screens/HomeScreen/HomeScreen.tsx", new: "screens/HomeScreen/home-screen.tsx" },
+      { old: "screens/LanguageScreen/LanguageScreen.tsx", new: "screens/LanguageScreen/language-screen.tsx" },
+      { old: "screens/ListBankScreen/ListBankScreen.tsx", new: "screens/ListBankScreen/list-bank-screen.tsx" },
+      { old: "screens/NewBudgetScreen/NewBudgetScreen.tsx", new: "screens/NewBudgetScreen/new-budget-screen.tsx" },
+      { old: "screens/NewCategoryScreen/NewCategoryScreen.tsx", new: "screens/NewCategoryScreen/new-category-screen.tsx" },
+      { old: "screens/NumberFormatScreen/NumberFormatScreen.tsx", new: "screens/NumberFormatScreen/number-format-screen.tsx" },
+      { old: "screens/ProfileScreen/ProfileScreen.tsx", new: "screens/ProfileScreen/profile-screen.tsx" },
+      { old: "screens/ReportsCategoryScreen/ReportsCategoryScreen.tsx", new: "screens/ReportsCategoryScreen/reports-category-screen.tsx" },
+      { old: "screens/ReportsIncomeScreen/ReportsIncomeScreen.tsx", new: "screens/ReportsIncomeScreen/reports-income-screen.tsx" },
+      { old: "screens/ReportsScreen/ReportsScreen.tsx", new: "screens/ReportsScreen/reports-screen.tsx" },
+      { old: "screens/SelectBankScreen/SelectBankScreen.tsx", new: "screens/SelectBankScreen/select-bank-screen.tsx" },
+      { old: "screens/SelectBankTypeScreen/SelectBankTypeScreen.tsx", new: "screens/SelectBankTypeScreen/select-bank-type-screen.tsx" },
+      { old: "screens/SplashScreen/SplashScreen.tsx", new: "screens/SplashScreen/splash-screen.tsx" },
+      { old: "screens/TransactionScreen/TransactionScreen.tsx", new: "screens/TransactionScreen/transaction-screen.tsx" },
+      { old: "screens/TransactionsScreen/TransactionsScreen.tsx", new: "screens/TransactionsScreen/transactions-screen.tsx" },
+      { old: "screens/WebViewScreen/WebViewScreen.tsx", new: "screens/WebViewScreen/web-view-screen.tsx" },
+      { old: "screens/WelcomeScreen/WelcomeScreen.tsx", new: "screens/WelcomeScreen/welcome-screen.tsx" },
     ],
     dirs: [
       { old: "screens/AccountBalanceScreen", new: "screens/account-balance-screen" },
@@ -421,36 +420,48 @@ function buildReplacementPairs(category) {
   const pairs = []
   const cat = CATEGORIES[category]
 
+  // Build a map of directory renames for computing final import paths
+  const dirRenameMap = new Map()
+  for (const { old: oldDir, new: newDir } of cat.dirs) {
+    dirRenameMap.set(oldDir, newDir)
+  }
+
   for (const { old: oldPath, new: newPath } of cat.files) {
     const oldBase = oldPath.replace(/\.(tsx?|native\.tsx?)$/, "")
-    const newBase = newPath.replace(/\.(tsx?|native\.tsx?)$/, "")
+    let newBase = newPath.replace(/\.(tsx?|native\.tsx?)$/, "")
+
+    // Apply directory renames to compute the final import path
+    // e.g., "screens/AccountBalanceScreen/account-balance-screen" →
+    //        "screens/account-balance-screen/account-balance-screen"
+    for (const [oldDir, newDir] of dirRenameMap) {
+      if (newBase.startsWith(oldDir + "/")) {
+        newBase = newDir + newBase.slice(oldDir.length)
+        break
+      }
+    }
 
     if (oldBase === newBase) continue
 
     // For platform-specific files like gestureHandler.native.ts
-    // The import path is just "gestureHandler" (no .native extension)
-    // So we need to strip .native from both old and new base if present
     const oldImport = oldBase.replace(/\.native$/, "")
     const newImport = newBase.replace(/\.native$/, "")
 
     if (oldImport === newImport) continue
 
-    // Extract just the filename part (no directory) for relative imports
     const oldFilename = basename(oldImport)
     const newFilename = basename(newImport)
 
-    // Full path for @/ imports (relative to apps/mobile/)
     pairs.push({
       oldAbsolute: `@/${oldImport}`,
       newAbsolute: `@/${newImport}`,
       oldFilename,
       newFilename,
       oldDir: dirname(oldPath),
-      newDir: dirname(newPath),
+      newDir: dirname(newBase),
     })
   }
 
-  // Also handle directory renames in imports
+  // Also handle directory renames in imports (for path prefix replacements)
   for (const { old: oldDir, new: newDir } of cat.dirs) {
     pairs.push({
       oldDirPath: `@/${oldDir}`,

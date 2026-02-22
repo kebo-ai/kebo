@@ -34,7 +34,7 @@ import {
   currencyMap,
   useCurrencyFormatter,
 } from "@/components/common/CurrencyFormatter";
-import { EditIconSvg } from "@/components/icons/EditIconSvg";
+import { EditIconSvg } from "@/components/icons/edit-icon-svg";
 import { useAnalytics } from "@/hooks/use-analytics";
 
 interface CreateBudgetCategoryScreenProps {}

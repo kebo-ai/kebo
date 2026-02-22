@@ -26,7 +26,7 @@ import { ChartService } from "@/services/chart-service";
 import { deleteCategoryService } from "@/services/category-service";
 import { showToast } from "@/components/ui/custom-toast";
 import { CategoriesList } from "@/components/common/CategoriesList";
-import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
+import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { useTheme } from "@/hooks/use-theme";
 
 interface ReportsCategoryScreenProps {}

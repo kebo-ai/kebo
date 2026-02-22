@@ -12,7 +12,7 @@ import * as Haptics from "expo-haptics";
 import moment from "moment";
 import "moment/locale/es";
 import i18n from "@/i18n/i18n";
-import { PencilSvg } from "@/components/icons/PencilSvg";
+import { PencilSvg } from "@/components/icons/pencil-svg";
 
 const ensureValidMomentLocale = () => {
   try {

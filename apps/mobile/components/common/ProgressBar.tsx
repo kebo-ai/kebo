@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Animated, Image } from "react-native";
 import tw from "twrnc";
-import { IconSliderSvg } from "@/components/icons/IconSliderSvg";
+import { IconSliderSvg } from "@/components/icons/icon-slider-svg";
 interface ProgressBarProps {
   progress: number; // valor entre 0 y 1
   height?: number;

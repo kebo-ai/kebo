@@ -36,7 +36,7 @@ import {
 import { updateUserAnalyticsProperties } from "@/utils/analytics-utils";
 import { useNotifications } from "@/hooks/use-notifications";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { PencilSvg } from "@/components/icons/PencilSvg";
+import { PencilSvg } from "@/components/icons/pencil-svg";
 import { LanguageService } from "@/services/language-service";
 import * as StoreReview from "expo-store-review";
 

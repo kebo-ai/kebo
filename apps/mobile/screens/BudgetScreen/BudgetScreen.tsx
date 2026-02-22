@@ -14,7 +14,7 @@ import { standardHeader } from "@/theme/header-options";
 import { useTheme } from "@/hooks/use-theme";
 import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
-import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
+import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { CategoriesListBudget } from "@/components/common/CategoriesListBudget";
 import CustomBudgetCard from "@/components/common/CustomBudgetCard";
 import { budgetService } from "@/services/budget-service";

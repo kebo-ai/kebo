@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { translate } from "@/i18n";
-import { KeboCongratulation } from "@/components/icons/KeboCongratulation";
+import { KeboCongratulation } from "@/components/icons/kebo-congratulation";
 import * as StoreReview from "expo-store-review";
 import { ReviewService } from "@/services/review-service";
 import logger from "@/utils/logger";

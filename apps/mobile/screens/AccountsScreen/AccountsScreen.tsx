@@ -27,7 +27,7 @@ import {
 import { useStores } from "@/models/helpers/use-stores";
 import { showToast } from "@/components/ui/custom-toast";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
-import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
+import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { Stack, useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";
 
 interface BankOption {

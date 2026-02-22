@@ -14,7 +14,7 @@ import { translate } from "@/i18n";
 import { Stack, useRouter } from "expo-router";
 import moment from "moment";
 import IncomeExpenseBarChart from "@/components/common/CustomBarIncome";
-import { ArrowDownSimpleIcon } from "@/components/icons/ArrowDownSimpleIcon";
+import { ArrowDownSimpleIcon } from "@/components/icons/arrow-down-simple-icon";
 import CustomModal from "@/components/common/CustomModal";
 import {
   ChartService,
@@ -27,7 +27,7 @@ import CustomAlert from "@/components/common/CustomAlert";
 import { deleteCategoryService } from "@/services/category-service";
 import { showToast } from "@/components/ui/custom-toast";
 import { useStores } from "@/models/helpers/use-stores";
-import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
+import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { load, save } from "@/utils/storage";
 import { REPORTS_INCOME_PERIOD } from "@/utils/storage/storage-keys";
 import { useTheme } from "@/hooks/use-theme";

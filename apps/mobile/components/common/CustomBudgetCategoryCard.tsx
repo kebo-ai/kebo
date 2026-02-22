@@ -7,7 +7,7 @@ import { useCurrencyFormatter } from "./CurrencyFormatter";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "@/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { PencilSvg } from "@/components/icons/PencilSvg";
+import { PencilSvg } from "@/components/icons/pencil-svg";
 
 interface CategoryMetrics {
   budget_line_id: string;

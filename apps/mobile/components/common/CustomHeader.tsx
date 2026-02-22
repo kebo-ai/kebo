@@ -7,7 +7,7 @@ import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { IconTypes } from "@/components/assets/Icon";
 import { colors } from "@/theme";
-import { BackIconSvg } from "@/components/icons/BackSvg";
+import { BackIconSvg } from "@/components/icons/back-svg";
 
 interface CustomHeaderProps {
   showPrimaryIcon?: boolean;

@@ -14,8 +14,8 @@ import { translate } from "@/i18n";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
 import TooltipOverlay from "./TooltipOverlay";
 import { useIsFocused } from "@react-navigation/native";
-import { ArrowRightIconSvg } from "@/components/icons/ArrowRightIcon";
-import { ArrowLefttIconV2 } from "@/components/icons/ArrowLefttIconV2";
+import { ArrowRightIconSvg } from "@/components/icons/arrow-right-icon";
+import { ArrowLefttIconV2 } from "@/components/icons/arrow-leftt-icon-v2";
 import { useTheme } from "@/hooks/use-theme";
 
 interface PeriodData {

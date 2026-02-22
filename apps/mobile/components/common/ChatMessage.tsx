@@ -20,7 +20,7 @@ import { createReportThread } from "@/services/chat-service";
 import reactotron from "reactotron-react-native";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { KeboWiseThinkingSvg } from "@/components/icons/KeboWiseThinkingSvg";
+import { KeboWiseThinkingSvg } from "@/components/icons/kebo-wise-thinking-svg";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useTheme } from "@/hooks/use-theme";
 

@@ -2,7 +2,7 @@ import React from "react";
 import { TouchableOpacity, Text, View, Image, TextInput } from "react-native";
 import { observer } from "mobx-react-lite";
 import tw from "twrnc";
-import { ChevronRightIconSvg } from "@/components/icons/ChevronRightIconSvg";
+import { ChevronRightIconSvg } from "@/components/icons/chevron-right-icon-svg";
 import { colors } from "@/theme/colors";
 import { SvgUri } from "react-native-svg";
 

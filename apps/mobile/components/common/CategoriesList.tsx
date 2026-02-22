@@ -4,7 +4,7 @@ import { Text } from "@/components/ui";
 import tw from "twrnc";
 import { translate } from "@/i18n";
 import { SvgUri } from "react-native-svg";
-import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
+import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { colors } from "@/theme/colors";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
 import { translateCategoryName } from "@/utils/category-translations";

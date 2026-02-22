@@ -23,15 +23,15 @@ import {
   updateCategoryService,
   getIconSuggestions,
 } from "@/services/category-service";
-import { ArrowDownIconSvg } from "@/components/icons/ArrowDownIcon";
+import { ArrowDownIconSvg } from "@/components/icons/arrow-down-icon";
 import { showToast } from "@/components/ui/custom-toast";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Instance } from "mobx-state-tree";
-import { EditIconSvg } from "@/components/icons/EditIconSvg";
+import { EditIconSvg } from "@/components/icons/edit-icon-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import EmojiKeyboard, { EmojiType } from "rn-emoji-keyboard";
-import { KeboIconSvg } from "@/components/icons/KeboIconSvg";
+import { KeboIconSvg } from "@/components/icons/kebo-icon-svg";
 import { SvgUri } from "react-native-svg";
 
 interface CategoryFormValues {

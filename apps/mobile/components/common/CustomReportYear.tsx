@@ -3,9 +3,9 @@ import { View, Text, TouchableOpacity } from "react-native";
 import tw from "twrnc";
 import moment from "moment";
 import { translate } from "@/i18n/translate";
-import { ArrowRightIconSvg } from "@/components/icons/ArrowRightIcon";
+import { ArrowRightIconSvg } from "@/components/icons/arrow-right-icon";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
-import { ArrowLefttIconV2 } from "@/components/icons/ArrowLefttIconV2";
+import { ArrowLefttIconV2 } from "@/components/icons/arrow-leftt-icon-v2";
 
 interface CustomReportYearProps {
   income: number;

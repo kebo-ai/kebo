@@ -16,7 +16,7 @@ import { useTheme } from "@/hooks/use-theme";
 import tw from "@/hooks/use-tailwind";
 import { Ionicons } from "@expo/vector-icons";
 import { translate } from "@/i18n";
-import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
+import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import CustomBudgetCard from "@/components/common/CustomBudgetCard";
 import { budgetService } from "@/services/budget-service";
 import { Stack, useFocusEffect, useRouter } from "expo-router";

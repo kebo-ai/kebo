@@ -5,10 +5,10 @@ import { useNavigation } from "@react-navigation/native";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { Svg, Path } from "react-native-svg";
-import { ArrowDownIconSvg } from "@/components/icons/ArrowDownIcon";
-import { ArrowLeftIconSvg } from "@/components/icons/ArrowLeftIcon";
-import { NewChatIconSvg } from "@/components/icons/NewChatIconSvg";
-import { NewChatSvg } from "@/components/icons/NewChatSvg";
+import { ArrowDownIconSvg } from "@/components/icons/arrow-down-icon";
+import { ArrowLeftIconSvg } from "@/components/icons/arrow-left-icon";
+import { NewChatIconSvg } from "@/components/icons/new-chat-icon-svg";
+import { NewChatSvg } from "@/components/icons/new-chat-svg";
 
 interface ChatHeaderProps {
   onNewChat?: () => void;

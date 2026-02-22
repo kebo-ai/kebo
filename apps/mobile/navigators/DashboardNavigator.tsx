@@ -22,12 +22,12 @@ import {
   ChatbotScreen,
 } from "@/screens";
 import { colors } from "@/theme/colors";
-import { HomeIconSvg } from "@/components/icons/HomeSvg";
-import { BudgetIconSvg } from "@/components/icons/BudgetSvg";
-import { PlusIconSvg } from "@/components/icons/PlusSvg";
-import { ReportsIconSvg } from "@/components/icons/ReportsSvg";
+import { HomeIconSvg } from "@/components/icons/home-svg";
+import { BudgetIconSvg } from "@/components/icons/budget-svg";
+import { PlusIconSvg } from "@/components/icons/plus-svg";
+import { ReportsIconSvg } from "@/components/icons/reports-svg";
 import { translate } from "@/i18n";
-import { ChatbotIconSvg } from "@/components/icons/ChatBotSvg";
+import { ChatbotIconSvg } from "@/components/icons/chat-bot-svg";
 import tw from "@/hooks/use-tailwind";
 import { TransactionScreen } from "@/screens/TransactionScreen/TransactionScreen";
 import { useStores } from "@/models/helpers/use-stores";

@@ -1,8 +1,8 @@
 import { TouchableOpacity, View } from "react-native";
 import { Text } from "@/components/ui";
 import tw from "@/hooks/use-tailwind";
-import { ArrowDownSimpleIcon } from "@/components/icons/ArrowDownSimpleIcon";
-import { BackIconSvg } from "@/components/icons/BackSvg";
+import { ArrowDownSimpleIcon } from "@/components/icons/arrow-down-simple-icon";
+import { BackIconSvg } from "@/components/icons/back-svg";
 import { colors } from "@/theme/colors";
 import { IconTypes } from "@/components/assets/Icon";
 

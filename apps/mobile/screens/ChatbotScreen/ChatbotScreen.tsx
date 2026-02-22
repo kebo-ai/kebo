@@ -34,7 +34,7 @@ import { translate } from "@/i18n";
 import { colors } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/hooks/use-theme";
-import { NewChatIconSvg } from "@/components/icons/NewChatIconSvg";
+import { NewChatIconSvg } from "@/components/icons/new-chat-icon-svg";
 
 interface Message {
   id: string;

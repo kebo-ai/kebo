@@ -1,0 +1,28 @@
+# Kebo API - Development Environment Variables
+# Copy this file to .dev.vars for local development
+# Run `bun run supabase:status` to verify local Supabase ports
+
+# Database
+# For local Supabase:
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54332/postgres
+# For remote Supabase:
+# DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT].supabase.co:5432/postgres
+
+# Supabase Auth
+# For local Supabase:
+SUPABASE_URL=http://127.0.0.1:54331
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+SUPABASE_JWT_SECRET=super-secret-jwt-token-with-at-least-32-characters-long
+# For remote Supabase:
+# SUPABASE_URL=https://[PROJECT].supabase.co
+# SUPABASE_ANON_KEY=[ANON_KEY]
+# SUPABASE_JWT_SECRET=[JWT_SECRET]
+
+# Environment
+ENVIRONMENT=development
+
+# AI Configuration
+AI_GATEWAY_API_KEY=[AI_GATEWAY_KEY]
+
+# Admin API Key (for protected endpoints)
+ADMIN_API_KEY=[ADMIN_KEY]

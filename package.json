@@ -16,7 +16,16 @@
     "typecheck": "turbo typecheck",
     "clean": "turbo clean && rm -rf node_modules",
     "mobile": "bun run --cwd apps/mobile",
-    "web": "bun run --cwd apps/web"
+    "web": "bun run --cwd apps/web",
+    "api": "bun run --cwd apps/api",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:reset": "supabase db reset",
+    "supabase:migrate": "supabase migration up",
+    "supabase:diff": "supabase db diff",
+    "supabase:push": "supabase db push",
+    "db:seed": "bun run --cwd apps/api db:seed"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",

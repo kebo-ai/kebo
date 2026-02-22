@@ -56,6 +56,20 @@ const config: Config = {
           800: "#2A1454",
           900: "#150A2A",
         },
+        /* Mercury-style Dashboard Colors */
+        dash: {
+          bg: "#0F1419",
+          card: "#1A1F26",
+          "card-hover": "#22272E",
+          border: "#2A3038",
+          text: "#FFFFFF",
+          "text-secondary": "#E5E7EB",
+          "text-muted": "#9CA3AF",
+          "text-dim": "#6B7280",
+          accent: "#3B82F6",
+          success: "#10B981",
+          error: "#EF4444",
+        },
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],

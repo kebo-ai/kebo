@@ -12,7 +12,7 @@ import { showToast } from "@/components/ui/CustomToast";
 import { useStores } from "@/models/helpers/useStores";
 import { translate } from "@/i18n";
 import { updateUserProfile } from "@/services/UserService";
-import { getUserInfo } from "@/utils/authUtils";
+import { getUserInfo } from "@/utils/auth-utils";
 import * as Localization from "expo-localization";
 
 interface CountryScreenProps {}

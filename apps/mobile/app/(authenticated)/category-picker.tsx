@@ -13,7 +13,7 @@ import { useStores } from "@/models/helpers/useStores";
 import { observer } from "mobx-react-lite";
 import { SvgUri } from "react-native-svg";
 import { translate } from "@/i18n";
-import { translateCategoryName } from "@/utils/categoryTranslations";
+import { translateCategoryName } from "@/utils/category-translations";
 import { Ionicons } from "@expo/vector-icons";
 const ICON_SIZE = 50;
 

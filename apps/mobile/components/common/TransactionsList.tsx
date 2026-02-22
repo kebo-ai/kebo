@@ -6,7 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import moment from "moment";
 import i18n from "@/i18n/i18n";
 import { translate } from "@/i18n";
-import { translateCategoryName } from "@/utils/categoryTranslations";
+import { translateCategoryName } from "@/utils/category-translations";
 import tw from "@/hooks/useTailwind";
 import { SvgUri } from "react-native-svg";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";

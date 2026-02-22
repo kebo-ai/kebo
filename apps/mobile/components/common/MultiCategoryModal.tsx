@@ -15,7 +15,7 @@ import { colors } from "@/theme";
 import { SvgUri } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
-import { translateCategoryName } from "@/utils/categoryTranslations";
+import { translateCategoryName } from "@/utils/category-translations";
 import { useTheme } from "@/hooks/useTheme";
 
 const { width } = Dimensions.get("window");

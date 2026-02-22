@@ -39,7 +39,7 @@ import {
   getCategoriesUsers,
 } from "@/services/CategoryService";
 import { translate } from "@/i18n";
-import { translateCategoryName } from "@/utils/categoryTranslations";
+import { translateCategoryName } from "@/utils/category-translations";
 
 const ICON_SIZE = 50;
 

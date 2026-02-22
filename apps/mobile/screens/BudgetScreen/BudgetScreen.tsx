@@ -28,7 +28,7 @@ import * as Haptics from "expo-haptics";
 import moment from "moment";
 import "moment/locale/es";
 import i18n from "@/i18n/i18n";
-import { translateCategoryName } from "@/utils/categoryTranslations";
+import { translateCategoryName } from "@/utils/category-translations";
 import logger from "@/utils/logger";
 
 const ensureValidMomentLocale = () => {

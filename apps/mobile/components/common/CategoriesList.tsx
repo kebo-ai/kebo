@@ -7,7 +7,7 @@ import { SvgUri } from "react-native-svg";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { colors } from "@/theme/colors";
 import { useCurrencyFormatter } from "./CurrencyFormatter";
-import { translateCategoryName } from "@/utils/categoryTranslations";
+import { translateCategoryName } from "@/utils/category-translations";
 import { useRoute } from "@react-navigation/native";
 import { useTheme } from "@/hooks/useTheme";
 

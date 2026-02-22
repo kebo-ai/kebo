@@ -20,7 +20,7 @@ import CustomListItemOption from "@/components/common/CustomListItemOption";
 import { useStores } from "@/models/helpers/useStores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { getUserInfo } from "@/utils/authUtils";
+import { getUserInfo } from "@/utils/auth-utils";
 import ModalAccountType from "@/components/ModalAccountType";
 import { AccountTypeSnapshotIn } from "@/models/account-type-store/account-type";
 import { showToast } from "@/components/ui/CustomToast";

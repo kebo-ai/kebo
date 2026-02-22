@@ -29,7 +29,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { Stack, useRouter } from "expo-router";
 import { useFocusEffect } from "expo-router";
 import { useCurrencyFormatter } from "@/components/common/CurrencyFormatter";
-import { getUserInfo } from "@/utils/authUtils";
+import { getUserInfo } from "@/utils/auth-utils";
 import { SpentSvg } from "@/components/icons/SpentSvg";
 import { TranferSvg } from "@/components/icons/TranferSvg";
 import { IncomeSvg } from "@/components/icons/IncomeSvg";
@@ -48,13 +48,13 @@ import { TransactionType } from "@/types/transaction";
 import { SwipeableListWrapper } from "@/components";
 import { KeboSadIconSvg } from "@/components/icons/KeboSadIconSvg";
 import { RecurrenceIconHomeSvg } from "@/components/icons/RecurrenceIconHomeSvg";
-import { translateCategoryName } from "@/utils/categoryTranslations";
+import { translateCategoryName } from "@/utils/category-translations";
 import { useReviewModal } from "@/hooks/useReviewModal";
 import CustomModalReview from "@/components/common/CustomModalReview";
 import { loadString, saveString } from "@/utils/storage/storage";
 import { BALANCE_VISIBILITY } from "@/utils/storage/storage-keys";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { initializeUserAnalytics } from "@/utils/analyticsUtils";
+import { initializeUserAnalytics } from "@/utils/analytics-utils";
 
 interface HomeScreenProps {}
 

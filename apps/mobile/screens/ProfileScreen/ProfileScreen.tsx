@@ -16,7 +16,7 @@ import { colors } from "@/theme/colors";
 import { largeTitleHeader } from "@/theme/header-options";
 import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/config/supabase";
-import { getUserInfo } from "@/utils/authUtils";
+import { getUserInfo } from "@/utils/auth-utils";
 import { showToast } from "@/components/ui/CustomToast";
 import { Text, Button, Icon } from "@/components/ui";
 import DeleteAccountModal from "@/components/common/DeleteAccountModal";
@@ -33,7 +33,7 @@ import {
   EVENT_PROPERTIES,
   ProfileEventName,
 } from "@/services/AnalyticsService";
-import { updateUserAnalyticsProperties } from "@/utils/analyticsUtils";
+import { updateUserAnalyticsProperties } from "@/utils/analytics-utils";
 import { useNotifications } from "@/hooks/useNotifications";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { PencilSvg } from "@/components/icons/PencilSvg";

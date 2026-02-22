@@ -7,7 +7,7 @@ import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
 import { BackBlackSvg } from "@/components/icons/BackBlackSvg";
 import { EditIconSvg } from "@/components/icons/EditIconSvg";
-import { getUserInfo } from "@/utils/authUtils";
+import { getUserInfo } from "@/utils/auth-utils";
 import { showToast } from "@/components/ui/CustomToast";
 import { useStores } from "@/models/helpers/useStores";
 import { translate } from "@/i18n";

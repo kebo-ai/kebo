@@ -22,7 +22,7 @@ import "moment/locale/es";
 import { SvgUri } from "react-native-svg";
 import { EndDateIconSvg } from "@/components/icons/EndDateSvg";
 import { translate } from "@/i18n";
-import { translateCategoryName } from "@/utils/categoryTranslations";
+import { translateCategoryName } from "@/utils/category-translations";
 import { useTheme } from "@/hooks/useTheme";
 
 interface CustomListItemOptionProps {

@@ -20,7 +20,7 @@ import { customFontsToLoad } from "@/theme";
 import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
 import { initI18n } from "@/i18n";
-import { loadDateFnsLocale } from "@/utils/formatDate";
+import { loadDateFnsLocale } from "@/utils/format-date";
 import CustomToast from "@/components/ui/CustomToast";
 import Loader from "@/components/ui/CustomLoader";
 import i18n from "@/i18n/i18n";

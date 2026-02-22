@@ -25,7 +25,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native
 import tw from "twrnc";
 import { useDeviceContext } from "twrnc";
 import { initI18n } from "@/i18n";
-import { loadDateFnsLocale } from "@/utils/formatDate";
+import { loadDateFnsLocale } from "@/utils/format-date";
 import CustomToast from "@/components/ui/CustomToast";
 import Loader from "@/components/ui/CustomLoader";
 import i18n from "@/i18n/i18n";

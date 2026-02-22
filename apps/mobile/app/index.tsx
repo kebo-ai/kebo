@@ -7,7 +7,7 @@ import { ImageCustom } from "@/components/assets/Image";
 import {
   isUserAuthenticated,
   subscribeAuthChanges,
-} from "@/utils/authUtils";
+} from "@/utils/auth-utils";
 import { BannerService } from "@/services/BannerService";
 import i18n from "@/i18n/i18n";
 import { useAnalytics } from "@/hooks/useAnalytics";

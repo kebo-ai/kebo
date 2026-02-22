@@ -8,7 +8,7 @@ import { Text } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { colors } from "@/theme/colors";
 import { Category } from "@/models/category/category";
-import { translateCategoryName } from "@/utils/categoryTranslations";
+import { translateCategoryName } from "@/utils/category-translations";
 
 interface InlineCategoryPickerProps {
   categories: Category[];

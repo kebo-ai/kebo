@@ -20,9 +20,9 @@ import {
 import { translate } from "@/i18n";
 import { useNumberEntry } from "@/hooks/use-number-entry";
 import { useShakeAnimation } from "@/hooks/use-shake-animation";
-import { AmountDisplay } from "@/components/transaction/AmountDisplay";
-import { NumberPad } from "@/components/transaction/NumberPad";
-import { TransactionFieldRow } from "@/components/transaction/TransactionFieldRow";
+import { AmountDisplay } from "@/components/transaction/amount-display";
+import { NumberPad } from "@/components/transaction/number-pad";
+import { TransactionFieldRow } from "@/components/transaction/transaction-field-row";
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 
 // Interface for safe account type to use with formik

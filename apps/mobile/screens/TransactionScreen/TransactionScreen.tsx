@@ -37,10 +37,10 @@ import i18n from "@/i18n/i18n";
 import logger from "@/utils/logger";
 
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
-import { NumberPad } from "@/components/transaction/NumberPad";
-import { AmountDisplay } from "@/components/transaction/AmountDisplay";
-import { TransactionTypeToggle } from "@/components/transaction/TransactionTypeToggle";
-import { TransactionFieldRow } from "@/components/transaction/TransactionFieldRow";
+import { NumberPad } from "@/components/transaction/number-pad";
+import { AmountDisplay } from "@/components/transaction/amount-display";
+import { TransactionTypeToggle } from "@/components/transaction/transaction-type-toggle";
+import { TransactionFieldRow } from "@/components/transaction/transaction-field-row";
 import { useSharedValue } from "react-native-reanimated";
 
 export const TransactionScreen: FC<TransactionScreenProps> = observer(

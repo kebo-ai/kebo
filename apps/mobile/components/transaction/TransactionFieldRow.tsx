@@ -4,10 +4,12 @@ import { PressableScale } from "pressto";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   useAnimatedStyle,
+  interpolateColor,
   type SharedValue,
 } from "react-native-reanimated";
 import { Text } from "@/components/ui";
 import { useTheme } from "@/hooks/useTheme";
+import { colors } from "@/theme/colors";
 
 interface TransactionFieldRowProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -24,6 +26,9 @@ interface TransactionFieldRowProps {
   emoji?: string;
   // Image URL (e.g. bank logo)
   imageUrl?: string;
+  // Highlight animation
+  highlightProgress?: SharedValue<number>;
+  highlightScale?: SharedValue<number>;
 }
 
 export function TransactionFieldRow({
@@ -38,21 +43,37 @@ export function TransactionFieldRow({
   onNoteChange,
   emoji,
   imageUrl,
+  highlightProgress,
+  highlightScale,
 }: TransactionFieldRowProps) {
   const { theme } = useTheme();
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: shakeOffset?.value ?? 0 }],
+    transform: [
+      { translateX: shakeOffset?.value ?? 0 },
+      { scale: highlightScale?.value ?? 1 },
+    ],
   }));
 
+  const rowAnimatedStyle = useAnimatedStyle(() => {
+    if (!highlightProgress) return {};
+    const borderColor = interpolateColor(
+      highlightProgress.value,
+      [0, 1],
+      [theme.border, colors.primary],
+    );
+    return { borderColor };
+  });
+
   const content = (
-    <View
+    <Animated.View
       style={[
         styles.row,
         {
           borderColor: theme.border,
           backgroundColor: theme.surface,
         },
+        rowAnimatedStyle,
       ]}
     >
       <View style={styles.iconContainer}>
@@ -102,7 +123,7 @@ export function TransactionFieldRow({
       {showChevron && !isNote && (
         <Ionicons name="chevron-forward" size={18} color={theme.chevron} />
       )}
-    </View>
+    </Animated.View>
   );
 
   if (isNote) {

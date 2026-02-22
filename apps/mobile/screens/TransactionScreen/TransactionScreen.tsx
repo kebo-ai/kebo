@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useEffect } from "react";
+import React, { FC, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   View,
   SafeAreaView,
@@ -13,6 +13,7 @@ import { translate } from "@/i18n";
 import { useStores } from "@/models/helpers/useStores";
 import { useTheme } from "@/hooks/useTheme";
 import { useShakeAnimation } from "@/hooks/useShakeAnimation";
+import { useHighlightAnimation } from "@/hooks/useHighlightAnimation";
 import { useNumberEntry } from "@/hooks/useNumberEntry";
 import { colors } from "@/theme/colors";
 import { CalendarPicker } from "@/components/common/CalendarPicker";
@@ -136,6 +137,17 @@ export const TransactionScreen: FC<TransactionScreenProps> = observer(
     const amountShake = useShakeAnimation();
     const categoryShake = useShakeAnimation();
     const accountShake = useShakeAnimation();
+
+    // --- Category highlight animation ---
+    const categoryHighlight = useHighlightAnimation();
+    const prevCategoryId = useRef(category_id);
+
+    useEffect(() => {
+      if (category_id && category_id !== prevCategoryId.current) {
+        categoryHighlight.highlight();
+      }
+      prevCategoryId.current = category_id;
+    }, [category_id]);
 
     // --- Tab transition shared values (fuse-home-tabs-transition-animation) ---
     const activeTabIndex = useSharedValue(0);
@@ -470,6 +482,8 @@ export const TransactionScreen: FC<TransactionScreenProps> = observer(
               emoji={categoryEmoji}
               onPress={handleOpenCategoryModal}
               shakeOffset={categoryShake.offset}
+              highlightProgress={categoryHighlight.progress}
+              highlightScale={categoryHighlight.scale}
               showChevron={false}
             />
           </View>

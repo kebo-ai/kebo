@@ -6,7 +6,7 @@ import { FC } from "react";
 import { Screen } from "@/components/screen";
 import AuthButtons from "@/components/auth-button";
 import { translate } from "@/i18n";
-import { ImageCustom } from "@/components/assets/Image";
+import { ImageCustom } from "@/components/assets/image";
 import tw from "twrnc";
 import { useTheme } from "@/hooks/use-theme";
 import { useAnalytics } from "@/hooks/use-analytics";

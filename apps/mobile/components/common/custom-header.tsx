@@ -5,7 +5,7 @@ import {
 } from "react-native";
 import { Text } from "@/components/ui";
 import tw from "twrnc";
-import { IconTypes } from "@/components/assets/Icon";
+import { IconTypes } from "@/components/assets/icon";
 import { colors } from "@/theme";
 import { BackIconSvg } from "@/components/icons/back-svg";
 

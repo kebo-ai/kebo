@@ -4,7 +4,7 @@ import LottieView from "lottie-react-native";
 import { View, StyleSheet, BackHandler, Animated } from "react-native";
 import { AppStackScreenProps } from "@/navigators";
 import { observer } from "mobx-react-lite";
-import { ImageCustom } from "@/components/assets/Image";
+import { ImageCustom } from "@/components/assets/image";
 import {
   isUserAuthenticated,
   subscribeAuthChanges,

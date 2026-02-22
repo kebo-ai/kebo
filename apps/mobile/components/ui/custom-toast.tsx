@@ -3,7 +3,7 @@ import { View, Image, Pressable } from "react-native";
 import { Text } from "@/components/ui";
 import Toast, { ToastConfig } from "react-native-toast-message";
 import tw from "twrnc";
-import { ImageCustom } from "@/components/assets/Image";
+import { ImageCustom } from "@/components/assets/image";
 import { colors } from "@/theme";
 const toastConfig: ToastConfig = {
   success: ({ text1 }) => (

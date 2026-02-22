@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { View, BackHandler, Animated, useColorScheme } from "react-native";
 import LottieView from "lottie-react-native";
 import { observer } from "mobx-react-lite";
-import { ImageCustom } from "@/components/assets/Image";
+import { ImageCustom } from "@/components/assets/image";
 import {
   isUserAuthenticated,
   subscribeAuthChanges,

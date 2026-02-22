@@ -40,8 +40,6 @@ interface BankOption {
 
 export type AppStackParamList = {
   Welcome: undefined;
-  Login: undefined;
-  MagicLink: undefined;
   Transaction: {
     transactionType?: "Expense" | "Income" | "Transfer";
     transactionId?: string;
@@ -356,16 +354,6 @@ export const AppStack = observer(function AppStack() {
           <Stack.Screen
             name="Welcome"
             component={Screens.WelcomeScreen}
-            options={{ gestureEnabled: true }}
-          />
-          <Stack.Screen
-            name="Login"
-            component={Screens.LoginScreen}
-            options={{ gestureEnabled: true }}
-          />
-          <Stack.Screen
-            name="MagicLink"
-            component={Screens.MagicLinkScreen}
             options={{ gestureEnabled: true }}
           />
         </>

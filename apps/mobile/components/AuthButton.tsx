@@ -58,9 +58,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({
   );
 };
 
-interface AuthButtonsProps {
-  showEmail?: boolean;
-}
+interface AuthButtonsProps {}
 
 WebBrowser.maybeCompleteAuthSession();
 const redirectTo = makeRedirectUri();
@@ -84,6 +82,7 @@ const performOAuth = async (provider: "google" | "apple") => {
     options: {
       redirectTo,
       skipBrowserRedirect: false,
+      queryParams: { prompt: "select_account" },
     },
   });
   if (error) throw error;
@@ -97,7 +96,7 @@ const performOAuth = async (provider: "google" | "apple") => {
   }
 };
 
-const AuthButtons: React.FC<AuthButtonsProps> = ({ showEmail = true }) => {
+const AuthButtons: React.FC<AuthButtonsProps> = () => {
   if (Platform.OS === "android") {
     GoogleSignin.configure({
       scopes: ["openid", "email", "profile"],
@@ -191,7 +190,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ showEmail = true }) => {
     <View style={tw`w-full max-w-[350px] self-center`}>
       {Platform.OS === "ios" && (
         <AuthButton
-          icon={<AntDesign name="apple1" size={24} color="white" />}
+          icon={<AntDesign name="apple" size={24} color="white" />}
           text={t("loginButtons:apple")}
           backgroundColor="black"
           style={[
@@ -284,19 +283,6 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ showEmail = true }) => {
         onPress={handleGoogleSignIn}
       />
 
-      {/* Email Button */}
-      {/* {showEmail && (
-        <AuthButton
-          icon={<Ionicons name="mail" size={20} color="black" />}
-          text={t("loginButtons:email")}
-          backgroundColor="white"
-          textColor="black"
-          style={tw`border border-[${colors.gray}]`}
-          onPress={() => {
-            navigation.navigate("MagicLink");
-          }}
-        />
-      )} */}
     </View>
   );
 };

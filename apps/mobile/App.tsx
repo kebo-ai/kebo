@@ -2,7 +2,7 @@ if (__DEV__) {
   require("./ReactotronConfig");
 }
 import { AppNavigator } from "@/navigators";
-import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary";
+import { ErrorBoundary } from "@/screens/error-screen/error-boundary";
 import moment from "moment";
 
 import "moment/locale/es";
@@ -20,13 +20,13 @@ import { customFontsToLoad } from "@/theme";
 import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
 import { initI18n } from "@/i18n";
-import { loadDateFnsLocale } from "@/utils/formatDate";
-import CustomToast from "@/components/ui/CustomToast";
-import Loader from "@/components/ui/CustomLoader";
+import { loadDateFnsLocale } from "@/utils/format-date";
+import CustomToast from "@/components/ui/custom-toast";
+import Loader from "@/components/ui/custom-loader";
 import i18n from "@/i18n/i18n";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications } from "@/hooks/use-notifications";
 import * as Notifications from "expo-notifications";
-import { postHogClient } from "@/services/PostHogClient";
+import { postHogClient } from "@/services/post-hog-client";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({

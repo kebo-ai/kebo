@@ -7,7 +7,7 @@ import {
 } from "@react-navigation/native"
 import Config from "@/config"
 import type { PersistNavigationConfig } from "@/config/config.base"
-import { useIsMounted } from "@/hooks/useIsMounted"
+import { useIsMounted } from "@/hooks/use-is-mounted"
 import type { AppStackParamList, NavigationProps } from "@/navigators/AppNavigator"
 import logger from "@/utils/logger"
 

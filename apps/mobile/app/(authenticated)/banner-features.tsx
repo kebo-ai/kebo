@@ -1,11 +1,12 @@
 import logger from "@/utils/logger";
 import React, { useEffect, useRef, useState } from "react";
-import { View, Dimensions, Text, ActivityIndicator, Image } from "react-native";
+import { View, Dimensions, ActivityIndicator, Image } from "react-native";
+import { Text } from "@/components/ui";
 import { observer } from "mobx-react-lite";
-import { BannerService } from "@/services/BannerService";
-import CustomButton from "@/components/common/CustomButton";
+import { BannerService } from "@/services/banner-service";
+import CustomButton from "@/components/common/custom-button";
 import { useRouter } from "expo-router";
-import tw from "@/hooks/useTailwind";
+import tw from "@/hooks/use-tailwind";
 import { SvgUri } from "react-native-svg";
 import i18n from "@/i18n/i18n";
 import AppIntroSlider from "react-native-app-intro-slider";
@@ -101,29 +102,23 @@ const BannerFeaturesRoute = observer(function BannerFeaturesRoute() {
         </View>
         <View style={tw`mt-8 items-center`}>
           <Text
-            style={[
-              tw`text-2xl text-center text-[${colors.secondary}]`,
-              { fontFamily: "SFUIDisplayBold" },
-            ]}
+            style={tw`text-2xl text-center text-[${colors.secondary}]`}
+            weight="bold"
           >
             {item.title}
           </Text>
           {item.subtitle && (
             <Text
-              style={[
-                tw`text-base text-center text-gray-600 mt-2`,
-                { fontFamily: "SFUIDisplayMedium" },
-              ]}
+              style={tw`text-base text-center text-gray-600 mt-2`}
+              weight="medium"
             >
               {item.subtitle}
             </Text>
           )}
           {item.description && (
             <Text
-              style={[
-                tw`text-sm text-center text-gray-500 mt-4 px-4`,
-                { fontFamily: "SFUIDisplayRegular" },
-              ]}
+              style={tw`text-sm text-center text-gray-500 mt-4 px-4`}
+              weight="normal"
             >
               {item.description}
             </Text>

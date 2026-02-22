@@ -9,8 +9,8 @@ import {
   IAnyModelType,
   applySnapshot,
 } from "mobx-state-tree";
-import { TransactionService } from "@/services/TransactionService";
-import { RootStore } from "@/models/RootStore";
+import { TransactionService } from "@/services/transaction-service";
+import { RootStore } from "@/models/root-store";
 import { CategoryStoreModel } from "@/models/category-store/category-store";
 import { translate } from "@/i18n/translate";
 import logger from "@/utils/logger";

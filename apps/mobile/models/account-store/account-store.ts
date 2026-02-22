@@ -17,13 +17,13 @@ import {
   createAccountUser,
   getAccountsUsers,
   getAccountsWithBalance,
-} from "@/services/AccountService";
+} from "@/services/account-service";
 import {
   AccountType,
   AccountTypeModel,
   AccountTypeSnapshotOut,
 } from "@/models/account-type-store/account-type";
-import { getAccountsType } from "@/services/AccountTypeService";
+import { getAccountsType } from "@/services/account-type-service";
 import logger from "@/utils/logger";
 /**
  * Model description here for TypeScript hints.

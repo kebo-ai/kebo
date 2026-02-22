@@ -3,7 +3,7 @@ if (__DEV__) {
 }
 
 import { Stack } from "expo-router";
-import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary";
+import { ErrorBoundary } from "@/screens/error-screen/error-boundary";
 import moment from "moment";
 
 import "moment/locale/es";
@@ -20,16 +20,24 @@ import Config from "@/config";
 import { customFontsToLoad } from "@/theme";
 import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
+import { useColorScheme } from "react-native";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import tw from "twrnc";
+import { useDeviceContext } from "twrnc";
 import { initI18n } from "@/i18n";
-import { loadDateFnsLocale } from "@/utils/formatDate";
-import CustomToast from "@/components/ui/CustomToast";
-import Loader from "@/components/ui/CustomLoader";
+import { loadDateFnsLocale } from "@/utils/format-date";
+import CustomToast from "@/components/ui/custom-toast";
+import Loader from "@/components/ui/custom-loader";
 import i18n from "@/i18n/i18n";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications } from "@/hooks/use-notifications";
 import * as Notifications from "expo-notifications";
-import { postHogClient } from "@/services/PostHogClient";
+import { postHogClient } from "@/services/post-hog-client";
 import { StatusBar } from "expo-status-bar";
 import { colors } from "@/theme/colors";
+import * as Haptics from "expo-haptics";
+import { PressablesConfig } from "pressto";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -40,6 +48,8 @@ Notifications.setNotificationHandler({
 });
 
 export default function RootLayout() {
+  useDeviceContext(tw);
+  const colorScheme = useColorScheme();
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad);
   const [isI18nInitialized, setIsI18nInitialized] = useState(false);
   useNotifications();
@@ -72,26 +82,52 @@ export default function RootLayout() {
     return null;
   }
 
+  const navigationTheme = colorScheme === "dark"
+    ? {
+        ...DarkTheme,
+        colors: {
+          ...DarkTheme.colors,
+          background: colors.dark.background,
+          card: colors.dark.navigationBar,
+        },
+      }
+    : DefaultTheme;
+
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ErrorBoundary catchErrors={Config.catchErrors}>
-        <StatusBar style="dark" backgroundColor="transparent" translucent />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            navigationBarColor: colors.white,
-            contentStyle: {
-              backgroundColor: colors.white,
-            },
-            animation: "slide_from_right",
-            gestureEnabled: true,
-            gestureDirection: "horizontal",
-            animationDuration: 200,
-          }}
-        />
-        <CustomToast />
-        <Loader />
-      </ErrorBoundary>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={navigationTheme}>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <ErrorBoundary catchErrors={Config.catchErrors}>
+            <KeyboardProvider>
+              <PressablesConfig
+                globalHandlers={{
+                  onPress: () => {
+                    Haptics.selectionAsync();
+                  },
+                }}
+                config={{ minScale: 0.97 }}
+              >
+                <StatusBar style={colorScheme === "dark" ? "light" : "dark"} backgroundColor="transparent" translucent />
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    navigationBarColor: colorScheme === "dark" ? colors.dark.navigationBar : colors.white,
+                    contentStyle: {
+                      backgroundColor: colorScheme === "dark" ? colors.dark.background : colors.white,
+                    },
+                    animation: "slide_from_right",
+                    gestureEnabled: true,
+                    gestureDirection: "horizontal",
+                    animationDuration: 200,
+                  }}
+                />
+                <CustomToast />
+                <Loader />
+              </PressablesConfig>
+            </KeyboardProvider>
+          </ErrorBoundary>
+        </SafeAreaProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

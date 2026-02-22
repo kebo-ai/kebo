@@ -15,26 +15,24 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppStackParamList, AppStackScreenProps } from "@/navigators/AppNavigator";
 import { TransactionType } from "@/types/transaction";
-import {
-  BudgetsScreen,
-  HomeScreen,
-  ReportsScreen,
-  ChatbotScreen,
-} from "@/screens";
+import { BudgetsScreen } from "@/screens/budgets-screen/budgets-screen";
+import { HomeScreen } from "@/screens/home-screen/home-screen";
+import { ReportsScreen } from "@/screens/reports-screen/reports-screen";
+import { ChatbotScreen } from "@/screens/chatbot-screen/chatbot-screen";
 import { colors } from "@/theme/colors";
-import { HomeIconSvg } from "@/components/icons/HomeSvg";
-import { BudgetIconSvg } from "@/components/icons/BudgetSvg";
-import { PlusIconSvg } from "@/components/icons/PlusSvg";
-import { ReportsIconSvg } from "@/components/icons/ReportsSvg";
+import { HomeIconSvg } from "@/components/icons/home-svg";
+import { BudgetIconSvg } from "@/components/icons/budget-svg";
+import { PlusIconSvg } from "@/components/icons/plus-svg";
+import { ReportsIconSvg } from "@/components/icons/reports-svg";
 import { translate } from "@/i18n";
-import { ChatbotIconSvg } from "@/components/icons/ChatBotSvg";
-import tw from "@/hooks/useTailwind";
-import { TransactionScreen } from "@/screens/TransactionScreen/TransactionScreen";
-import { useStores } from "@/models/helpers/useStores";
+import { ChatbotIconSvg } from "@/components/icons/chat-bot-svg";
+import tw from "@/hooks/use-tailwind";
+import { TransactionScreen } from "@/screens/transaction-screen/transaction-screen";
+import { useStores } from "@/models/helpers/use-stores";
 import { useCallback, useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import React from "react";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/hooks/use-analytics";
 import { registerAnalyticsService } from "@/navigators/navigationUtilities";
 import logger from "@/utils/logger";
 

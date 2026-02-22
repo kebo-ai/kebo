@@ -1,1 +1,1 @@
-export { SelectBankScreen as default } from "@/screens/SelectBankScreen/SelectBankScreen";
+export { SelectBankScreen as default } from "@/screens/select-bank-screen/select-bank-screen";

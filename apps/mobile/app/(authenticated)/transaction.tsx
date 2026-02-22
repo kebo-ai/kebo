@@ -1,6 +1,5 @@
-import { TransactionScreen as TransactionScreenComponent } from "@/screens/TransactionScreen/TransactionScreen";
+import { TransactionScreen as TransactionScreenComponent } from "@/screens/transaction-screen/transaction-screen";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { createNavigationAdapter } from "@/utils/routerNavigation";
 
 export default function TransactionRoute() {
   const router = useRouter();
@@ -10,7 +9,6 @@ export default function TransactionRoute() {
     fromCategoryScreen?: string;
   }>();
 
-  // Create a navigation adapter that maps expo-router to React Navigation API
   const navigation = {
     navigate: (route: string, navParams?: any) => {
       if (route === "Home") {
@@ -26,10 +24,6 @@ export default function TransactionRoute() {
     },
     goBack: () => router.back(),
     setOptions: () => {},
-    addListener: (event: string, callback: () => void) => {
-      // Return a function to unsubscribe
-      return () => {};
-    },
   };
 
   const route = {

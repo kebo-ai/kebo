@@ -1,1 +1,1 @@
-export { CountryScreen as default } from "@/screens/CountryScreen/CountryScreen";
+export { CountryScreen as default } from "@/screens/country-screen/country-screen";

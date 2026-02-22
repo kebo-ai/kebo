@@ -1,2 +1,2 @@
-import { TransactionsScreen } from "@/screens/TransactionsScreen/TransactionsScreen";
+import { TransactionsScreen } from "@/screens/transactions-screen/transactions-screen";
 export default TransactionsScreen;

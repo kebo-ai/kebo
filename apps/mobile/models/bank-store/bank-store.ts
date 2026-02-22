@@ -1,6 +1,6 @@
 import { cast, getRoot, flow, Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 import { BankModel, BankSnapshotOut } from "@/models/bank/bank";
-import { getBanks, getBanksByCountry, searchBanksService, searchBanksByCountryService } from "@/services/BankService";
+import { getBanks, getBanksByCountry, searchBanksService, searchBanksByCountryService } from "@/services/bank-service";
 import logger from "@/utils/logger";
 
 /**

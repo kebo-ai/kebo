@@ -1,8 +1,8 @@
 import type { StyleProp } from "react-native"
 import { colors as colorsLight } from "./colors"
-import { colors as colorsDark } from "./colorsDark"
+import { colors as colorsDark } from "./colors-dark"
 import { spacing as spacingLight } from "./spacing"
-import { spacing as spacingDark } from "./spacingDark"
+import { spacing as spacingDark } from "./spacing-dark"
 import { timing } from "./timing"
 import { typography } from "./typography"
 

@@ -1,3 +1,3 @@
-import { AccountBalanceScreen } from "@/screens/AccountBalanceScreen/AccountBalanceScreen";
+import { AccountBalanceScreen } from "@/screens/account-balance-screen/account-balance-screen";
 
 export default AccountBalanceScreen;

@@ -92,20 +92,29 @@ const SplashIndex = observer(function SplashIndex() {
 
   return (
     <Animated.View style={[styles.animationContainer, { opacity: fadeAnim, backgroundColor: bgColor }]}>
-      <LottieView
-        ref={animation}
-        style={{ width: "100%", height: 250 }}
-        resizeMode="contain"
-        source={require("../assets/animations/splashAnimation.json")}
-        autoPlay
-        loop={false}
-      />
-      <View>
+      {isDark ? (
         <ImageCustom
-          icon={isDark ? "keboLogoHeaderDark" : "keboLogoHeader"}
+          icon="keboLogoHeaderDark"
           size={{ width: 256, height: 116 }}
         />
-      </View>
+      ) : (
+        <>
+          <LottieView
+            ref={animation}
+            style={{ width: "100%", height: 250 }}
+            resizeMode="contain"
+            source={require("../assets/animations/splashAnimation.json")}
+            autoPlay
+            loop={false}
+          />
+          <View>
+            <ImageCustom
+              icon="keboLogoHeader"
+              size={{ width: 256, height: 116 }}
+            />
+          </View>
+        </>
+      )}
     </Animated.View>
   );
 });

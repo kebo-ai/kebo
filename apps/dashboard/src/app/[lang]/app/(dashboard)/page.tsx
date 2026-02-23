@@ -249,7 +249,11 @@ function AccountsPanel({ lang }: { lang: string }) {
                 <div
                   className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium ${getAvatarColor(index)}`}
                 >
-                  {account.icon_url || account.name.charAt(0).toUpperCase()}
+                  {account.icon_url ? (
+                    <img src={account.icon_url} alt="" className="h-6 w-6 object-contain" />
+                  ) : (
+                    account.name.charAt(0).toUpperCase()
+                  )}
                 </div>
                 <span className="flex-1 text-dash-text-secondary text-sm">
                   {account.name}
@@ -360,10 +364,12 @@ function RecentTransactions({ lang }: { lang: string }) {
               <div
                 className={`h-10 w-10 rounded-full flex items-center justify-center ${getAvatarColor(index)}`}
               >
-                {transaction.icon_url || transaction.category_icon ? (
+                {transaction.category_icon ? (
                   <span className="text-lg">
-                    {transaction.category_icon || transaction.icon_url}
+                    {transaction.category_icon}
                   </span>
+                ) : transaction.icon_url ? (
+                  <img src={transaction.icon_url} alt="" className="h-6 w-6 object-contain" />
                 ) : (
                   getTransactionIcon(transaction.transaction_type)
                 )}

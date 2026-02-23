@@ -1,17 +1,15 @@
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export default function NotFound() {
   return (
-    <div className="dark dashboard flex min-h-screen items-center justify-center p-4 bg-dash-bg">
+    <div className="flex min-h-screen items-center justify-center p-4 bg-background">
       <div className="text-center">
-        <h1 className="text-6xl font-bold text-dash-text mb-4">404</h1>
-        <p className="text-dash-text-muted mb-6">Page not found</p>
-        <Link
-          href="/app"
-          className="inline-flex items-center px-4 py-2 rounded-lg bg-dash-accent text-white text-sm font-medium hover:bg-dash-accent/90 transition-colors"
-        >
-          Go to Dashboard
-        </Link>
+        <h1 className="text-6xl font-bold text-foreground mb-4">404</h1>
+        <p className="text-muted-foreground mb-6">Page not found</p>
+        <Button asChild>
+          <Link href="/app">Go to Dashboard</Link>
+        </Button>
       </div>
     </div>
   )

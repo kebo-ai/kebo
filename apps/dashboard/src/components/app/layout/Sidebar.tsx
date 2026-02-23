@@ -39,9 +39,10 @@ import { useAuth } from "@/lib/auth/hooks"
 import { useState } from "react"
 
 interface SidebarProps {
-  lang: string
   user?: User
 }
+
+const basePath = "/app"
 
 const navItems = [
   { href: "", icon: Home, label: "Home" },
@@ -85,12 +86,10 @@ function NavItem({
 }
 
 function SidebarContent({
-  lang,
   collapsed,
   onCollapse,
   serverUser,
 }: {
-  lang: string
   collapsed: boolean
   onCollapse?: () => void
   serverUser?: User
@@ -100,8 +99,6 @@ function SidebarContent({
 
   // Use server user if available, fallback to client user
   const user = serverUser || clientUser
-
-  const basePath = `/${lang}/app`
 
   const getInitials = (name?: string, email?: string) => {
     if (name) {
@@ -243,7 +240,7 @@ function SidebarContent({
   )
 }
 
-export function Sidebar({ lang, user }: SidebarProps) {
+export function Sidebar({ user }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
@@ -256,7 +253,6 @@ export function Sidebar({ lang, user }: SidebarProps) {
         )}
       >
         <SidebarContent
-          lang={lang}
           collapsed={collapsed}
           onCollapse={() => setCollapsed(!collapsed)}
           serverUser={user}
@@ -279,7 +275,7 @@ export function Sidebar({ lang, user }: SidebarProps) {
           className="w-64 p-0 bg-dash-bg border-dash-border"
         >
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-          <SidebarContent lang={lang} collapsed={false} serverUser={user} />
+          <SidebarContent collapsed={false} serverUser={user} />
         </SheetContent>
       </Sheet>
     </>

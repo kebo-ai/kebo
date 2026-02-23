@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -27,12 +27,12 @@ export async function middleware(request: NextRequest) {
 
   const code = request.nextUrl.searchParams.get("code")
 
-  console.log("[Middleware]", request.nextUrl.pathname, code ? `code=${code.slice(0, 8)}...` : "no code")
+  console.log("[Proxy]", request.nextUrl.pathname, code ? `code=${code.slice(0, 8)}...` : "no code")
 
   // If an auth code arrives, exchange it for a session right here
   if (code && request.nextUrl.pathname.startsWith("/app")) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    console.log("[Middleware] Exchange result:", error ? error.message : "success")
+    console.log("[Proxy] Exchange result:", error ? error.message : "success")
 
     const url = request.nextUrl.clone()
     url.searchParams.delete("code")

@@ -4,89 +4,78 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 262 66% 52%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 262 66% 52%;
-    --radius: 0.625rem;
-    --chart-1: 142 76% 36%;
-    --chart-2: 0 84% 60%;
-    --chart-3: 262 66% 52%;
-    --chart-4: 47 96% 53%;
-    --chart-5: 199 89% 48%;
+    --background: 0.9783 0.0067 295.4527;
+    --foreground: 0.3038 0.0198 293.5244;
+    --card: 0.9981 0.0017 325.5889;
+    --card-foreground: 0.0000 0.0000 0.0000;
+    --popover: 0.9981 0.0017 325.5889;
+    --popover-foreground: 0.0000 0.0000 0.0000;
+    --primary: 0.4927 0.2257 289.3142;
+    --primary-foreground: 1.0000 0.0000 0.0000;
+    --secondary: 0.5708 0.1987 354.2486;
+    --secondary-foreground: 1.0000 0.0000 0.0000;
+    --muted: 0.9432 0.0246 298.6077;
+    --muted-foreground: 0.5233 0.0333 298.3102;
+    --accent: 0.7744 0.1137 229.8444;
+    --accent-foreground: 0.0000 0.0000 0.0000;
+    --destructive: 0.6003 0.1876 33.3760;
+    --destructive-foreground: 0.0000 0.0000 0.0000;
+    --border: 0.9013 0.0403 299.7461;
+    --input: 0.8020 0.0402 300.1531;
+    --ring: 0.5922 0.2262 289.4264;
+    --radius: 0.375rem;
+    --success: 0.696 0.170 163.2;
+    --info: 0.623 0.214 259.8;
+    --chart-1: 0.5748 0.1972 289.1723;
+    --chart-2: 0.6161 0.1246 231.2949;
+    --chart-3: 0.7386 0.1395 289.5504;
+    --chart-4: 0.4368 0.0965 237.7333;
+    --chart-5: 0.4058 0.2050 289.6184;
+    --sidebar-background: 0.9783 0.0067 295.4527;
+    --sidebar-foreground: 0.0000 0.0000 0.0000;
+    --sidebar-primary: 0.4927 0.2257 289.3142;
+    --sidebar-primary-foreground: 1.0000 0.0000 0.0000;
+    --sidebar-accent: 0.9981 0.0017 325.5889;
+    --sidebar-accent-foreground: 0.0000 0.0000 0.0000;
+    --sidebar-border: 0.9013 0.0403 299.7461;
+    --sidebar-ring: 0.5922 0.2262 289.4264;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 262 66% 52%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 262 66% 52%;
-    --chart-1: 142 70% 45%;
-    --chart-2: 0 72% 51%;
-    --chart-3: 262 66% 52%;
-    --chart-4: 47 96% 53%;
-    --chart-5: 199 89% 48%;
-  }
-
-  /* Mercury-style Dashboard Theme */
-  .dashboard {
-    --dash-bg: 210 22% 8%;
-    --dash-card: 213 18% 13%;
-    --dash-card-hover: 213 15% 17%;
-    --dash-border: 214 14% 20%;
-    --dash-text: 0 0% 100%;
-    --dash-text-secondary: 220 13% 91%;
-    --dash-text-muted: 218 11% 65%;
-    --dash-text-dim: 218 11% 50%;
-    --dash-accent: 217 91% 60%;
-    --dash-success: 160 84% 39%;
-    --dash-error: 0 84% 60%;
-
-    /* Override base variables for dashboard */
-    --background: var(--dash-bg);
-    --foreground: var(--dash-text);
-    --card: var(--dash-card);
-    --card-foreground: var(--dash-text);
-    --popover: var(--dash-card);
-    --popover-foreground: var(--dash-text);
-    --secondary: var(--dash-card);
-    --secondary-foreground: var(--dash-text);
-    --muted: var(--dash-card);
-    --muted-foreground: var(--dash-text-muted);
-    --accent: var(--dash-card-hover);
-    --accent-foreground: var(--dash-text);
-    --border: var(--dash-border);
-    --input: var(--dash-card);
+    --background: 0.2115 0.0332 288.6098;
+    --foreground: 0.9486 0.0220 300.2022;
+    --card: 0.1806 0.0344 287.8340;
+    --card-foreground: 1.0000 0.0000 0.0000;
+    --popover: 0.1806 0.0344 287.8340;
+    --popover-foreground: 1.0000 0.0000 0.0000;
+    --primary: 0.7328 0.1495 290.5348;
+    --primary-foreground: 0.0000 0.0000 0.0000;
+    --secondary: 0.7703 0.1402 8.7086;
+    --secondary-foreground: 0.0000 0.0000 0.0000;
+    --muted: 0.2297 0.0600 287.8966;
+    --muted-foreground: 0.7349 0.0387 287.1042;
+    --accent: 0.4532 0.0835 221.6175;
+    --accent-foreground: 1.0000 0.0000 0.0000;
+    --destructive: 0.6918 0.1997 33.2464;
+    --destructive-foreground: 0.0000 0.0000 0.0000;
+    --border: 0.3168 0.0733 286.8877;
+    --input: 0.4182 0.0724 286.9903;
+    --ring: 0.6331 0.1496 290.4918;
+    --success: 0.696 0.170 163.2;
+    --info: 0.673 0.182 259.8;
+    --chart-1: 0.6345 0.1411 290.4105;
+    --chart-2: 0.6414 0.1142 216.4105;
+    --chart-3: 0.7943 0.1126 291.0580;
+    --chart-4: 0.4532 0.0835 221.6175;
+    --chart-5: 0.4403 0.1223 290.6610;
+    --sidebar-background: 0.2115 0.0332 288.6098;
+    --sidebar-foreground: 1.0000 0.0000 0.0000;
+    --sidebar-primary: 0.7328 0.1495 290.5348;
+    --sidebar-primary-foreground: 0.0000 0.0000 0.0000;
+    --sidebar-accent: 0.1709 0.0328 288.1431;
+    --sidebar-accent-foreground: 1.0000 0.0000 0.0000;
+    --sidebar-border: 0.3168 0.0733 286.8877;
+    --sidebar-ring: 0.6331 0.1496 290.4918;
   }
 }
 
@@ -99,152 +88,12 @@
   }
 
   ::selection {
-    background-color: hsl(262 66% 52%);
-    color: hsl(0 0% 100%);
+    background-color: oklch(0.4927 0.2257 289.3142);
+    color: oklch(1.0000 0.0000 0.0000);
   }
 
   ::-moz-selection {
-    background-color: hsl(262 66% 52%);
-    color: hsl(0 0% 100%);
-  }
-}
-
-/* Dashboard Utility Classes */
-@layer utilities {
-  .dash-bg {
-    background-color: hsl(var(--dash-bg));
-  }
-
-  .dash-card {
-    background-color: hsl(var(--dash-card));
-    border: 1px solid hsl(var(--dash-border));
-    border-radius: 0.75rem;
-  }
-
-  .dash-card-hover {
-    @apply transition-colors;
-  }
-
-  .dash-card-hover:hover {
-    background-color: hsl(var(--dash-card-hover));
-  }
-
-  .dash-text {
-    color: hsl(var(--dash-text));
-  }
-
-  .dash-text-secondary {
-    color: hsl(var(--dash-text-secondary));
-  }
-
-  .dash-text-muted {
-    color: hsl(var(--dash-text-muted));
-  }
-
-  .dash-text-dim {
-    color: hsl(var(--dash-text-dim));
-  }
-
-  .dash-accent {
-    color: hsl(var(--dash-accent));
-  }
-
-  .dash-success {
-    color: hsl(var(--dash-success));
-  }
-
-  .dash-error {
-    color: hsl(var(--dash-error));
-  }
-
-  .dash-border {
-    border-color: hsl(var(--dash-border));
-  }
-
-  .dash-btn-pill {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors;
-    background-color: hsl(var(--dash-card));
-    border: 1px solid hsl(var(--dash-border));
-    color: hsl(var(--dash-text));
-  }
-
-  .dash-btn-pill:hover {
-    background-color: hsl(var(--dash-card-hover));
-  }
-
-  .dash-btn-pill-primary {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors;
-    background-color: hsl(var(--dash-accent));
-    color: hsl(var(--dash-text));
-  }
-
-  .dash-btn-pill-primary:hover {
-    background-color: hsl(217 91% 55%);
-  }
-
-  .dash-input {
-    @apply w-full px-3 py-2 rounded-lg text-sm transition-colors;
-    background-color: hsl(var(--dash-card));
-    border: 1px solid hsl(var(--dash-border));
-    color: hsl(var(--dash-text));
-  }
-
-  .dash-input:focus {
-    outline: none;
-    border-color: hsl(var(--dash-accent));
-    box-shadow: 0 0 0 2px hsl(var(--dash-accent) / 0.2);
-  }
-
-  .dash-input::placeholder {
-    color: hsl(var(--dash-text-dim));
-  }
-
-  .dash-nav-item {
-    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors;
-    color: hsl(var(--dash-text-muted));
-  }
-
-  .dash-nav-item:hover {
-    background-color: hsl(var(--dash-card));
-    color: hsl(var(--dash-text));
-  }
-
-  .dash-nav-item-active {
-    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm;
-    background-color: hsl(var(--dash-accent));
-    color: hsl(var(--dash-text));
-  }
-
-  .dash-list-item {
-    @apply flex items-center gap-4 px-3 py-3 rounded-lg transition-colors cursor-pointer;
-  }
-
-  .dash-list-item:hover {
-    background-color: hsl(var(--dash-card-hover));
-  }
-
-  .dash-avatar-blue {
-    background-color: hsl(217 91% 60% / 0.2);
-    color: hsl(217 91% 70%);
-  }
-
-  .dash-avatar-green {
-    background-color: hsl(160 84% 39% / 0.2);
-    color: hsl(160 84% 50%);
-  }
-
-  .dash-avatar-purple {
-    background-color: hsl(262 66% 52% / 0.2);
-    color: hsl(262 66% 65%);
-  }
-
-  .dash-avatar-orange {
-    background-color: hsl(25 95% 53% / 0.2);
-    color: hsl(25 95% 63%);
-  }
-
-  .dash-avatar-pink {
-    background-color: hsl(330 81% 60% / 0.2);
-    color: hsl(330 81% 70%);
+    background-color: oklch(0.4927 0.2257 289.3142);
+    color: oklch(1.0000 0.0000 0.0000);
   }
 }

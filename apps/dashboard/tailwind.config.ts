@@ -10,39 +10,41 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: "oklch(var(--border) / <alpha-value>)",
+        input: "oklch(var(--input) / <alpha-value>)",
+        ring: "oklch(var(--ring) / <alpha-value>)",
+        background: "oklch(var(--background) / <alpha-value>)",
+        foreground: "oklch(var(--foreground) / <alpha-value>)",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "oklch(var(--primary) / <alpha-value>)",
+          foreground: "oklch(var(--primary-foreground) / <alpha-value>)",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "oklch(var(--secondary) / <alpha-value>)",
+          foreground: "oklch(var(--secondary-foreground) / <alpha-value>)",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "oklch(var(--destructive) / <alpha-value>)",
+          foreground: "oklch(var(--destructive-foreground) / <alpha-value>)",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "oklch(var(--muted) / <alpha-value>)",
+          foreground: "oklch(var(--muted-foreground) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "oklch(var(--accent) / <alpha-value>)",
+          foreground: "oklch(var(--accent-foreground) / <alpha-value>)",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "oklch(var(--popover) / <alpha-value>)",
+          foreground: "oklch(var(--popover-foreground) / <alpha-value>)",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "oklch(var(--card) / <alpha-value>)",
+          foreground: "oklch(var(--card-foreground) / <alpha-value>)",
         },
+        success: "oklch(var(--success) / <alpha-value>)",
+        info: "oklch(var(--info) / <alpha-value>)",
         kebo: {
           DEFAULT: "#6934D2",
           50: "#F5F0FF",
@@ -56,19 +58,17 @@ const config: Config = {
           800: "#2A1454",
           900: "#150A2A",
         },
-        /* Mercury-style Dashboard Colors */
-        dash: {
-          bg: "#0F1419",
-          card: "#1A1F26",
-          "card-hover": "#22272E",
-          border: "#2A3038",
-          text: "#FFFFFF",
-          "text-secondary": "#E5E7EB",
-          "text-muted": "#9CA3AF",
-          "text-dim": "#6B7280",
-          accent: "#3B82F6",
-          success: "#10B981",
-          error: "#EF4444",
+        sidebar: {
+          DEFAULT: "oklch(var(--sidebar-background) / <alpha-value>)",
+          foreground: "oklch(var(--sidebar-foreground) / <alpha-value>)",
+          primary: "oklch(var(--sidebar-primary) / <alpha-value>)",
+          "primary-foreground":
+            "oklch(var(--sidebar-primary-foreground) / <alpha-value>)",
+          accent: "oklch(var(--sidebar-accent) / <alpha-value>)",
+          "accent-foreground":
+            "oklch(var(--sidebar-accent-foreground) / <alpha-value>)",
+          border: "oklch(var(--sidebar-border) / <alpha-value>)",
+          ring: "oklch(var(--sidebar-ring) / <alpha-value>)",
         },
       },
       fontFamily: {

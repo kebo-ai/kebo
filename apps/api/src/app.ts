@@ -45,13 +45,15 @@ export function createApp() {
   // Database initialization middleware
   app.use("*", async (c, next) => {
     const client = postgres(c.env.DATABASE_URL, {
-      prepare: false, // Required for Cloudflare Workers
-      max: 1, // Single connection per request
+      prepare: false,
+      max: 1,
+      idle_timeout: 20,
+      connect_timeout: 10,
     })
     const db = drizzle(client, { schema })
     c.set("db", db)
     await next()
-    await client.end()
+    await client.end({ timeout: 0 })
   })
 
   // Error handler

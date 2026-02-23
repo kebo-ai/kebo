@@ -1,7 +1,5 @@
 {
-  "framework": null,
+  "buildCommand": "turbo run build",
   "installCommand": "bun install",
-  "buildCommand": "echo 'skip'",
-  "outputDirectory": "public",
-  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+  "outputDirectory": "dist"
 }

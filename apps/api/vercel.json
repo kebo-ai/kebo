@@ -2,5 +2,6 @@
   "framework": null,
   "buildCommand": "turbo run build",
   "installCommand": "bun install",
+  "outputDirectory": "dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
 }

@@ -1,0 +1,133 @@
+{
+  "header": {
+    "contact": "Contáctanos"
+  },
+  "home": {
+    "badge": "Únete a más de 50,000 usuarios gestionando sus finanzas",
+    "hero": {
+      "title": "Tu dinero bajo control,<br/>tu futuro más brillante",
+      "description": "Simplifica tus finanzas con IA. Ahorra más, gasta mejor y alcanza tus metas financieras con un asistente inteligente que te guía en cada paso."
+    },
+    "features": {
+      "title": "Descubre el poder de Kebo",
+      "description": "Una app diseñada para transformar la manera en que manejas tu dinero, con herramientas inteligentes que se adaptan a tu estilo de vida",
+      "feature1": {
+        "title": "Todo tu dinero en un solo lugar",
+        "description": "Gestiona todas tus cuentas y transacciones en una única aplicación intuitiva y fácil de usar."
+      },
+      "feature2": {
+        "title": "Análisis inteligente con IA",
+        "description": "Gracias a la IA, entiende tus finanzas sin complicarte, recibiendo recomendaciones personalizadas."
+      },
+      "feature3": {
+        "title": "Presupuestos adaptables",
+        "description": "Crea presupuestos que se ajustan a tu estilo de vida y mide tu progreso en tiempo real."
+      }
+    },
+    "screenshots": {
+      "alt1": "Todo tu dinero en un solo lugar",
+      "alt2": "Ahorra más, disfruta igual",
+      "alt3": "Presupuestos que se adaptan a ti",
+      "alt4": "Registra tus gastos en segundos",
+      "alt5": "Entiende tus finanzas"
+    }
+  },
+  "stats": {
+    "users": "Usuarios",
+    "rating": "Calificación",
+    "downloads": "Descargas",
+    "countries": "Países"
+  },
+  "cta": {
+    "title": "¿Listo para tomar el control de tus finanzas?",
+    "description": "Únete a más de 50,000 usuarios que ya están gestionando su dinero de forma inteligente."
+  },
+  "footer": {
+    "email": "hola@kebo.app",
+    "products": {
+      "title": "Productos",
+      "howItWorks": "¿Cómo funciona?",
+      "integrations": "Integraciones",
+      "pricing": "Precios",
+      "faqs": "FAQs"
+    },
+    "company": {
+      "title": "Compañía",
+      "about": "Nosotros",
+      "careers": "Únete al equipo",
+      "blog": "Blog"
+    },
+    "download": "Descarga la App",
+    "copyright": "© 2023, 2024, 2025 Kebo. Todos los derechos reservados.",
+    "legal": {
+      "terms": "Términos de uso",
+      "privacy": "Privacidad",
+      "cookies": "Política de cookies"
+    }
+  },
+  "faqs": {
+    "title": "Preguntas Frecuentes",
+    "notFound": "¿No encontraste la respuesta que buscabas?",
+    "contactUs": "Contáctanos",
+    "items": [
+      {
+        "question": "¿Cómo elimino mi cuenta en Kebo?",
+        "answer": "Para eliminar tu cuenta, sigue estos pasos: 1) Abre la aplicación Kebo 2) Ve a Configuración (Settings) 3) Selecciona 'Eliminar Cuenta' (Delete Account) 4) Escribe 'Confirmar' en el campo de texto 5) Presiona el botón de eliminar. Ten en cuenta que esta acción es irreversible y se eliminarán todos tus datos financieros asociados."
+      },
+      {
+        "question": "¿Cómo puedo conectar mis cuentas bancarias?",
+        "answer": "Para conectar tus cuentas bancarias: 1) Ve a la sección 'Conectar Cuentas' 2) Selecciona tu banco de la lista de instituciones financieras soportadas 3) Sigue el proceso de autenticación seguro 4) Selecciona las cuentas que deseas conectar. Tus datos bancarios están protegidos con encriptación de nivel bancario."
+      },
+      {
+        "question": "¿Cómo funciona el presupuesto automático?",
+        "answer": "Kebo analiza tus gastos y crea un presupuesto personalizado basado en tus patrones de gasto. Puedes ajustar las categorías y límites según tus necesidades. La app te notificará cuando te acerques a tus límites de gasto."
+      },
+      {
+        "question": "¿Cómo puedo exportar mis datos financieros?",
+        "answer": "Para exportar tus datos: 1) Ve a Configuración 2) Selecciona 'Exportar Datos' 3) Elige el formato (CSV, Excel, PDF) 4) Selecciona el rango de fechas 5) Confirma la exportación. Los datos se enviarán a tu correo electrónico registrado."
+      },
+      {
+        "question": "¿Cómo funciona el análisis de inversiones?",
+        "answer": "Kebo proporciona análisis detallado de tus inversiones, incluyendo rendimiento, diversificación y recomendaciones personalizadas. Puedes ver el historial de transacciones, ganancias/pérdidas y comparar con índices de referencia."
+      },
+      {
+        "question": "¿Qué información necesito para comenzar?",
+        "answer": "Para comenzar, necesitas: 1) Documento de identidad válido 2) Información de contacto 3) Cuenta bancaria para la verificación 4) Información básica sobre tus objetivos financieros. La app te guiará paso a paso en el proceso de configuración."
+      },
+      {
+        "question": "¿Cómo funciona la seguridad de mis datos?",
+        "answer": "Kebo utiliza encriptación de nivel bancario para proteger tus datos financieros. Todas las conexiones son seguras y tus credenciales bancarias nunca se almacenan en nuestros servidores. Utilizamos autenticación de dos factores para mayor seguridad."
+      },
+      {
+        "question": "¿Puedo configurar alertas personalizadas?",
+        "answer": "Sí, puedes configurar alertas para: gastos excesivos, límites de presupuesto, fechas de pago, cambios en inversiones, y más. Las alertas se pueden recibir por notificación push, email o SMS según tus preferencias."
+      }
+    ]
+  },
+  "metadata": {
+    "title": "Kebo - Tu futuro financiero",
+    "description": "Descarga Kebo y únete a la revolución financiera. Disponible en App Store: https://apps.apple.com/app/kebo-tu-asistente-financiero/id6742430536",
+    "applicationName": "Kebo",
+    "appleWebApp": {
+      "title": "Kebo - Tu asistente financiero"
+    },
+    "keywords": [
+      "finanzas personales",
+      "educación financiera",
+      "ahorro",
+      "inversiones",
+      "finanzas para mujeres",
+      "gestión de dinero",
+      "planificación financiera"
+    ],
+    "openGraph": {
+      "siteName": "Kebo",
+      "title": "Kebo - Finanzas Personales Open Source para LATAM",
+      "description": "Únete a más de 50,000 usuarios que controlan su dinero. Registra gastos, crea presupuestos y obtén insights con IA. Ahora open source."
+    },
+    "twitter": {
+      "title": "Kebo - Finanzas Personales Open Source para LATAM",
+      "description": "Únete a más de 50,000 usuarios que controlan su dinero. Registra gastos, crea presupuestos y obtén insights con IA. Ahora open source."
+    }
+  }
+}

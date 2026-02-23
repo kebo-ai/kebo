@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import {
   BudgetForm,
   type BudgetFormData,
-} from "@/components/app/budgets/BudgetForm"
+} from "@/components/budget-form"
 
 function EditBudgetSkeleton() {
   return (

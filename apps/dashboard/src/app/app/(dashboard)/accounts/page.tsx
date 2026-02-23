@@ -13,15 +13,17 @@ import {
 import { useAccounts } from "@/lib/api/hooks/use-accounts"
 import type { Account } from "@/lib/api/types"
 
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
 // Avatar color palette
 const avatarColors = [
-  "dash-avatar-blue",
-  "dash-avatar-green",
-  "dash-avatar-purple",
-  "dash-avatar-orange",
-  "dash-avatar-pink",
+  "bg-blue-500/20 text-blue-400",
+  "bg-emerald-500/20 text-emerald-400",
+  "bg-purple-500/20 text-purple-400",
+  "bg-orange-500/20 text-orange-400",
+  "bg-pink-500/20 text-pink-400",
 ]
 
 function getAvatarColor(index: number) {
@@ -60,7 +62,7 @@ function AccountItem({
   return (
     <Link
       href={`/app/accounts/${account.id}`}
-      className="dash-list-item"
+      className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted transition-colors cursor-pointer"
     >
       <div
         className={`h-12 w-12 rounded-full flex items-center justify-center ${getAvatarColor(index)}`}
@@ -76,10 +78,10 @@ function AccountItem({
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-dash-text-secondary font-medium truncate">
+        <p className="text-foreground font-medium truncate">
           {account.customized_name || account.name}
         </p>
-        <div className="flex items-center gap-2 text-sm text-dash-text-dim">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground/70">
           {account.bank_name && (
             <>
               <Building2 className="h-3 w-3" />
@@ -89,15 +91,15 @@ function AccountItem({
           )}
           <span>{account.account_type || "Account"}</span>
           {account.is_default && (
-            <span className="px-1.5 py-0.5 text-xs bg-dash-accent/10 text-dash-accent rounded">
+            <span className="px-1.5 py-0.5 text-xs bg-info/10 text-info rounded">
               Default
             </span>
           )}
         </div>
       </div>
       <div className="text-right">
-        <span className="text-dash-text font-semibold">${dollars}</span>
-        <span className="text-dash-text-muted">.{cents}</span>
+        <span className="text-foreground font-semibold">${dollars}</span>
+        <span className="text-muted-foreground">.{cents}</span>
       </div>
     </Link>
   )
@@ -106,12 +108,12 @@ function AccountItem({
 function AccountSkeleton() {
   return (
     <div className="flex items-center gap-4 px-3 py-3">
-      <Skeleton className="h-12 w-12 rounded-full bg-dash-card-hover" />
+      <Skeleton className="h-12 w-12 rounded-full bg-muted" />
       <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-32 bg-dash-card-hover" />
-        <Skeleton className="h-3 w-24 bg-dash-card-hover" />
+        <Skeleton className="h-4 w-32 bg-muted" />
+        <Skeleton className="h-3 w-24 bg-muted" />
       </div>
-      <Skeleton className="h-4 w-20 bg-dash-card-hover" />
+      <Skeleton className="h-4 w-20 bg-muted" />
     </div>
   )
 }
@@ -133,43 +135,47 @@ export default function AccountsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-dash-text">Accounts</h1>
-          <p className="text-dash-text-muted text-sm">
+          <h1 className="text-2xl font-semibold text-foreground">Accounts</h1>
+          <p className="text-muted-foreground text-sm">
             Manage your bank accounts and cards
           </p>
         </div>
-        <Link href={`/app/accounts/new`} className="dash-btn-pill-primary">
-          <Plus className="h-4 w-4" />
-          New Account
-        </Link>
+        <Button className="rounded-full" asChild>
+          <Link href={`/app/accounts/new`}>
+            <Plus className="h-4 w-4" />
+            New Account
+          </Link>
+        </Button>
       </div>
 
       {/* Total Balance Card */}
-      <div className="dash-card p-6">
-        <p className="text-dash-text-muted text-sm mb-2">Total Balance</p>
-        {isLoading ? (
-          <Skeleton className="h-10 w-40 bg-dash-card-hover" />
-        ) : (
-          <div className="flex items-baseline">
-            <span className="text-4xl font-bold text-dash-text">${dollars}</span>
-            <span className="text-xl font-bold text-dash-text-muted">.{cents}</span>
-          </div>
-        )}
-      </div>
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-muted-foreground text-sm mb-2">Total Balance</p>
+          {isLoading ? (
+            <Skeleton className="h-10 w-40 bg-muted" />
+          ) : (
+            <div className="flex items-baseline">
+              <span className="text-4xl font-bold text-foreground">${dollars}</span>
+              <span className="text-xl font-bold text-muted-foreground">.{cents}</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Accounts List */}
-      <div className="dash-card">
-        <div className="p-4 border-b border-dash-border">
-          <h2 className="text-dash-text font-medium">Your Accounts</h2>
+      <Card>
+        <div className="p-4 border-b border-border">
+          <h2 className="text-foreground font-medium">Your Accounts</h2>
         </div>
         {isLoading ? (
-          <div className="divide-y divide-dash-border">
+          <div className="divide-y divide-border">
             {[...Array(3)].map((_, i) => (
               <AccountSkeleton key={i} />
             ))}
           </div>
         ) : accounts && accounts.length > 0 ? (
-          <div className="divide-y divide-dash-border">
+          <div className="divide-y divide-border">
             {accounts.map((account, index) => (
               <AccountItem
                 key={account.id}
@@ -180,15 +186,17 @@ export default function AccountsPage() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <Wallet className="h-12 w-12 mx-auto text-dash-text-muted mb-4" />
-            <p className="text-dash-text-muted mb-4">No accounts yet</p>
-            <Link href="/app/accounts/new" className="dash-btn-pill-primary">
-              <Plus className="h-4 w-4" />
-              Add your first account
-            </Link>
+            <Wallet className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-muted-foreground mb-4">No accounts yet</p>
+            <Button className="rounded-full" asChild>
+              <Link href="/app/accounts/new">
+                <Plus className="h-4 w-4" />
+                Add your first account
+              </Link>
+            </Button>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

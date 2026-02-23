@@ -37,7 +37,7 @@ import {
 import {
   AccountForm,
   type AccountFormData,
-} from "@/components/app/accounts/AccountForm"
+} from "@/components/account-form"
 
 function formatCurrency(amount: number, currency: string = "USD") {
   return new Intl.NumberFormat("en-US", {

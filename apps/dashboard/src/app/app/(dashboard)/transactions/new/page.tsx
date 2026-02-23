@@ -9,7 +9,8 @@ import { useCreateTransaction, useCreateTransfer } from "@/lib/api/hooks"
 import {
   TransactionForm,
   type TransactionFormData,
-} from "@/components/app/transactions/TransactionForm"
+} from "@/components/transaction-form"
+import { Card, CardContent } from "@/components/ui/card"
 
 export default function NewTransactionPage() {
   const router = useRouter()
@@ -68,27 +69,29 @@ export default function NewTransactionPage() {
       <div className="flex items-center gap-4">
         <Link
           href="/app/transactions"
-          className="p-2 rounded-lg hover:bg-dash-card transition-colors text-dash-text-muted hover:text-dash-text"
+          className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <h1 className="text-2xl font-semibold text-dash-text">
+        <h1 className="text-2xl font-semibold text-foreground">
           New Transaction
         </h1>
       </div>
 
       {/* Form */}
-      <div className="dash-card p-6">
-        <h2 className="text-lg font-medium text-dash-text mb-6">
-          Transaction Details
-        </h2>
-        <TransactionForm
-          initialType={initialType || undefined}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          isLoading={isLoading}
-        />
-      </div>
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="text-lg font-medium text-foreground mb-6">
+            Transaction Details
+          </h2>
+          <TransactionForm
+            initialType={initialType || undefined}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            isLoading={isLoading}
+          />
+        </CardContent>
+      </Card>
     </div>
   )
 }

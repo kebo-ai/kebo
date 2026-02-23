@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   AccountForm,
   type AccountFormData,
-} from "@/components/app/accounts/AccountForm"
+} from "@/components/account-form"
 
 export default function NewAccountPage() {
   const router = useRouter()

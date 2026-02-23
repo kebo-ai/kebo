@@ -55,6 +55,9 @@ yarn.lock
 .next/
 out/
 
+# Wrangler
+.wrangler/
+
 # Build outputs
 dist/
 build/

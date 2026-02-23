@@ -4,11 +4,12 @@ This document provides essential information for AI coding agents working in the
 
 ## Project Overview
 
-Kebo is a personal finance mobile app with a marketing website. It's a **Turborepo monorepo** using **Bun** as the package manager.
+Kebo is a personal finance app with a mobile app, web dashboard, and marketing website. It's a **Turborepo monorepo** using **Bun** as the package manager.
 
 | App | Path | Framework | Description |
 |-----|------|-----------|-------------|
-| Web | `apps/web` | Next.js 16 + React 19 | Marketing/landing website |
+| Dashboard | `apps/dashboard` | Next.js 16 + React 19 | Authenticated financial dashboard |
+| Marketing | `apps/marketing` | Next.js 16 + React 19 | Public marketing/landing website |
 | Mobile | `apps/mobile` | Expo SDK 52 + React Native | Main mobile application |
 | Shared | `packages/shared` | TypeScript | Shared types and constants |
 
@@ -29,11 +30,17 @@ bun run clean        # Clean build artifacts and node_modules
 ### App-Specific Commands
 
 ```bash
-# Web app
-bun run web dev          # Start Next.js dev server
-bun run web dev:turbo    # Start with Turbopack (faster)
-bun run web build        # Production build
-bun run web typecheck    # Type check web app only
+# Dashboard app
+bun run dashboard dev          # Start Next.js dev server (port 3000)
+bun run dashboard dev:turbo    # Start with Turbopack (faster)
+bun run dashboard build        # Production build
+bun run dashboard typecheck    # Type check dashboard app only
+
+# Marketing app
+bun run marketing dev          # Start Next.js dev server (port 3001)
+bun run marketing dev:turbo    # Start with Turbopack (faster)
+bun run marketing build        # Production build
+bun run marketing typecheck    # Type check marketing app only
 
 # Mobile app
 bun run mobile start     # Start Expo dev server (clears cache)
@@ -81,7 +88,7 @@ bun run format       # Format all files
 - **Strict mode** is enabled across all packages
 - Path aliases available:
   - `@/*` maps to `./src/*` (within each app)
-  - `@kebo/shared` for shared package imports
+  - `@kebo/shared` for shared package imports (dashboard only)
 - Allowed (linter rules disabled):
   - Non-null assertions (`!`)
   - Explicit `any` types
@@ -130,26 +137,24 @@ static async fetchData() {
 
 ## Architecture Patterns
 
-### Web App (Next.js)
+### Dashboard App (Next.js)
 
-- **App Router** with internationalization (`/[lang]/...`)
+- **App Router** with internationalization (`/[lang]/app/...`)
 - **Supported languages**: `es`, `en`, `pt`
 - **UI Components**: shadcn/ui pattern with Radix primitives
 - **Styling**: Tailwind CSS with `cn()` utility for class merging
+- **State**: React Query for server state
+- **Auth**: Supabase Auth with SSR middleware
 - **Client components**: Use `"use client"` directive
 
-```typescript
-// Component pattern
-import { cn } from "@/lib/utils"
+### Marketing App (Next.js)
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "outline"
-}
-
-export function Button({ className, variant = "default", ...props }: ButtonProps) {
-  return <button className={cn(baseStyles, variantStyles[variant], className)} {...props} />
-}
-```
+- **App Router** with internationalization (`/[lang]/...`)
+- **Supported languages**: `es`, `en`, `pt`
+- **i18n**: JSON dictionaries for translations
+- **UI Components**: Minimal shadcn/ui (button, sheet)
+- **Styling**: Tailwind CSS with Framer Motion animations
+- **No auth** — public pages only
 
 ### Mobile App (React Native/Expo)
 
@@ -195,40 +200,48 @@ export class TransactionService {
 ```
 kebo/
 ├── apps/
-│   ├── web/src/
-│   │   ├── app/[lang]/     # Next.js pages (i18n routes)
-│   │   ├── components/     # React components
-│   │   │   └── ui/         # shadcn/ui components
-│   │   ├── i18n/           # Translations
-│   │   └── lib/            # Utilities (cn, etc.)
+│   ├── dashboard/src/
+│   │   ├── app/[lang]/app/   # Dashboard pages (auth + dashboard routes)
+│   │   ├── components/
+│   │   │   ├── app/          # Dashboard-specific components
+│   │   │   └── ui/           # shadcn/ui components
+│   │   └── lib/              # Utilities, auth, API hooks
+│   │
+│   ├── marketing/src/
+│   │   ├── app/[lang]/       # Marketing pages (landing, blog, FAQs, legal)
+│   │   ├── components/       # Marketing components (Header, Hero, etc.)
+│   │   ├── i18n/             # Translations
+│   │   └── lib/              # Utilities (cn, etc.)
 │   │
 │   └── mobile/src/
-│       ├── components/     # UI components
-│       ├── screens/        # Screen components
-│       ├── navigators/     # React Navigation config
-│       ├── models/         # MobX-State-Tree stores
-│       ├── services/       # API service classes
-│       ├── hooks/          # Custom React hooks
-│       ├── i18n/           # i18next translations
-│       ├── theme/          # Colors, typography
-│       └── utils/          # Utility functions
+│       ├── components/       # UI components
+│       ├── screens/          # Screen components
+│       ├── navigators/       # React Navigation config
+│       ├── models/           # MobX-State-Tree stores
+│       ├── services/         # API service classes
+│       ├── hooks/            # Custom React hooks
+│       ├── i18n/             # i18next translations
+│       ├── theme/            # Colors, typography
+│       └── utils/            # Utility functions
 │
-└── packages/shared/src/    # Shared types and constants
+└── packages/shared/src/      # Shared types and constants
 ```
 
 ## Environment Variables
 
-- **Web**: Prefix with `NEXT_PUBLIC_` for client-side access
+- **Dashboard**: Prefix with `NEXT_PUBLIC_` for client-side access. Also uses `NEXT_PUBLIC_MARKETING_URL` for cross-links.
+- **Marketing**: Prefix with `NEXT_PUBLIC_` for client-side access. Uses `RESEND_API_KEY` for email.
 - **Mobile**: Prefix with `EXPO_PUBLIC_` for client-side access
 - Required: Supabase URL/key, PostHog key
 
 ## Key Dependencies
 
-| Purpose | Web | Mobile |
-|---------|-----|--------|
-| Backend | Supabase | Supabase |
-| Styling | Tailwind CSS | twrnc |
-| UI | Radix UI, shadcn/ui | Custom components |
-| State | React state | MobX-State-Tree |
-| Analytics | Vercel Analytics | PostHog |
-| i18n | Custom dictionary | i18next |
+| Purpose | Dashboard | Marketing | Mobile |
+|---------|-----------|-----------|--------|
+| Backend | Supabase | Supabase (waitlist) | Supabase |
+| Styling | Tailwind CSS | Tailwind CSS | twrnc |
+| UI | Radix UI, shadcn/ui | Minimal shadcn/ui | Custom components |
+| State | React Query | React state | MobX-State-Tree |
+| Analytics | Vercel Analytics | Vercel Analytics | PostHog |
+| i18n | — | Custom dictionary | i18next |
+| Animation | — | Framer Motion | — |

@@ -11,7 +11,7 @@ The shared package contains **TypeScript types and constants** used across both 
 | Package Name | `@kebo/shared` |
 | Language | TypeScript |
 | Build | None (source exported directly) |
-| Consumers | `apps/web`, `apps/mobile` |
+| Consumers | `apps/dashboard`, `apps/mobile` |
 
 ## Commands
 

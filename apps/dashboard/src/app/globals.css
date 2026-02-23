@@ -1,0 +1,250 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 262 66% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 262 66% 52%;
+    --radius: 0.625rem;
+    --chart-1: 142 76% 36%;
+    --chart-2: 0 84% 60%;
+    --chart-3: 262 66% 52%;
+    --chart-4: 47 96% 53%;
+    --chart-5: 199 89% 48%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 262 66% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 262 66% 52%;
+    --chart-1: 142 70% 45%;
+    --chart-2: 0 72% 51%;
+    --chart-3: 262 66% 52%;
+    --chart-4: 47 96% 53%;
+    --chart-5: 199 89% 48%;
+  }
+
+  /* Mercury-style Dashboard Theme */
+  .dashboard {
+    --dash-bg: 210 22% 8%;
+    --dash-card: 213 18% 13%;
+    --dash-card-hover: 213 15% 17%;
+    --dash-border: 214 14% 20%;
+    --dash-text: 0 0% 100%;
+    --dash-text-secondary: 220 13% 91%;
+    --dash-text-muted: 218 11% 65%;
+    --dash-text-dim: 218 11% 50%;
+    --dash-accent: 217 91% 60%;
+    --dash-success: 160 84% 39%;
+    --dash-error: 0 84% 60%;
+
+    /* Override base variables for dashboard */
+    --background: var(--dash-bg);
+    --foreground: var(--dash-text);
+    --card: var(--dash-card);
+    --card-foreground: var(--dash-text);
+    --popover: var(--dash-card);
+    --popover-foreground: var(--dash-text);
+    --secondary: var(--dash-card);
+    --secondary-foreground: var(--dash-text);
+    --muted: var(--dash-card);
+    --muted-foreground: var(--dash-text-muted);
+    --accent: var(--dash-card-hover);
+    --accent-foreground: var(--dash-text);
+    --border: var(--dash-border);
+    --input: var(--dash-card);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  ::selection {
+    background-color: hsl(262 66% 52%);
+    color: hsl(0 0% 100%);
+  }
+
+  ::-moz-selection {
+    background-color: hsl(262 66% 52%);
+    color: hsl(0 0% 100%);
+  }
+}
+
+/* Dashboard Utility Classes */
+@layer utilities {
+  .dash-bg {
+    background-color: hsl(var(--dash-bg));
+  }
+
+  .dash-card {
+    background-color: hsl(var(--dash-card));
+    border: 1px solid hsl(var(--dash-border));
+    border-radius: 0.75rem;
+  }
+
+  .dash-card-hover {
+    @apply transition-colors;
+  }
+
+  .dash-card-hover:hover {
+    background-color: hsl(var(--dash-card-hover));
+  }
+
+  .dash-text {
+    color: hsl(var(--dash-text));
+  }
+
+  .dash-text-secondary {
+    color: hsl(var(--dash-text-secondary));
+  }
+
+  .dash-text-muted {
+    color: hsl(var(--dash-text-muted));
+  }
+
+  .dash-text-dim {
+    color: hsl(var(--dash-text-dim));
+  }
+
+  .dash-accent {
+    color: hsl(var(--dash-accent));
+  }
+
+  .dash-success {
+    color: hsl(var(--dash-success));
+  }
+
+  .dash-error {
+    color: hsl(var(--dash-error));
+  }
+
+  .dash-border {
+    border-color: hsl(var(--dash-border));
+  }
+
+  .dash-btn-pill {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors;
+    background-color: hsl(var(--dash-card));
+    border: 1px solid hsl(var(--dash-border));
+    color: hsl(var(--dash-text));
+  }
+
+  .dash-btn-pill:hover {
+    background-color: hsl(var(--dash-card-hover));
+  }
+
+  .dash-btn-pill-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors;
+    background-color: hsl(var(--dash-accent));
+    color: hsl(var(--dash-text));
+  }
+
+  .dash-btn-pill-primary:hover {
+    background-color: hsl(217 91% 55%);
+  }
+
+  .dash-input {
+    @apply w-full px-3 py-2 rounded-lg text-sm transition-colors;
+    background-color: hsl(var(--dash-card));
+    border: 1px solid hsl(var(--dash-border));
+    color: hsl(var(--dash-text));
+  }
+
+  .dash-input:focus {
+    outline: none;
+    border-color: hsl(var(--dash-accent));
+    box-shadow: 0 0 0 2px hsl(var(--dash-accent) / 0.2);
+  }
+
+  .dash-input::placeholder {
+    color: hsl(var(--dash-text-dim));
+  }
+
+  .dash-nav-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors;
+    color: hsl(var(--dash-text-muted));
+  }
+
+  .dash-nav-item:hover {
+    background-color: hsl(var(--dash-card));
+    color: hsl(var(--dash-text));
+  }
+
+  .dash-nav-item-active {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm;
+    background-color: hsl(var(--dash-accent));
+    color: hsl(var(--dash-text));
+  }
+
+  .dash-list-item {
+    @apply flex items-center gap-4 px-3 py-3 rounded-lg transition-colors cursor-pointer;
+  }
+
+  .dash-list-item:hover {
+    background-color: hsl(var(--dash-card-hover));
+  }
+
+  .dash-avatar-blue {
+    background-color: hsl(217 91% 60% / 0.2);
+    color: hsl(217 91% 70%);
+  }
+
+  .dash-avatar-green {
+    background-color: hsl(160 84% 39% / 0.2);
+    color: hsl(160 84% 50%);
+  }
+
+  .dash-avatar-purple {
+    background-color: hsl(262 66% 52% / 0.2);
+    color: hsl(262 66% 65%);
+  }
+
+  .dash-avatar-orange {
+    background-color: hsl(25 95% 53% / 0.2);
+    color: hsl(25 95% 63%);
+  }
+
+  .dash-avatar-pink {
+    background-color: hsl(330 81% 60% / 0.2);
+    color: hsl(330 81% 70%);
+  }
+}

@@ -1,4 +1,6 @@
-import { Sidebar } from "@/components/app/layout/Sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import { SiteHeader } from "@/components/site-header"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { createClient } from "@/lib/auth/server"
 import { redirect } from "next/navigation"
 
@@ -18,11 +20,12 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="dark dashboard flex h-screen bg-dash-bg">
-      <Sidebar user={user} />
-      <main className="flex-1 overflow-auto">
-        <div className="container mx-auto p-6 lg:p-8">{children}</div>
-      </main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar user={user} />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

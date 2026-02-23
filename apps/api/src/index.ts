@@ -1,3 +1,4 @@
+import "hono"
 import { createApp } from "./app"
 
 const app = createApp()

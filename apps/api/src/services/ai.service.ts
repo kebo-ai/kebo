@@ -1,6 +1,6 @@
 import { createGateway } from "@ai-sdk/gateway"
 import { embed, streamText } from "ai"
-import { cosineDistance, desc, eq, gt, isNotNull, sql } from "drizzle-orm"
+import { and, cosineDistance, desc, eq, gt, isNotNull, sql } from "drizzle-orm"
 import type { DrizzleClient } from "@/db"
 import { chatConversations, chatMessages, documentChunks } from "@/db/schema"
 
@@ -128,6 +128,7 @@ export class AIService {
   static async loadConversationHistory(
     db: DrizzleClient,
     conversationId: string,
+    userId: string,
     limit: number = 20,
   ): Promise<ConversationMessage[]> {
     const messages = await db
@@ -136,7 +137,16 @@ export class AIService {
         content: chatMessages.content,
       })
       .from(chatMessages)
-      .where(eq(chatMessages.conversation_id, conversationId))
+      .innerJoin(
+        chatConversations,
+        eq(chatMessages.conversation_id, chatConversations.id),
+      )
+      .where(
+        and(
+          eq(chatMessages.conversation_id, conversationId),
+          eq(chatConversations.user_id, userId),
+        ),
+      )
       .orderBy(desc(chatMessages.created_at))
       .limit(limit)
 
@@ -157,11 +167,16 @@ export class AIService {
     title?: string,
   ): Promise<string> {
     if (conversationId) {
-      // Verify conversation belongs to user
+      // Verify conversation exists AND belongs to this user
       const existing = await db
         .select({ id: chatConversations.id })
         .from(chatConversations)
-        .where(eq(chatConversations.id, conversationId))
+        .where(
+          and(
+            eq(chatConversations.id, conversationId),
+            eq(chatConversations.user_id, userId),
+          ),
+        )
         .limit(1)
 
       if (existing.length > 0) {
@@ -227,7 +242,7 @@ export class AIService {
     await AIService.saveMessage(db, convId, "user", message)
 
     // Load conversation history
-    const history = await AIService.loadConversationHistory(db, convId)
+    const history = await AIService.loadConversationHistory(db, convId, userId)
 
     // Retrieve relevant context via RAG
     const contexts = await AIService.retrieveContext(db, message, apiKey)

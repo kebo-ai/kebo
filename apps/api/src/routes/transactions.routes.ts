@@ -51,7 +51,12 @@ const CreateTransactionSchema = z.object({
   category_id: z.string().uuid().optional(),
   account_id: z.string().uuid(),
   transaction_type: z.enum(["Income", "Expense", "Transfer"]),
-  amount: z.union([z.string(), z.number()]).transform((val) => String(val)),
+  amount: z
+    .union([z.string(), z.number()])
+    .transform((val) => String(val))
+    .refine((val) => /^\d+(\.\d{1,2})?$/.test(val) && parseFloat(val) > 0, {
+      message: "Amount must be a positive number with up to 2 decimal places",
+    }),
   currency: z.string().length(3).default("USD"),
   description: z.string().optional(),
   date: z.string().datetime(),
@@ -67,7 +72,10 @@ const CreateTransactionSchema = z.object({
 const CreateTransferSchema = z.object({
   fromAccountId: z.string().uuid(),
   toAccountId: z.string().uuid(),
-  amount: z.string().regex(/^\d+(\.\d{1,2})?$/),
+  amount: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/, "Invalid amount format")
+    .refine((val) => parseFloat(val) > 0, { message: "Amount must be greater than zero" }),
   description: z.string().optional(),
   date: z.string().datetime(),
 })
@@ -220,12 +228,24 @@ app.openapi(recurringRoute, async (c) => {
 app.openapi(transferRoute, async (c) => {
   const userId = c.get("userId")
   const body = c.req.valid("json")
-  const result = await TransactionService.createTransfer(
-    c.get("db"),
-    userId,
-    body,
-  )
-  return c.json(result, 201)
+
+  if (body.fromAccountId === body.toAccountId) {
+    return c.json({ error: "Cannot transfer to the same account" }, 400)
+  }
+
+  try {
+    const result = await TransactionService.createTransfer(
+      c.get("db"),
+      userId,
+      body,
+    )
+    return c.json(result, 201)
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("do not belong")) {
+      return c.json({ error: "One or both accounts not found" }, 403)
+    }
+    throw error
+  }
 })
 
 app.openapi(getRoute, async (c) => {

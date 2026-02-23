@@ -247,6 +247,23 @@ export class TransactionService {
     params: CreateTransferParams,
   ) {
     return await db.transaction(async (tx) => {
+      // Verify both accounts belong to the requesting user
+      const userAccounts = await tx
+        .select({ id: accounts.id })
+        .from(accounts)
+        .where(
+          and(
+            eq(accounts.user_id, userId),
+            eq(accounts.is_deleted, false),
+            inArray(accounts.id, [params.fromAccountId, params.toAccountId]),
+          ),
+        )
+
+      const ownedIds = new Set(userAccounts.map((a) => a.id))
+      if (!ownedIds.has(params.fromAccountId) || !ownedIds.has(params.toAccountId)) {
+        throw new Error("One or both accounts do not belong to this user")
+      }
+
       // Create the main transfer transaction
       const [transferTx] = await tx
         .insert(transactions)

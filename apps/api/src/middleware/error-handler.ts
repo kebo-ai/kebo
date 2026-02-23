@@ -55,9 +55,9 @@ export const errorHandler: ErrorHandler<AppEnv> = (err, c) => {
   return c.json(
     {
       error:
-        c.env.ENVIRONMENT === "production"
-          ? "Internal server error"
-          : (err as Error).message,
+        c.env.ENVIRONMENT === "development"
+          ? (err as Error).message
+          : "Internal server error",
     },
     500,
   )

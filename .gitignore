@@ -63,3 +63,4 @@ dist/
 build/
 
 kebo-supabase
+.vercel

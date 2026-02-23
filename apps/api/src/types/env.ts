@@ -9,6 +9,9 @@ export interface Env {
   // AI-related variables
   AI_GATEWAY_API_KEY: string
   ADMIN_API_KEY: string
+  // Upstash Redis
+  UPSTASH_REDIS_REST_URL: string
+  UPSTASH_REDIS_REST_TOKEN: string
 }
 
 export interface Variables {

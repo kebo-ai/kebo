@@ -5,7 +5,12 @@ import { cors } from "hono/cors"
 import { secureHeaders } from "hono/secure-headers"
 import postgres from "postgres"
 import * as schema from "@/db/schema"
-import { errorHandler, loggerMiddleware } from "@/middleware"
+import {
+  errorHandler,
+  loggerMiddleware,
+  rateLimitMiddleware,
+  defaultBodyLimit,
+} from "@/middleware"
 import { registerRoutes } from "@/routes"
 import type { AppEnv } from "@/types/env"
 
@@ -30,6 +35,12 @@ export function createApp() {
       credentials: true,
     }),
   )
+
+  // Body size limit (1MB for all routes by default)
+  app.use("*", defaultBodyLimit)
+
+  // Global rate limiting (60 req/min per user or IP)
+  app.use("*", rateLimitMiddleware)
 
   // Database initialization middleware
   app.use("*", async (c, next) => {

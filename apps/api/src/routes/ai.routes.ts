@@ -2,7 +2,7 @@ import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi"
 import { and, desc, eq } from "drizzle-orm"
 import { stream } from "hono/streaming"
 import { aiReports, chatConversations, chatMessages } from "@/db/schema"
-import { authMiddleware } from "@/middleware"
+import { authMiddleware, aiRateLimitMiddleware } from "@/middleware"
 import { AIService } from "@/services/ai.service"
 import type { AppEnv } from "@/types/env"
 
@@ -105,8 +105,9 @@ const getConversationRoute = createRoute({
   },
 })
 
-// Apply auth middleware
+// Apply auth middleware + stricter rate limit for AI (10 req/min)
 app.use("/*", authMiddleware)
+app.use("/*", aiRateLimitMiddleware)
 
 // Report creation (unchanged)
 app.openapi(createReportRoute, async (c) => {

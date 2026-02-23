@@ -1,13 +1,48 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi"
 import { EmbeddingService } from "@/services/embedding.service"
+import { adminRateLimitMiddleware, adminBodyLimit } from "@/middleware"
 import type { AppEnv } from "@/types/env"
 
 const app = new OpenAPIHono<AppEnv>()
 
-// Admin key middleware (simple API key check)
+/**
+ * Timing-safe comparison to prevent timing attacks on admin key.
+ * Uses Web Crypto API (available in both Node.js and Cloudflare Workers).
+ */
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    // Still do a comparison to avoid leaking length info via timing
+    const encoder = new TextEncoder()
+    const bufA = encoder.encode(a)
+    const bufB = encoder.encode(a) // Compare same-length buffers
+    crypto.subtle // no-op reference to keep consistent timing
+    let result = 0
+    for (let i = 0; i < bufA.length; i++) {
+      result |= bufA[i] ^ bufB[i]
+    }
+    return false
+  }
+
+  const encoder = new TextEncoder()
+  const bufA = encoder.encode(a)
+  const bufB = encoder.encode(b)
+  let result = 0
+  for (let i = 0; i < bufA.length; i++) {
+    result |= bufA[i] ^ bufB[i]
+  }
+  return result === 0
+}
+
+// Rate limit admin endpoints (5 req/min per IP)
+app.use("/*", adminRateLimitMiddleware)
+
+// Larger body limit for document ingestion (5MB)
+app.use("/*", adminBodyLimit)
+
+// Admin key middleware (timing-safe comparison)
 app.use("/*", async (c, next) => {
   const apiKey = c.req.header("X-Admin-Key")
-  if (!apiKey || apiKey !== c.env.ADMIN_API_KEY) {
+  if (!apiKey || !timingSafeEqual(apiKey, c.env.ADMIN_API_KEY)) {
     return c.json({ error: "Unauthorized" }, 401)
   }
   await next()

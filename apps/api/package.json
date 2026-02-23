@@ -22,6 +22,8 @@
     "@hono/zod-openapi": "^0.18.0",
     "@kebo/shared": "workspace:*",
     "@scalar/hono-api-reference": "^0.5.179",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.36.2",
     "ai": "^6.0.69",
     "drizzle-orm": "^0.36.0",
     "drizzle-seed": "^0.3.1",

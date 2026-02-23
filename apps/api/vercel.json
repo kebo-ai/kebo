@@ -1,6 +1,7 @@
 {
   "framework": null,
   "installCommand": "bun install",
-  "buildCommand": "",
+  "buildCommand": "echo 'skip'",
+  "outputDirectory": "public",
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
 }

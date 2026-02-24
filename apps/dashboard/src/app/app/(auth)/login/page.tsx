@@ -34,32 +34,79 @@ export default function LoginPage() {
     process.env.NEXT_PUBLIC_MARKETING_URL || "https://kebo.app"
 
   return (
-    <div className="grid min-h-svh lg:grid-cols-2">
-      {/* Left — Form */}
-      <div className="flex flex-col">
-        {/* Logo */}
-        <div className="p-6 md:p-10">
-          <KeboLogo className="h-8 w-8" />
+    <div className="flex min-h-svh bg-black">
+      {/* Full-screen shell */}
+      <div className="flex w-full min-h-svh">
+        {/* Left panel — gradient mesh with dot grid */}
+        <div className="relative hidden lg:flex lg:flex-1 overflow-hidden rounded-3xl m-3 mr-0">
+          {/* Gradient mesh layer */}
+          <div className="absolute inset-0">
+            {/* Deep violet glow — top-left */}
+            <div className="absolute -top-1/4 -left-1/4 h-[80%] w-[80%] rounded-full bg-violet-800/50 blur-[120px]" />
+            {/* Purple glow — center */}
+            <div className="absolute top-1/4 left-1/4 h-[60%] w-[60%] rounded-full bg-purple-500/50 blur-[100px]" />
+            {/* Fuchsia glow — top-right */}
+            <div className="absolute -top-1/4 -right-1/4 h-[70%] w-[70%] rounded-full bg-fuchsia-600/40 blur-[120px]" />
+            {/* Dark fade — bottom half */}
+            <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black via-black/80 to-transparent" />
+          </div>
+
+          {/* Dot grid overlay */}
+          <svg
+            className="absolute inset-0 h-full w-full opacity-[0.15]"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <pattern
+                id="dot-grid"
+                x="0"
+                y="0"
+                width="8"
+                height="8"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle cx="1" cy="1" r="0.8" fill="white" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#dot-grid)" />
+          </svg>
+
+          {/* Left panel text overlay */}
+          <div className="relative z-10 flex flex-col justify-end p-10">
+            <h2 className="text-4xl font-bold tracking-tight text-white">
+              Get Started
+              <br />
+              with Kebo
+            </h2>
+            <p className="mt-3 max-w-xs text-sm text-white/60">
+              Your finances, your goals, your flow&nbsp;&mdash; all in one
+              place.
+            </p>
+          </div>
         </div>
 
-        {/* Centered form */}
-        <div className="flex flex-1 items-center justify-center px-6 pb-16">
-          <div className="w-full max-w-sm space-y-8">
+        {/* Right panel — login form */}
+        <div className="flex flex-1 flex-col items-center justify-center px-8 py-12 sm:px-12 lg:max-w-md">
+          <div className="w-full max-w-sm">
+            {/* Logo */}
+            <div className="flex justify-center mb-8">
+              <KeboLogo className="h-10 w-10" />
+            </div>
+
             {/* Heading */}
-            <div className="space-y-2">
-              <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-                Welcome back!
+            <div className="space-y-2 text-center mb-8">
+              <h1 className="text-2xl font-semibold tracking-tight text-white">
+                Sign In
               </h1>
-              <p className="text-muted-foreground">
-                Your finances, your goals, your flow&nbsp;&mdash; all in one
-                place.
+              <p className="text-sm text-neutral-400">
+                Sign in to your account to continue.
               </p>
             </div>
 
             {/* OAuth Buttons */}
-            <div className="flex gap-3">
+            <div className="flex w-full gap-3 mb-8">
               <button
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-50"
                 onClick={() => handleOAuthLogin("google")}
                 disabled={isLoading}
               >
@@ -81,10 +128,10 @@ export default function LoginPage() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Sign In with Google
+                Google
               </button>
               <button
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-50"
                 onClick={() => handleOAuthLogin("apple")}
                 disabled={isLoading}
               >
@@ -95,77 +142,39 @@ export default function LoginPage() {
                 >
                   <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
                 </svg>
-                Sign In with Apple
+                Apple
               </button>
             </div>
 
             {/* Footer links */}
-            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+            <div className="flex items-center justify-center gap-4 text-xs text-neutral-500">
               <a
                 href={`${marketingUrl}/help`}
-                className="hover:text-foreground transition-colors"
+                className="hover:text-white transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Help
               </a>
-              <span className="text-border">/</span>
+              <span className="text-neutral-700">/</span>
               <a
                 href={`${marketingUrl}/terms`}
-                className="hover:text-foreground transition-colors"
+                className="hover:text-white transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Terms
               </a>
-              <span className="text-border">/</span>
+              <span className="text-neutral-700">/</span>
               <a
                 href={`${marketingUrl}/privacy-policy`}
-                className="hover:text-foreground transition-colors"
+                className="hover:text-white transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Privacy
               </a>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right — Visual panel */}
-      <div className="relative hidden lg:block overflow-hidden rounded-l-3xl">
-        {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-kebo-600 via-kebo-500 to-kebo-400" />
-
-        {/* Subtle grid pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.4) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
-
-        {/* Floating accent shapes */}
-        <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-kebo-900/20 blur-3xl" />
-
-        {/* Content overlay */}
-        <div className="relative flex h-full flex-col items-center justify-center px-12 text-white">
-          <div className="max-w-md space-y-6 text-center">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl">
-              <KeboLogo className="h-12 w-12" />
-            </div>
-            <blockquote className="space-y-3">
-              <p className="text-xl font-medium leading-relaxed text-white/90">
-                &ldquo;Finally a finance app that feels like it was built for
-                me. Simple, beautiful, and actually useful.&rdquo;
-              </p>
-              <footer className="text-sm text-white/60">
-                &mdash; Early Kebo user
-              </footer>
-            </blockquote>
           </div>
         </div>
       </div>

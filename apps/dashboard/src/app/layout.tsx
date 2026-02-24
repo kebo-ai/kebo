@@ -4,6 +4,9 @@ import { ThemeProvider } from "next-themes"
 import "./globals.css"
 import { Analytics } from "@vercel/analytics/react"
 import { ReactNode } from "react"
+import { QueryProvider } from "@/lib/api/providers/QueryProvider"
+import { RealtimeSyncProvider } from "@/lib/realtime/realtime-provider"
+import { Toaster } from "@/components/ui/sonner"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -45,7 +48,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Analytics />
-          {children}
+          <QueryProvider>
+            <RealtimeSyncProvider>
+              {children}
+            </RealtimeSyncProvider>
+            <Toaster />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

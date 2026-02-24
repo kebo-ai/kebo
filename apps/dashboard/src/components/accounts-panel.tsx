@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
 
-const basePath = "/app"
+const basePath = ""
 
 const avatarColors = [
   "bg-blue-500/20 text-blue-400",

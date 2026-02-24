@@ -14,7 +14,7 @@ import {
 import Link from "next/link"
 import { format } from "date-fns"
 
-const basePath = "/app"
+const basePath = ""
 
 const avatarColors = [
   "bg-blue-500/20 text-blue-400",

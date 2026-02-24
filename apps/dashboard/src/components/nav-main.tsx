@@ -21,10 +21,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-const basePath = "/app"
-
 const navItems: { href: string; icon: LucideIcon; label: string }[] = [
-  { href: "", icon: Home, label: "Home" },
+  { href: "/", icon: Home, label: "Home" },
   { href: "/transactions", icon: ArrowLeftRight, label: "Transactions" },
   { href: "/budgets", icon: PiggyBank, label: "Budgets" },
   { href: "/reports", icon: BarChart3, label: "Reports" },
@@ -42,16 +40,15 @@ export function NavMain() {
       <SidebarGroupContent>
         <SidebarMenu>
           {navItems.map((item) => {
-            const fullHref = `${basePath}${item.href}`
             const isActive =
-              item.href === ""
-                ? pathname === basePath
-                : pathname.startsWith(fullHref)
+              item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href)
 
             return (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton asChild isActive={isActive}>
-                  <Link href={fullHref}>
+                  <Link href={item.href}>
                     <item.icon />
                     <span>{item.label}</span>
                   </Link>

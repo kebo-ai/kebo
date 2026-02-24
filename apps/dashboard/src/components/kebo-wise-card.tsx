@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ChevronRight } from "lucide-react"
 import Link from "next/link"
 
-const basePath = "/app"
+const basePath = ""
 
 const sampleQuestions = [
   "How am I doing this month?",

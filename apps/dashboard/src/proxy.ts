@@ -30,13 +30,13 @@ export async function proxy(request: NextRequest) {
   console.log("[Proxy]", request.nextUrl.pathname, code ? `code=${code.slice(0, 8)}...` : "no code")
 
   // If an auth code arrives, exchange it for a session right here
-  if (code && request.nextUrl.pathname.startsWith("/app")) {
+  if (code && request.nextUrl.pathname.startsWith("/")) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     console.log("[Proxy] Exchange result:", error ? error.message : "success")
 
     const url = request.nextUrl.clone()
     url.searchParams.delete("code")
-    url.pathname = error ? "/app/login" : "/app"
+    url.pathname = error ? "/login" : "/"
 
     // Copy session cookies with their full options onto the redirect
     const redirectResponse = NextResponse.redirect(url)

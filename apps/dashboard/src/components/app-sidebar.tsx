@@ -24,7 +24,7 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/app">
+              <Link href="/">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-kebo-500 to-kebo-600 text-white font-bold shadow-lg shadow-kebo-500/20">
                   K
                 </div>

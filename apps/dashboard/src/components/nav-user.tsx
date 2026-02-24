@@ -75,7 +75,7 @@ export function NavUser({ serverUser }: { serverUser?: User }) {
             sideOffset={4}
           >
             <DropdownMenuItem asChild>
-              <Link href="/app/settings">
+              <Link href="/settings">
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </Link>

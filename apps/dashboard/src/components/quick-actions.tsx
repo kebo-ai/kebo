@@ -4,27 +4,25 @@ import { ArrowLeftRight, ArrowUpCircle, Send, Wallet } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-const basePath = "/app"
-
 const actions = [
   {
-    href: `${basePath}/transactions/new?type=Expense`,
+    href: "/transactions/new?type=Expense",
     icon: Send,
     label: "Expense",
     primary: true,
   },
   {
-    href: `${basePath}/transactions/new?type=Transfer`,
+    href: "/transactions/new?type=Transfer",
     icon: ArrowLeftRight,
     label: "Transfer",
   },
   {
-    href: `${basePath}/transactions/new?type=Income`,
+    href: "/transactions/new?type=Income",
     icon: ArrowUpCircle,
     label: "Income",
   },
   {
-    href: `${basePath}/accounts/new`,
+    href: "/accounts/new",
     icon: Wallet,
     label: "Account",
   },

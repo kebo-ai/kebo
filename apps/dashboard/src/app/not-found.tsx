@@ -8,7 +8,7 @@ export default function NotFound() {
         <h1 className="text-6xl font-bold text-foreground mb-4">404</h1>
         <p className="text-muted-foreground mb-6">Page not found</p>
         <Button asChild>
-          <Link href="/app">Go to Dashboard</Link>
+          <Link href="/">Go to Dashboard</Link>
         </Button>
       </div>
     </div>

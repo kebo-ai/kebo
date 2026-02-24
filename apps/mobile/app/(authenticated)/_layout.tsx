@@ -15,9 +15,9 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) logger.error("Error getting session:", error);
-      setToken(data.session?.access_token || null);
+      const { data, error } = await supabase.auth.getUser();
+      if (error) logger.error("Error getting user:", error);
+      setToken(data.user ? "authenticated" : null);
       setLoading(false);
     };
 

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
+import { useQueryState, parseAsString, parseAsInteger } from "nuqs"
 import { format } from "date-fns"
 import {
   ArrowDownCircle,
@@ -18,6 +18,9 @@ import { useAccounts } from "@/lib/api/hooks/use-accounts"
 import { useCategories } from "@/lib/api/hooks/use-categories"
 import type { Transaction, TransactionType } from "@/lib/api/types"
 
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Select,
@@ -29,11 +32,11 @@ import {
 
 // Avatar color palette
 const avatarColors = [
-  "dash-avatar-blue",
-  "dash-avatar-green",
-  "dash-avatar-purple",
-  "dash-avatar-orange",
-  "dash-avatar-pink",
+  "bg-blue-500/20 text-blue-400",
+  "bg-emerald-500/20 text-emerald-400",
+  "bg-purple-500/20 text-purple-400",
+  "bg-orange-500/20 text-orange-400",
+  "bg-pink-500/20 text-pink-400",
 ]
 
 function getAvatarColor(index: number) {
@@ -43,13 +46,13 @@ function getAvatarColor(index: number) {
 function TransactionIcon({ type }: { type: TransactionType }) {
   switch (type) {
     case "Expense":
-      return <ArrowDownCircle className="h-5 w-5 text-dash-error" />
+      return <ArrowDownCircle className="h-5 w-5 text-destructive" />
     case "Income":
-      return <ArrowUpCircle className="h-5 w-5 text-dash-success" />
+      return <ArrowUpCircle className="h-5 w-5 text-success" />
     case "Transfer":
-      return <ArrowLeftRight className="h-5 w-5 text-dash-accent" />
+      return <ArrowLeftRight className="h-5 w-5 text-info" />
     default:
-      return <ArrowLeftRight className="h-5 w-5 text-dash-text-muted" />
+      return <ArrowLeftRight className="h-5 w-5 text-muted-foreground" />
   }
 }
 
@@ -70,7 +73,7 @@ function TransactionItem({
   return (
     <Link
       href={`/app/transactions/${transaction.id}`}
-      className="dash-list-item"
+      className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted transition-colors cursor-pointer"
     >
       <div
         className={`h-10 w-10 rounded-full flex items-center justify-center ${getAvatarColor(index)}`}
@@ -82,12 +85,12 @@ function TransactionItem({
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-dash-text-secondary text-sm font-medium truncate">
+        <p className="text-foreground text-sm font-medium truncate">
           {transaction.description ||
             transaction.category_name ||
             transaction.transaction_type}
         </p>
-        <p className="text-dash-text-dim text-xs">
+        <p className="text-muted-foreground/70 text-xs">
           {transaction.account_name} •{" "}
           {format(new Date(transaction.date), "MMM d, yyyy")}
         </p>
@@ -95,10 +98,10 @@ function TransactionItem({
       <div
         className={`font-medium ${
           transaction.transaction_type === "Income"
-            ? "text-dash-success"
+            ? "text-success"
             : transaction.transaction_type === "Expense"
-              ? "text-dash-error"
-              : "text-dash-text"
+              ? "text-destructive"
+              : "text-foreground"
         }`}
       >
         {transaction.transaction_type === "Income" ? "+" : "-"}
@@ -111,30 +114,28 @@ function TransactionItem({
 function TransactionSkeleton() {
   return (
     <div className="flex items-center gap-4 px-3 py-3">
-      <Skeleton className="h-10 w-10 rounded-full bg-dash-card-hover" />
+      <Skeleton className="h-10 w-10 rounded-full bg-muted" />
       <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-32 bg-dash-card-hover" />
-        <Skeleton className="h-3 w-24 bg-dash-card-hover" />
+        <Skeleton className="h-4 w-32 bg-muted" />
+        <Skeleton className="h-3 w-24 bg-muted" />
       </div>
-      <Skeleton className="h-4 w-20 bg-dash-card-hover" />
+      <Skeleton className="h-4 w-20 bg-muted" />
     </div>
   )
 }
 
 export default function TransactionsPage() {
 
-  const [filters, setFilters] = useState({
-    account_id: "",
-    category_id: "",
-    transaction_type: "",
-    search: "",
-  })
-  const [page, setPage] = useState(1)
+  const [accountId, setAccountId] = useQueryState("account", parseAsString)
+  const [categoryId, setCategoryId] = useQueryState("category", parseAsString)
+  const [transactionType, setTransactionType] = useQueryState("type", parseAsString)
+  const [search, setSearch] = useQueryState("q", parseAsString)
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
 
-  const { data, isLoading } = useTransactions({
-    account_id: filters.account_id || undefined,
-    category_id: filters.category_id || undefined,
-    transaction_type: filters.transaction_type || undefined,
+  const { data, isLoading, isFetching } = useTransactions({
+    account_id: accountId || undefined,
+    category_id: categoryId || undefined,
+    transaction_type: transactionType || undefined,
     limit: 20,
     offset: (page - 1) * 20,
   })
@@ -146,221 +147,207 @@ export default function TransactionsPage() {
   const totalPages = Math.ceil((data?.total || 0) / 20)
 
   const clearFilters = () => {
-    setFilters({
-      account_id: "",
-      category_id: "",
-      transaction_type: "",
-      search: "",
-    })
+    setAccountId(null)
+    setCategoryId(null)
+    setTransactionType(null)
+    setSearch(null)
     setPage(1)
   }
 
-  const hasActiveFilters =
-    filters.account_id || filters.category_id || filters.transaction_type
+  const hasActiveFilters = accountId || categoryId || transactionType
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-dash-text">Transactions</h1>
-        <Link href="/app/transactions/new" className="dash-btn-pill-primary">
-          <Plus className="h-4 w-4" />
-          New Transaction
-        </Link>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold text-foreground">Transactions</h1>
+          {isFetching && !isLoading && (
+            <div className="h-4 w-4 border-2 border-muted-foreground/30 border-t-foreground rounded-full animate-spin" />
+          )}
+        </div>
+        <Button className="rounded-full" asChild>
+          <Link href="/app/transactions/new">
+            <Plus className="h-4 w-4" />
+            New Transaction
+          </Link>
+        </Button>
       </div>
 
       {/* Filters */}
-      <div className="dash-card p-4">
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-dash-text-dim" />
-            <input
-              placeholder="Search transactions..."
-              value={filters.search}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, search: e.target.value }))
-              }
-              className="dash-input pl-9"
-            />
-          </div>
-
-          {/* Type Filter */}
-          <Select
-            value={filters.transaction_type || "all"}
-            onValueChange={(value) =>
-              setFilters((f) => ({
-                ...f,
-                transaction_type: value === "all" ? "" : value,
-              }))
-            }
-          >
-            <SelectTrigger className="w-[140px] bg-dash-card border-dash-border text-dash-text-secondary">
-              <SelectValue placeholder="All Types" />
-            </SelectTrigger>
-            <SelectContent className="bg-dash-card border-dash-border">
-              <SelectItem
-                value="all"
-                className="text-dash-text-secondary hover:bg-dash-card-hover focus:bg-dash-card-hover"
-              >
-                All Types
-              </SelectItem>
-              <SelectItem
-                value="Expense"
-                className="text-dash-text-secondary hover:bg-dash-card-hover focus:bg-dash-card-hover"
-              >
-                Expense
-              </SelectItem>
-              <SelectItem
-                value="Income"
-                className="text-dash-text-secondary hover:bg-dash-card-hover focus:bg-dash-card-hover"
-              >
-                Income
-              </SelectItem>
-              <SelectItem
-                value="Transfer"
-                className="text-dash-text-secondary hover:bg-dash-card-hover focus:bg-dash-card-hover"
-              >
-                Transfer
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Account Filter */}
-          <Select
-            value={filters.account_id || "all"}
-            onValueChange={(value) =>
-              setFilters((f) => ({
-                ...f,
-                account_id: value === "all" ? "" : value,
-              }))
-            }
-          >
-            <SelectTrigger className="w-[160px] bg-dash-card border-dash-border text-dash-text-secondary">
-              <SelectValue placeholder="All Accounts" />
-            </SelectTrigger>
-            <SelectContent className="bg-dash-card border-dash-border">
-              <SelectItem
-                value="all"
-                className="text-dash-text-secondary hover:bg-dash-card-hover focus:bg-dash-card-hover"
-              >
-                All Accounts
-              </SelectItem>
-              {accounts?.map((account) => (
-                <SelectItem
-                  key={account.id}
-                  value={account.id}
-                  className="text-dash-text-secondary hover:bg-dash-card-hover focus:bg-dash-card-hover"
-                >
-                  {account.customized_name || account.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Category Filter */}
-          <Select
-            value={filters.category_id || "all"}
-            onValueChange={(value) =>
-              setFilters((f) => ({
-                ...f,
-                category_id: value === "all" ? "" : value,
-              }))
-            }
-          >
-            <SelectTrigger className="w-[160px] bg-dash-card border-dash-border text-dash-text-secondary">
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent className="bg-dash-card border-dash-border">
-              <SelectItem
-                value="all"
-                className="text-dash-text-secondary hover:bg-dash-card-hover focus:bg-dash-card-hover"
-              >
-                All Categories
-              </SelectItem>
-              {categories
-                ?.filter((c) => c.is_visible && !c.is_deleted)
-                .map((category) => (
-                  <SelectItem
-                    key={category.id}
-                    value={category.id}
-                    className="text-dash-text-secondary hover:bg-dash-card-hover focus:bg-dash-card-hover"
-                  >
-                    {category.icon_emoji} {category.name}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-
-          {/* Clear Filters */}
-          {hasActiveFilters && (
-            <button
-              className="text-dash-text-muted hover:text-dash-text text-sm transition-colors"
-              onClick={clearFilters}
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Transactions List */}
-      <div className="dash-card">
-        {isLoading ? (
-          <div className="divide-y divide-dash-border">
-            {[...Array(5)].map((_, i) => (
-              <TransactionSkeleton key={i} />
-            ))}
-          </div>
-        ) : transactions.length > 0 ? (
-          <>
-            <div className="divide-y divide-dash-border">
-              {transactions.map((transaction, index) => (
-                <TransactionItem
-                  key={transaction.id}
-                  transaction={transaction}
-                  index={index}
-                />
-              ))}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search */}
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
+              <Input
+                placeholder="Search transactions..."
+                value={search ?? ""}
+                onChange={(e) =>
+                  setSearch(e.target.value || null)
+                }
+                className="pl-9"
+              />
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between p-4 border-t border-dash-border">
-                <p className="text-sm text-dash-text-muted">
-                  Page {page} of {totalPages}
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    className="dash-btn-pill"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
+            {/* Type Filter */}
+            <Select
+              value={transactionType ?? "all"}
+              onValueChange={(value) => {
+                setTransactionType(value === "all" ? null : value)
+                setPage(1)
+              }}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  All Types
+                </SelectItem>
+                <SelectItem value="Expense">
+                  Expense
+                </SelectItem>
+                <SelectItem value="Income">
+                  Income
+                </SelectItem>
+                <SelectItem value="Transfer">
+                  Transfer
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Account Filter */}
+            <Select
+              value={accountId ?? "all"}
+              onValueChange={(value) => {
+                setAccountId(value === "all" ? null : value)
+                setPage(1)
+              }}
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="All Accounts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  All Accounts
+                </SelectItem>
+                {accounts?.map((account) => (
+                  <SelectItem
+                    key={account.id}
+                    value={account.id}
                   >
-                    <ChevronLeft className="h-4 w-4" />
-                    Previous
-                  </button>
-                  <button
-                    className="dash-btn-pill"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                  >
-                    Next
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
+                    {account.customized_name || account.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Category Filter */}
+            <Select
+              value={categoryId ?? "all"}
+              onValueChange={(value) => {
+                setCategoryId(value === "all" ? null : value)
+                setPage(1)
+              }}
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  All Categories
+                </SelectItem>
+                {categories
+                  ?.filter((c) => c.is_visible && !c.is_deleted)
+                  .map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id}
+                    >
+                      {category.icon_emoji} {category.name}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <button
+                className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                onClick={clearFilters}
+              >
+                Clear filters
+              </button>
             )}
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-dash-text-muted mb-4">No transactions found</p>
-            <Link href="/app/transactions/new" className="dash-btn-pill-primary">
-              <Plus className="h-4 w-4" />
-              Add your first transaction
-            </Link>
           </div>
-        )}
-      </div>
+        </CardContent>
+      </Card>
+
+      {/* Transactions List */}
+      <Card>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="divide-y divide-border">
+              {[...Array(5)].map((_, i) => (
+                <TransactionSkeleton key={i} />
+              ))}
+            </div>
+          ) : transactions.length > 0 ? (
+            <>
+              <div className="divide-y divide-border">
+                {transactions.map((transaction, index) => (
+                  <TransactionItem
+                    key={transaction.id}
+                    transaction={transaction}
+                    index={index}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between p-4 border-t">
+                  <p className="text-sm text-muted-foreground">
+                    Page {page} of {totalPages}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="rounded-full"
+                      onClick={() => setPage(Math.max(1, page - 1))}
+                      disabled={page === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="rounded-full"
+                      onClick={() => setPage(Math.min(totalPages, page + 1))}
+                      disabled={page === totalPages}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground mb-4">No transactions found</p>
+              <Button className="rounded-full" asChild>
+                <Link href="/app/transactions/new">
+                  <Plus className="h-4 w-4" />
+                  Add your first transaction
+                </Link>
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

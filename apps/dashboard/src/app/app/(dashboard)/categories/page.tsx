@@ -7,6 +7,8 @@ import { Plus, Tags, ArrowDownCircle, ArrowUpCircle } from "lucide-react"
 import { useCategories } from "@/lib/api/hooks/use-categories"
 import type { Category, TransactionType } from "@/lib/api/types"
 
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -18,22 +20,22 @@ function CategoryItem({
   return (
     <Link
       href={`/app/categories/${category.id}`}
-      className="dash-list-item"
+      className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted transition-colors cursor-pointer"
     >
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-dash-card-hover text-lg">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-lg">
         {category.icon_emoji || (category.type === "Expense" ? "💸" : "💰")}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-dash-text-secondary font-medium truncate">
+        <p className="text-foreground font-medium truncate">
           {category.name}
         </p>
-        <p className="text-sm text-dash-text-dim">{category.type}</p>
+        <p className="text-sm text-muted-foreground/70">{category.type}</p>
       </div>
       <div
         className={`px-2 py-1 text-xs rounded-full ${
           category.type === "Expense"
-            ? "bg-dash-error/10 text-dash-error"
-            : "bg-dash-success/10 text-dash-success"
+            ? "bg-destructive/10 text-destructive"
+            : "bg-success/10 text-success"
         }`}
       >
         {category.type}
@@ -45,12 +47,12 @@ function CategoryItem({
 function CategorySkeleton() {
   return (
     <div className="flex items-center gap-4 px-3 py-3">
-      <Skeleton className="h-10 w-10 rounded-full bg-dash-card-hover" />
+      <Skeleton className="h-10 w-10 rounded-full bg-muted" />
       <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-32 bg-dash-card-hover" />
-        <Skeleton className="h-3 w-20 bg-dash-card-hover" />
+        <Skeleton className="h-4 w-32 bg-muted" />
+        <Skeleton className="h-3 w-20 bg-muted" />
       </div>
-      <Skeleton className="h-6 w-16 rounded-full bg-dash-card-hover" />
+      <Skeleton className="h-6 w-16 rounded-full bg-muted" />
     </div>
   )
 }
@@ -70,7 +72,7 @@ function CategoryList({
 
   if (isLoading) {
     return (
-      <div className="divide-y divide-dash-border">
+      <div className="divide-y divide-border">
         {[...Array(4)].map((_, i) => (
           <CategorySkeleton key={i} />
         ))}
@@ -81,23 +83,22 @@ function CategoryList({
   if (!filteredCategories || filteredCategories.length === 0) {
     return (
       <div className="text-center py-12">
-        <Tags className="h-12 w-12 mx-auto text-dash-text-muted mb-4" />
-        <p className="text-dash-text-muted mb-4">
+        <Tags className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+        <p className="text-muted-foreground mb-4">
           No {type.toLowerCase()} categories yet
         </p>
-        <Link
-          href={`/app/categories/new?type=${type}`}
-          className="dash-btn-pill-primary"
-        >
-          <Plus className="h-4 w-4" />
-          Add {type} Category
-        </Link>
+        <Button className="rounded-full" asChild>
+          <Link href={`/app/categories/new?type=${type}`}>
+            <Plus className="h-4 w-4" />
+            Add {type} Category
+          </Link>
+        </Button>
       </div>
     )
   }
 
   return (
-    <div className="divide-y divide-dash-border">
+    <div className="divide-y divide-border">
       {filteredCategories.map((category) => (
         <CategoryItem key={category.id} category={category} />
       ))}
@@ -125,70 +126,71 @@ export default function CategoriesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-dash-text">Categories</h1>
-          <p className="text-dash-text-muted text-sm">
+          <h1 className="text-2xl font-semibold text-foreground">Categories</h1>
+          <p className="text-muted-foreground text-sm">
             Organize your transactions with categories
           </p>
         </div>
-        <Link
-          href={`/app/categories/new?type=${activeTab}`}
-          className="dash-btn-pill-primary"
-        >
-          <Plus className="h-4 w-4" />
-          New Category
-        </Link>
+        <Button className="rounded-full" asChild>
+          <Link href={`/app/categories/new?type=${activeTab}`}>
+            <Plus className="h-4 w-4" />
+            New Category
+          </Link>
+        </Button>
       </div>
 
       {/* Categories with Tabs */}
-      <div className="dash-card">
-        <Tabs
-          value={activeTab}
-          onValueChange={(v) => setActiveTab(v as TransactionType)}
-        >
-          <div className="p-4 border-b border-dash-border">
-            <TabsList className="grid w-full grid-cols-2 bg-dash-bg border border-dash-border rounded-lg p-1">
-              <TabsTrigger
-                value="Expense"
-                className="flex items-center gap-2 rounded-md text-sm data-[state=active]:bg-dash-card data-[state=active]:text-dash-text text-dash-text-muted"
-              >
-                <ArrowDownCircle className="h-4 w-4" />
-                Expenses
-                {!isLoading && (
-                  <span className="ml-1 text-xs text-dash-text-dim">
-                    ({expenseCount})
-                  </span>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="Income"
-                className="flex items-center gap-2 rounded-md text-sm data-[state=active]:bg-dash-card data-[state=active]:text-dash-text text-dash-text-muted"
-              >
-                <ArrowUpCircle className="h-4 w-4" />
-                Income
-                {!isLoading && (
-                  <span className="ml-1 text-xs text-dash-text-dim">
-                    ({incomeCount})
-                  </span>
-                )}
-              </TabsTrigger>
-            </TabsList>
-          </div>
-          <TabsContent value="Expense" className="m-0">
-            <CategoryList
-              categories={categories}
-              isLoading={isLoading}
-              type="Expense"
-            />
-          </TabsContent>
-          <TabsContent value="Income" className="m-0">
-            <CategoryList
-              categories={categories}
-              isLoading={isLoading}
-              type="Income"
-            />
-          </TabsContent>
-        </Tabs>
-      </div>
+      <Card>
+        <CardContent className="p-0">
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => setActiveTab(v as TransactionType)}
+          >
+            <div className="p-4 border-b border-border">
+              <TabsList className="grid w-full grid-cols-2 bg-background border border-border rounded-lg p-1">
+                <TabsTrigger
+                  value="Expense"
+                  className="flex items-center gap-2 rounded-md text-sm data-[state=active]:bg-card data-[state=active]:text-foreground text-muted-foreground"
+                >
+                  <ArrowDownCircle className="h-4 w-4" />
+                  Expenses
+                  {!isLoading && (
+                    <span className="ml-1 text-xs text-muted-foreground/70">
+                      ({expenseCount})
+                    </span>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="Income"
+                  className="flex items-center gap-2 rounded-md text-sm data-[state=active]:bg-card data-[state=active]:text-foreground text-muted-foreground"
+                >
+                  <ArrowUpCircle className="h-4 w-4" />
+                  Income
+                  {!isLoading && (
+                    <span className="ml-1 text-xs text-muted-foreground/70">
+                      ({incomeCount})
+                    </span>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            <TabsContent value="Expense" className="m-0">
+              <CategoryList
+                categories={categories}
+                isLoading={isLoading}
+                type="Expense"
+              />
+            </TabsContent>
+            <TabsContent value="Income" className="m-0">
+              <CategoryList
+                categories={categories}
+                isLoading={isLoading}
+                type="Income"
+              />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   )
 }

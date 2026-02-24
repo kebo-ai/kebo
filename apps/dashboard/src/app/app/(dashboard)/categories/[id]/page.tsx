@@ -37,7 +37,7 @@ import {
 import {
   CategoryForm,
   type CategoryFormData,
-} from "@/components/app/categories/CategoryForm"
+} from "@/components/category-form"
 
 function DetailRow({
   label,

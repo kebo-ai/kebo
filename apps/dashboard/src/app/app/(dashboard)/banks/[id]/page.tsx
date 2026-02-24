@@ -35,7 +35,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { BankForm, type BankFormData } from "@/components/app/banks/BankForm"
+import { BankForm, type BankFormData } from "@/components/bank-form"
 
 function DetailRow({
   label,

@@ -2,6 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { api } from "../client"
+import { queryKeys } from "../keys"
+import { queryConfig } from "../query-config"
 import type { Budget, BudgetWithDetails, CreateBudgetInput } from "../types"
 
 interface DataResponse<T> {
@@ -10,19 +12,21 @@ interface DataResponse<T> {
 
 export function useBudgets() {
   return useQuery({
-    queryKey: ["budgets"],
+    queryKey: queryKeys.budgets.list(),
     queryFn: async () => {
       const response = await api.get<DataResponse<Budget[]>>("/budgets")
       return response.data
     },
+    ...queryConfig.budgets,
   })
 }
 
 export function useBudget(id: string) {
   return useQuery({
-    queryKey: ["budget", id],
+    queryKey: queryKeys.budgets.detail(id),
     queryFn: () => api.get<BudgetWithDetails>(`/budgets/${id}`),
     enabled: !!id,
+    ...queryConfig.budgets,
   })
 }
 
@@ -33,7 +37,7 @@ export function useCreateBudget() {
     mutationFn: (data: CreateBudgetInput) =>
       api.put<Budget>("/budgets", data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgets.all })
     },
   })
 }
@@ -42,11 +46,18 @@ export function useUpdateBudget() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateBudgetInput> }) =>
-      api.put<Budget>("/budgets", { ...data, id }),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string
+      data: Partial<CreateBudgetInput>
+    }) => api.put<Budget>("/budgets", { ...data, id }),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] })
-      queryClient.invalidateQueries({ queryKey: ["budget", variables.id] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgets.all })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.budgets.detail(variables.id),
+      })
     },
   })
 }
@@ -57,7 +68,7 @@ export function useDeleteBudget() {
   return useMutation({
     mutationFn: (id: string) => api.delete(`/budgets/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgets.all })
     },
   })
 }

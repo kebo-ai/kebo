@@ -2,6 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { api } from "../client"
+import { queryKeys } from "../keys"
+import { queryConfig } from "../query-config"
 import type { Bank, CreateBankInput } from "../types"
 
 interface DataResponse<T> {
@@ -10,44 +12,52 @@ interface DataResponse<T> {
 
 export function useBanks() {
   return useQuery({
-    queryKey: ["banks"],
+    queryKey: queryKeys.banks.list(),
     queryFn: async () => {
       const response = await api.get<DataResponse<Bank[]>>("/banks")
       return response.data
     },
+    ...queryConfig.banks,
   })
 }
 
 export function useBanksByCountry(countryCode: string) {
   return useQuery({
-    queryKey: ["banks", countryCode],
+    queryKey: queryKeys.banks.byCountry(countryCode),
     queryFn: async () => {
-      const response = await api.get<DataResponse<Bank[]>>(`/banks?country=${countryCode}`)
+      const response = await api.get<DataResponse<Bank[]>>(
+        `/banks?country=${countryCode}`
+      )
       return response.data
     },
     enabled: !!countryCode,
+    ...queryConfig.banks,
   })
 }
 
 export function useSearchBanks(query: string) {
   return useQuery({
-    queryKey: ["banks", "search", query],
+    queryKey: queryKeys.banks.search(query),
     queryFn: async () => {
-      const response = await api.get<DataResponse<Bank[]>>(`/banks?search=${encodeURIComponent(query)}`)
+      const response = await api.get<DataResponse<Bank[]>>(
+        `/banks?search=${encodeURIComponent(query)}`
+      )
       return response.data
     },
     enabled: query.length > 0,
+    ...queryConfig.banks,
   })
 }
 
 export function useBank(id: string) {
   return useQuery({
-    queryKey: ["bank", id],
+    queryKey: queryKeys.banks.detail(id),
     queryFn: async () => {
       const response = await api.get<DataResponse<Bank>>(`/banks/${id}`)
       return response.data
     },
     enabled: !!id,
+    ...queryConfig.banks,
   })
 }
 
@@ -57,7 +67,7 @@ export function useCreateBank() {
   return useMutation({
     mutationFn: (data: CreateBankInput) => api.post<Bank>("/banks", data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["banks"] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.banks.all })
     },
   })
 }
@@ -66,12 +76,19 @@ export function useUpdateBank() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateBankInput> }) =>
-      api.put<Bank>(`/banks/${id}`, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string
+      data: Partial<CreateBankInput>
+    }) => api.put<Bank>(`/banks/${id}`, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["banks"] })
-      queryClient.invalidateQueries({ queryKey: ["bank", variables.id] })
-      queryClient.invalidateQueries({ queryKey: ["accounts"] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.banks.all })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.banks.detail(variables.id),
+      })
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all })
     },
   })
 }
@@ -82,7 +99,7 @@ export function useDeleteBank() {
   return useMutation({
     mutationFn: (id: string) => api.delete(`/banks/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["banks"] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.banks.all })
     },
   })
 }

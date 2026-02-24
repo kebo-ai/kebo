@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   CategoryForm,
   type CategoryFormData,
-} from "@/components/app/categories/CategoryForm"
+} from "@/components/category-form"
 
 export default function NewCategoryPage() {
   const router = useRouter()

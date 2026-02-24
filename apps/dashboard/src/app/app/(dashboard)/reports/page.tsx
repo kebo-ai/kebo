@@ -26,6 +26,8 @@ import {
   useExpenseByCategory,
 } from "@/lib/api/hooks/use-reports"
 import type { ReportGranularity } from "@/lib/api/types"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -63,28 +65,30 @@ function SummaryCard({
   trend?: "up" | "down" | "neutral"
 }) {
   return (
-    <div className="dash-card p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-dash-text-muted">{title}</p>
-          <p className="text-2xl font-bold text-dash-text">
-            {title === "Savings Rate"
-              ? `${value.toFixed(1)}%`
-              : formatCurrency(value)}
-          </p>
+    <Card>
+      <CardContent className="pt-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">{title}</p>
+            <p className="text-2xl font-bold text-foreground">
+              {title === "Savings Rate"
+                ? `${value.toFixed(1)}%`
+                : formatCurrency(value)}
+            </p>
+          </div>
+          <div
+            className={cn(
+              "p-3 rounded-full",
+              trend === "up" && "bg-success/10 text-success",
+              trend === "down" && "bg-destructive/10 text-destructive",
+              trend === "neutral" && "bg-muted text-muted-foreground"
+            )}
+          >
+            <Icon className="h-5 w-5" />
+          </div>
         </div>
-        <div
-          className={cn(
-            "p-3 rounded-full",
-            trend === "up" && "bg-dash-success/10 text-dash-success",
-            trend === "down" && "bg-dash-error/10 text-dash-error",
-            trend === "neutral" && "bg-dash-card-hover text-dash-text-muted"
-          )}
-        >
-          <Icon className="h-5 w-5" />
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -92,21 +96,21 @@ function ReportsSkeleton() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Skeleton className="h-8 w-32 bg-dash-card-hover" />
+        <Skeleton className="h-8 w-32 bg-muted" />
         <div className="flex items-center gap-2">
-          <Skeleton className="h-10 w-10 bg-dash-card-hover" />
-          <Skeleton className="h-6 w-32 bg-dash-card-hover" />
-          <Skeleton className="h-10 w-10 bg-dash-card-hover" />
+          <Skeleton className="h-10 w-10 bg-muted" />
+          <Skeleton className="h-6 w-32 bg-muted" />
+          <Skeleton className="h-10 w-10 bg-muted" />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
-          <Skeleton key={i} className="h-24 bg-dash-card-hover" />
+          <Skeleton key={i} className="h-24 bg-muted" />
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Skeleton className="h-80 bg-dash-card-hover" />
-        <Skeleton className="h-80 bg-dash-card-hover" />
+        <Skeleton className="h-80 bg-muted" />
+        <Skeleton className="h-80 bg-muted" />
       </div>
     </div>
   )
@@ -121,13 +125,20 @@ export default function ReportsPage() {
   const periodDate = format(currentDate, "yyyy-MM-dd")
 
   // Fetch report data
-  const { data: incomeExpenseReport, isLoading: isLoadingIncomeExpense } =
-    useIncomeExpenseReport({ periodDate, granularity })
+  const {
+    data: incomeExpenseReport,
+    isLoading: isLoadingIncomeExpense,
+    isFetching: isFetchingIncomeExpense,
+  } = useIncomeExpenseReport({ periodDate, granularity })
 
-  const { data: expenseReport, isLoading: isLoadingExpense } =
-    useExpenseByCategory({ periodDate })
+  const {
+    data: expenseReport,
+    isLoading: isLoadingExpense,
+    isFetching: isFetchingExpense,
+  } = useExpenseByCategory({ periodDate })
 
   const isLoading = isLoadingIncomeExpense || isLoadingExpense
+  const isFetching = isFetchingIncomeExpense || isFetchingExpense
 
   // Navigation handlers
   const goToPreviousPeriod = () => {
@@ -153,7 +164,7 @@ export default function ReportsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold text-dash-text">Reports</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Reports</h1>
         <ReportsSkeleton />
       </div>
     )
@@ -191,7 +202,12 @@ export default function ReportsPage() {
     <div className="space-y-6">
       {/* Header with period navigation */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-dash-text">Reports</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold text-foreground">Reports</h1>
+          {isFetching && !isLoading && (
+            <div className="h-4 w-4 border-2 border-muted-foreground/30 border-t-foreground rounded-full animate-spin" />
+          )}
+        </div>
 
         <div className="flex items-center gap-4">
           {/* Granularity selector */}
@@ -199,22 +215,22 @@ export default function ReportsPage() {
             value={granularity}
             onValueChange={(v) => setGranularity(v as ReportGranularity)}
           >
-            <TabsList className="bg-dash-bg border border-dash-border rounded-lg p-1">
+            <TabsList className="bg-background border border-border rounded-lg p-1">
               <TabsTrigger
                 value="week"
-                className="rounded-md text-sm data-[state=active]:bg-dash-card data-[state=active]:text-dash-text text-dash-text-muted"
+                className="rounded-md text-sm data-[state=active]:bg-card data-[state=active]:text-foreground text-muted-foreground"
               >
                 Week
               </TabsTrigger>
               <TabsTrigger
                 value="month"
-                className="rounded-md text-sm data-[state=active]:bg-dash-card data-[state=active]:text-dash-text text-dash-text-muted"
+                className="rounded-md text-sm data-[state=active]:bg-card data-[state=active]:text-foreground text-muted-foreground"
               >
                 Month
               </TabsTrigger>
               <TabsTrigger
                 value="year"
-                className="rounded-md text-sm data-[state=active]:bg-dash-card data-[state=active]:text-dash-text text-dash-text-muted"
+                className="rounded-md text-sm data-[state=active]:bg-card data-[state=active]:text-foreground text-muted-foreground"
               >
                 Year
               </TabsTrigger>
@@ -223,16 +239,16 @@ export default function ReportsPage() {
 
           {/* Period navigation */}
           <div className="flex items-center gap-2">
-            <button onClick={goToPreviousPeriod} className="dash-btn-pill p-2">
+            <Button variant="outline" size="icon" className="rounded-full" onClick={goToPreviousPeriod}>
               <ChevronLeft className="h-4 w-4" />
-            </button>
-            <span className="min-w-[140px] text-center font-medium text-dash-text">
+            </Button>
+            <span className="min-w-[140px] text-center font-medium text-foreground">
               {incomeExpenseReport?.period_label ||
                 format(currentDate, "MMM yyyy")}
             </span>
-            <button onClick={goToNextPeriod} className="dash-btn-pill p-2">
+            <Button variant="outline" size="icon" className="rounded-full" onClick={goToNextPeriod}>
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -268,169 +284,175 @@ export default function ReportsPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Income vs Expense Bar Chart */}
-        <div className="dash-card p-6">
-          <h2 className="text-lg font-medium text-dash-text mb-2">
-            Income vs Expenses
-          </h2>
-          <p className="text-sm text-dash-text-muted mb-4">
-            Comparing income and expenses over time
-          </p>
-          {timeSeries.length > 0 ? (
-            <ChartContainer
-              config={incomeExpenseConfig}
-              className="min-h-[300px] w-full"
-            >
-              <BarChart accessibilityLayer data={timeSeries}>
-                <CartesianGrid vertical={false} stroke="hsl(214 14% 20%)" />
-                <XAxis
-                  dataKey="period_label"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tick={{ fill: "hsl(218 11% 65%)" }}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `$${value}`}
-                  tick={{ fill: "hsl(218 11% 65%)" }}
-                />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value, name) => (
-                        <div className="flex items-center justify-between gap-2">
-                          <span>{name}</span>
-                          <span className="font-mono font-medium">
-                            {formatCurrency(Number(value))}
-                          </span>
-                        </div>
-                      )}
-                    />
-                  }
-                />
-                <ChartLegend content={<ChartLegendContent />} />
-                <Bar
-                  dataKey="income"
-                  fill="var(--color-income)"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="expense"
-                  fill="var(--color-expense)"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ChartContainer>
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-dash-text-muted">
-              No data for this period
-            </div>
-          )}
-        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <h2 className="text-lg font-medium text-foreground mb-2">
+              Income vs Expenses
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Comparing income and expenses over time
+            </p>
+            {timeSeries.length > 0 ? (
+              <ChartContainer
+                config={incomeExpenseConfig}
+                className="min-h-[300px] w-full"
+              >
+                <BarChart accessibilityLayer data={timeSeries}>
+                  <CartesianGrid vertical={false} stroke="hsl(214 14% 20%)" />
+                  <XAxis
+                    dataKey="period_label"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    tick={{ fill: "hsl(218 11% 65%)" }}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `$${value}`}
+                    tick={{ fill: "hsl(218 11% 65%)" }}
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value, name) => (
+                          <div className="flex items-center justify-between gap-2">
+                            <span>{name}</span>
+                            <span className="font-mono font-medium">
+                              {formatCurrency(Number(value))}
+                            </span>
+                          </div>
+                        )}
+                      />
+                    }
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Bar
+                    dataKey="income"
+                    fill="var(--color-income)"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="expense"
+                    fill="var(--color-expense)"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                No data for this period
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Expense by Category Pie Chart */}
-        <div className="dash-card p-6">
-          <h2 className="text-lg font-medium text-dash-text mb-2">
-            Expenses by Category
-          </h2>
-          <p className="text-sm text-dash-text-muted mb-4">
-            Breakdown of spending by category
-          </p>
-          {expenseCategories.length > 0 ? (
-            <ChartContainer
-              config={expenseCategoryConfig}
-              className="min-h-[300px] w-full"
-            >
-              <PieChart>
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value, name) => (
-                        <div className="flex items-center justify-between gap-2">
-                          <span>{name}</span>
-                          <span className="font-mono font-medium">
-                            {formatCurrency(Number(value))}
-                          </span>
-                        </div>
-                      )}
-                    />
-                  }
-                />
-                <Pie
-                  data={expenseCategories}
-                  dataKey="amount"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  strokeWidth={2}
-                >
-                  {expenseCategories.map((entry) => (
-                    <Cell
-                      key={entry.id}
-                      fill={entry.bar_color}
-                      stroke="hsl(210 22% 8%)"
-                    />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ChartContainer>
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-dash-text-muted">
-              No expenses for this period
-            </div>
-          )}
-        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <h2 className="text-lg font-medium text-foreground mb-2">
+              Expenses by Category
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Breakdown of spending by category
+            </p>
+            {expenseCategories.length > 0 ? (
+              <ChartContainer
+                config={expenseCategoryConfig}
+                className="min-h-[300px] w-full"
+              >
+                <PieChart>
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value, name) => (
+                          <div className="flex items-center justify-between gap-2">
+                            <span>{name}</span>
+                            <span className="font-mono font-medium">
+                              {formatCurrency(Number(value))}
+                            </span>
+                          </div>
+                        )}
+                      />
+                    }
+                  />
+                  <Pie
+                    data={expenseCategories}
+                    dataKey="amount"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    strokeWidth={2}
+                  >
+                    {expenseCategories.map((entry) => (
+                      <Cell
+                        key={entry.id}
+                        fill={entry.bar_color}
+                        stroke="hsl(210 22% 8%)"
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ChartContainer>
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                No expenses for this period
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Category breakdown list */}
-      <div className="dash-card p-6">
-        <h2 className="text-lg font-medium text-dash-text mb-4">
-          Category Breakdown
-        </h2>
-        {expenseCategories.length > 0 ? (
-          <div className="space-y-4">
-            {expenseCategories.map((category) => (
-              <div key={category.id} className="flex items-center gap-4">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                  style={{ backgroundColor: category.bar_color + "20" }}
-                >
-                  {category.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium text-dash-text-secondary truncate">
-                      {category.name}
-                    </span>
-                    <span className="text-sm text-dash-text-muted">
-                      {formatCurrency(category.amount)}
-                    </span>
+      <Card>
+        <CardContent className="pt-6">
+          <h2 className="text-lg font-medium text-foreground mb-4">
+            Category Breakdown
+          </h2>
+          {expenseCategories.length > 0 ? (
+            <div className="space-y-4">
+              {expenseCategories.map((category) => (
+                <div key={category.id} className="flex items-center gap-4">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                    style={{ backgroundColor: category.bar_color + "20" }}
+                  >
+                    {category.icon}
                   </div>
-                  <div className="h-2 bg-dash-border rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all"
-                      style={{
-                        width: `${category.percentage * 100}%`,
-                        backgroundColor: category.bar_color,
-                      }}
-                    />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-foreground truncate">
+                        {category.name}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {formatCurrency(category.amount)}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-border rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${category.percentage * 100}%`,
+                          backgroundColor: category.bar_color,
+                        }}
+                      />
+                    </div>
                   </div>
+                  <span className="text-sm font-medium text-muted-foreground w-16 text-right">
+                    {formatPercentage(category.percentage)}
+                  </span>
                 </div>
-                <span className="text-sm font-medium text-dash-text-muted w-16 text-right">
-                  {formatPercentage(category.percentage)}
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-dash-text-muted py-8">
-            No expense data for this period
-          </p>
-        )}
-      </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground py-8">
+              No expense data for this period
+            </p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

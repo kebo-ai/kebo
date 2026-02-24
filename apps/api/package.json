@@ -4,12 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "dev:remote": "wrangler dev --remote",
+    "dev": "bun --watch src/dev.ts",
     "build": "esbuild src/index.ts --bundle --format=esm --platform=node --outdir=dist --packages=external --alias:@=./src",
-    "build:workers": "wrangler deploy --dry-run --outdir=dist",
-    "deploy": "wrangler deploy",
-    "deploy:staging": "wrangler deploy --env staging",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
@@ -34,11 +30,9 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241127.0",
     "@types/node": "^22.0.0",
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.28.0",
-    "typescript": "^5.7.0",
-    "wrangler": "^3.91.0"
+    "typescript": "^5.7.0"
   }
 }

@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { useCreateBank } from "@/lib/api/hooks/use-banks"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BankForm, type BankFormData } from "@/components/app/banks/BankForm"
+import { BankForm, type BankFormData } from "@/components/bank-form"
 
 export default function NewBankPage() {
   const router = useRouter()

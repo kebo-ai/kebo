@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   BudgetForm,
   type BudgetFormData,
-} from "@/components/app/budgets/BudgetForm"
+} from "@/components/budget-form"
 
 export default function NewBudgetPage() {
   const router = useRouter()

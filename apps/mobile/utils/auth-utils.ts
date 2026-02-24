@@ -5,12 +5,12 @@ import logger from "./logger";
 
 export const isUserAuthenticated = async (): Promise<boolean> => {
   try {
-    const { data, error } = await supabase.auth.getSession();
+    const { data, error } = await supabase.auth.getUser();
     if (error) {
-      logger.error("Error getting session:", error);
+      logger.error("Error getting user:", error);
       return false;
     }
-    return !!data.session?.access_token;
+    return !!data.user;
   } catch (err) {
     logger.error("Error in authentication:", err);
     return false;
@@ -25,13 +25,6 @@ export const subscribeAuthChanges = (callback: (isAuthenticated: boolean) => voi
 
 export const getUserInfo = async (rootStore: RootStore): Promise<any | null> => {
   try {
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-
-    if (sessionError || !sessionData.session) {
-      logger.error("Error getting session or user not authenticated:", sessionError);
-      return null;
-    }
-
     const { data: userData, error: userError } = await supabase.auth.getUser();
 
     if (userError) {

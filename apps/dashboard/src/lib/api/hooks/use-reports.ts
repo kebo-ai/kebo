@@ -1,7 +1,9 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, keepPreviousData } from "@tanstack/react-query"
 import { api } from "../client"
+import { queryKeys } from "../keys"
+import { queryConfig } from "../query-config"
 import type {
   IncomeExpenseReport,
   ExpenseReportByCategory,
@@ -17,9 +19,6 @@ interface ExpenseByCategoryParams {
   periodDate?: string // YYYY-MM-DD format
 }
 
-/**
- * Get comprehensive income vs expense report with time series
- */
 export function useIncomeExpenseReport(params?: IncomeExpenseParams) {
   const searchParams = new URLSearchParams()
 
@@ -30,14 +29,15 @@ export function useIncomeExpenseReport(params?: IncomeExpenseParams) {
   const endpoint = `/reports/income-expense${queryString ? `?${queryString}` : ""}`
 
   return useQuery({
-    queryKey: ["reports", "income-expense", params],
+    queryKey: queryKeys.reports.incomeExpense(
+      params as Record<string, unknown>
+    ),
     queryFn: () => api.get<IncomeExpenseReport>(endpoint),
+    ...queryConfig.reports,
+    placeholderData: keepPreviousData,
   })
 }
 
-/**
- * Get expense breakdown by category for a specific month
- */
 export function useExpenseByCategory(params?: ExpenseByCategoryParams) {
   const searchParams = new URLSearchParams()
 
@@ -47,7 +47,11 @@ export function useExpenseByCategory(params?: ExpenseByCategoryParams) {
   const endpoint = `/reports/expense-by-category${queryString ? `?${queryString}` : ""}`
 
   return useQuery({
-    queryKey: ["reports", "expense-by-category", params],
+    queryKey: queryKeys.reports.expenseByCategory(
+      params as Record<string, unknown>
+    ),
     queryFn: () => api.get<ExpenseReportByCategory>(endpoint),
+    ...queryConfig.reports,
+    placeholderData: keepPreviousData,
   })
 }

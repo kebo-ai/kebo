@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
+import { useQueryState, parseAsString, parseAsInteger } from "nuqs"
 import { format } from "date-fns"
 import {
   ArrowDownCircle,
@@ -126,18 +126,16 @@ function TransactionSkeleton() {
 
 export default function TransactionsPage() {
 
-  const [filters, setFilters] = useState({
-    account_id: "",
-    category_id: "",
-    transaction_type: "",
-    search: "",
-  })
-  const [page, setPage] = useState(1)
+  const [accountId, setAccountId] = useQueryState("account", parseAsString)
+  const [categoryId, setCategoryId] = useQueryState("category", parseAsString)
+  const [transactionType, setTransactionType] = useQueryState("type", parseAsString)
+  const [search, setSearch] = useQueryState("q", parseAsString)
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
 
-  const { data, isLoading } = useTransactions({
-    account_id: filters.account_id || undefined,
-    category_id: filters.category_id || undefined,
-    transaction_type: filters.transaction_type || undefined,
+  const { data, isLoading, isFetching } = useTransactions({
+    account_id: accountId || undefined,
+    category_id: categoryId || undefined,
+    transaction_type: transactionType || undefined,
     limit: 20,
     offset: (page - 1) * 20,
   })
@@ -149,23 +147,25 @@ export default function TransactionsPage() {
   const totalPages = Math.ceil((data?.total || 0) / 20)
 
   const clearFilters = () => {
-    setFilters({
-      account_id: "",
-      category_id: "",
-      transaction_type: "",
-      search: "",
-    })
+    setAccountId(null)
+    setCategoryId(null)
+    setTransactionType(null)
+    setSearch(null)
     setPage(1)
   }
 
-  const hasActiveFilters =
-    filters.account_id || filters.category_id || filters.transaction_type
+  const hasActiveFilters = accountId || categoryId || transactionType
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-foreground">Transactions</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold text-foreground">Transactions</h1>
+          {isFetching && !isLoading && (
+            <div className="h-4 w-4 border-2 border-muted-foreground/30 border-t-foreground rounded-full animate-spin" />
+          )}
+        </div>
         <Button className="rounded-full" asChild>
           <Link href="/app/transactions/new">
             <Plus className="h-4 w-4" />
@@ -183,9 +183,9 @@ export default function TransactionsPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
               <Input
                 placeholder="Search transactions..."
-                value={filters.search}
+                value={search ?? ""}
                 onChange={(e) =>
-                  setFilters((f) => ({ ...f, search: e.target.value }))
+                  setSearch(e.target.value || null)
                 }
                 className="pl-9"
               />
@@ -193,13 +193,11 @@ export default function TransactionsPage() {
 
             {/* Type Filter */}
             <Select
-              value={filters.transaction_type || "all"}
-              onValueChange={(value) =>
-                setFilters((f) => ({
-                  ...f,
-                  transaction_type: value === "all" ? "" : value,
-                }))
-              }
+              value={transactionType ?? "all"}
+              onValueChange={(value) => {
+                setTransactionType(value === "all" ? null : value)
+                setPage(1)
+              }}
             >
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="All Types" />
@@ -222,13 +220,11 @@ export default function TransactionsPage() {
 
             {/* Account Filter */}
             <Select
-              value={filters.account_id || "all"}
-              onValueChange={(value) =>
-                setFilters((f) => ({
-                  ...f,
-                  account_id: value === "all" ? "" : value,
-                }))
-              }
+              value={accountId ?? "all"}
+              onValueChange={(value) => {
+                setAccountId(value === "all" ? null : value)
+                setPage(1)
+              }}
             >
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="All Accounts" />
@@ -250,13 +246,11 @@ export default function TransactionsPage() {
 
             {/* Category Filter */}
             <Select
-              value={filters.category_id || "all"}
-              onValueChange={(value) =>
-                setFilters((f) => ({
-                  ...f,
-                  category_id: value === "all" ? "" : value,
-                }))
-              }
+              value={categoryId ?? "all"}
+              onValueChange={(value) => {
+                setCategoryId(value === "all" ? null : value)
+                setPage(1)
+              }}
             >
               <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="All Categories" />
@@ -322,7 +316,7 @@ export default function TransactionsPage() {
                     <Button
                       variant="outline"
                       className="rounded-full"
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      onClick={() => setPage(Math.max(1, page - 1))}
                       disabled={page === 1}
                     >
                       <ChevronLeft className="h-4 w-4" />
@@ -331,7 +325,7 @@ export default function TransactionsPage() {
                     <Button
                       variant="outline"
                       className="rounded-full"
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      onClick={() => setPage(Math.min(totalPages, page + 1))}
                       disabled={page === totalPages}
                     >
                       Next

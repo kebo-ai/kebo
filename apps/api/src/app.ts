@@ -25,6 +25,7 @@ export function createApp() {
     cors({
       origin: [
         "https://kebo.app",
+        "https://my.kebo.app",
         "http://localhost:3000",
         "http://localhost:8081",
       ],

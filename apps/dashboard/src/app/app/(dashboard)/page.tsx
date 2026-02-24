@@ -1,41 +1,62 @@
-"use client"
+import {
+  QueryClient,
+  dehydrate,
+  HydrationBoundary,
+} from "@tanstack/react-query"
+import { createClient } from "@/lib/auth/server"
+import { createServerApi } from "@/lib/api/server"
+import { queryKeys } from "@/lib/api/keys"
+import type { UserBalance, Account, Transaction } from "@/lib/api/types"
+import { DashboardContent } from "./dashboard-content"
 
-import { useAuth } from "@/lib/auth/hooks"
-import { BalanceCard } from "@/components/balance-card"
-import { QuickActions } from "@/components/quick-actions"
-import { AccountsPanel } from "@/components/accounts-panel"
-import { RecentTransactions } from "@/components/recent-transactions"
-import { KeboWiseCard } from "@/components/kebo-wise-card"
+interface DataResponse<T> {
+  data: T
+}
 
-export default function DashboardPage() {
-  const { user } = useAuth()
+interface TransactionsResponse {
+  data: Transaction[]
+  total: number
+}
 
-  const firstName = user?.user_metadata?.full_name?.split(" ")[0] || "there"
+export default async function DashboardPage() {
+  const supabase = await createClient()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-  return (
-    <div className="space-y-6">
-      {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-foreground">
-          Welcome, {firstName}
-        </h1>
-        <QuickActions />
-      </div>
+  const user = session?.user
+  const firstName =
+    user?.user_metadata?.full_name?.split(" ")[0] || "there"
 
-      {/* Main Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left Column - Balance & Transactions */}
-        <div className="lg:col-span-2 space-y-6">
-          <BalanceCard />
-          <RecentTransactions />
-        </div>
+  if (session?.access_token) {
+    const api = createServerApi(session.access_token)
+    const queryClient = new QueryClient()
 
-        {/* Right Column - Accounts & Kebo Wise */}
-        <div className="space-y-6">
-          <AccountsPanel />
-          <KeboWiseCard />
-        </div>
-      </div>
-    </div>
-  )
+    await Promise.all([
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.balance.all,
+        queryFn: () => api.get<UserBalance>("/transactions/balance"),
+      }),
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.transactions.list({ limit: 5 } as Record<string, unknown>),
+        queryFn: () =>
+          api.get<TransactionsResponse>("/transactions?limit=5"),
+      }),
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.accounts.list(),
+        queryFn: async () => {
+          const response = await api.get<DataResponse<Account[]>>("/accounts")
+          return response.data
+        },
+      }),
+    ])
+
+    return (
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <DashboardContent firstName={firstName} />
+      </HydrationBoundary>
+    )
+  }
+
+  return <DashboardContent firstName={firstName} />
 }

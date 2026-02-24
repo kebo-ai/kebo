@@ -27,19 +27,28 @@ export default function NewTransactionPage() {
 
   const isLoading = createTransaction.isPending || createTransfer.isPending
 
-  const handleSubmit = async (data: TransactionFormData) => {
-    try {
-      if (data.transaction_type === "Transfer") {
-        await createTransfer.mutateAsync({
+  const handleSubmit = (data: TransactionFormData) => {
+    const toastCallbacks = {
+      onSuccess: () => toast.success("Transaction created successfully!"),
+      onError: (error: Error) =>
+        toast.error(error.message || "Failed to create transaction"),
+    }
+
+    if (data.transaction_type === "Transfer") {
+      createTransfer.mutate(
+        {
           from_account_id: data.account_id,
           to_account_id: data.to_account_id!,
           amount: parseFloat(data.amount),
           currency: "USD",
           date: data.date.toISOString(),
           description: data.description,
-        })
-      } else {
-        await createTransaction.mutateAsync({
+        },
+        toastCallbacks
+      )
+    } else {
+      createTransaction.mutate(
+        {
           account_id: data.account_id,
           amount: parseFloat(data.amount),
           currency: "USD",
@@ -47,16 +56,12 @@ export default function NewTransactionPage() {
           date: data.date.toISOString(),
           description: data.description,
           category_id: data.category_id || undefined,
-        })
-      }
-
-      toast.success("Transaction created successfully!")
-      router.push(`/app/transactions`)
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create transaction"
+        },
+        toastCallbacks
       )
     }
+
+    router.push("/app/transactions")
   }
 
   const handleCancel = () => {

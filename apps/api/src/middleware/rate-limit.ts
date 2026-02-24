@@ -28,7 +28,7 @@ export const rateLimitMiddleware = createMiddleware<AppEnv>(async (c, next) => {
 
   const userId = c.get("userId")
   const identifier =
-    userId || c.req.header("x-forwarded-for") || c.req.header("cf-connecting-ip") || "anonymous"
+    userId || c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || "anonymous"
 
   const { success, limit, remaining, reset } = await ratelimit.limit(identifier)
 
@@ -81,7 +81,7 @@ export const adminRateLimitMiddleware = createMiddleware<AppEnv>(async (c, next)
   )
 
   const identifier =
-    `admin:${c.req.header("x-forwarded-for") || c.req.header("cf-connecting-ip") || "anonymous"}`
+    `admin:${c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || "anonymous"}`
 
   const { success, limit, remaining, reset } = await ratelimit.limit(identifier)
 

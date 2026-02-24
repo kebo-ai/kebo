@@ -125,13 +125,20 @@ export default function ReportsPage() {
   const periodDate = format(currentDate, "yyyy-MM-dd")
 
   // Fetch report data
-  const { data: incomeExpenseReport, isLoading: isLoadingIncomeExpense } =
-    useIncomeExpenseReport({ periodDate, granularity })
+  const {
+    data: incomeExpenseReport,
+    isLoading: isLoadingIncomeExpense,
+    isFetching: isFetchingIncomeExpense,
+  } = useIncomeExpenseReport({ periodDate, granularity })
 
-  const { data: expenseReport, isLoading: isLoadingExpense } =
-    useExpenseByCategory({ periodDate })
+  const {
+    data: expenseReport,
+    isLoading: isLoadingExpense,
+    isFetching: isFetchingExpense,
+  } = useExpenseByCategory({ periodDate })
 
   const isLoading = isLoadingIncomeExpense || isLoadingExpense
+  const isFetching = isFetchingIncomeExpense || isFetchingExpense
 
   // Navigation handlers
   const goToPreviousPeriod = () => {
@@ -195,7 +202,12 @@ export default function ReportsPage() {
     <div className="space-y-6">
       {/* Header with period navigation */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-foreground">Reports</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold text-foreground">Reports</h1>
+          {isFetching && !isLoading && (
+            <div className="h-4 w-4 border-2 border-muted-foreground/30 border-t-foreground rounded-full animate-spin" />
+          )}
+        </div>
 
         <div className="flex items-center gap-4">
           {/* Granularity selector */}

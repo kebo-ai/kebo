@@ -4,10 +4,12 @@ import { createMiddleware } from "hono/factory"
 import type { AppEnv } from "@/types/env"
 
 function createRatelimiter(
-  url: string,
-  token: string,
+  url: string | undefined,
+  token: string | undefined,
   limiter: ReturnType<typeof Ratelimit.slidingWindow>,
 ) {
+  if (!url || !token) return null
+
   return new Ratelimit({
     redis: new Redis({ url, token }),
     limiter,
@@ -25,6 +27,11 @@ export const rateLimitMiddleware = createMiddleware<AppEnv>(async (c, next) => {
     c.env.UPSTASH_REDIS_REST_TOKEN,
     Ratelimit.slidingWindow(60, "60 s"),
   )
+
+  if (!ratelimit) {
+    await next()
+    return
+  }
 
   const userId = c.get("userId")
   const identifier =
@@ -54,6 +61,11 @@ export const aiRateLimitMiddleware = createMiddleware<AppEnv>(async (c, next) =>
     Ratelimit.slidingWindow(10, "60 s"),
   )
 
+  if (!ratelimit) {
+    await next()
+    return
+  }
+
   const userId = c.get("userId")
   const identifier = `ai:${userId || "anonymous"}`
 
@@ -79,6 +91,11 @@ export const adminRateLimitMiddleware = createMiddleware<AppEnv>(async (c, next)
     c.env.UPSTASH_REDIS_REST_TOKEN,
     Ratelimit.slidingWindow(5, "60 s"),
   )
+
+  if (!ratelimit) {
+    await next()
+    return
+  }
 
   const identifier =
     `admin:${c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || "anonymous"}`

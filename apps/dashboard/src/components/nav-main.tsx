@@ -11,6 +11,7 @@ import {
   Building2,
   type LucideIcon,
 } from "lucide-react"
+import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   SidebarGroup,
@@ -50,10 +51,10 @@ export function NavMain() {
             return (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton asChild isActive={isActive}>
-                  <a href={fullHref}>
+                  <Link href={fullHref}>
                     <item.icon />
                     <span>{item.label}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )

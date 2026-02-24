@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import type { User } from "@supabase/supabase-js"
 import {
   Sidebar,
@@ -23,7 +24,7 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="/app">
+              <Link href="/app">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-kebo-500 to-kebo-600 text-white font-bold shadow-lg shadow-kebo-500/20">
                   K
                 </div>
@@ -33,7 +34,7 @@ export function AppSidebar({
                     Finance
                   </span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

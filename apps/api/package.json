@@ -7,6 +7,7 @@
     "dev": "bun --watch src/dev.ts",
     "build": "esbuild src/index.ts --bundle --format=esm --platform=node --outdir=dist --packages=external --alias:@=./src",
     "typecheck": "tsc --noEmit",
+    "build:types": "tsc --build",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",

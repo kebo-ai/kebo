@@ -6,8 +6,6 @@ import { authMiddleware, aiRateLimitMiddleware } from "@/middleware"
 import { AIService } from "@/services/ai.service"
 import type { AppEnv } from "@/types/env"
 
-const app = new OpenAPIHono<AppEnv>()
-
 // Schemas
 const CreateReportSchema = z.object({
   message: z.record(z.unknown()),
@@ -85,9 +83,7 @@ const listConversationsRoute = createRoute({
   request: {
     query: ConversationListSchema,
   },
-  responses: {
-    200: { description: "List of conversations" },
-  },
+  responses: { 200: { description: "List of conversations" } },
 })
 
 const getConversationRoute = createRoute({
@@ -106,149 +102,136 @@ const getConversationRoute = createRoute({
 })
 
 // Apply auth middleware + stricter rate limit for AI (10 req/min)
-app.use("/*", authMiddleware)
-app.use("/*", aiRateLimitMiddleware)
+const base = new OpenAPIHono<AppEnv>()
+base.use("/*", authMiddleware)
+base.use("/*", aiRateLimitMiddleware)
 
-// Report creation (unchanged)
-app.openapi(createReportRoute, async (c) => {
-  const userId = c.get("userId")
-  const body = c.req.valid("json")
-  const db = c.get("db")
+const app = base
+  .openapi(createReportRoute, async (c) => {
+    const userId = c.get("userId")
+    const body = c.req.valid("json")
+    const db = c.get("db")
 
-  const [report] = await db
-    .insert(aiReports)
-    .values({
-      user_id: userId,
-      message: body.message,
-      report_message: body.reportMessage,
-    })
-    .returning()
+    const [report] = await db
+      .insert(aiReports)
+      .values({
+        user_id: userId,
+        message: body.message,
+        report_message: body.reportMessage,
+      })
+      .returning()
 
-  return c.json(report, 201)
-})
+    return c.json(report, 201)
+  })
+  .openapi(chatRoute, async (c) => {
+    const userId = c.get("userId")
+    const body = c.req.valid("json")
+    const db = c.get("db")
 
-// Non-streaming chat (for backward compatibility)
-app.openapi(chatRoute, async (c) => {
-  const userId = c.get("userId")
-  const body = c.req.valid("json")
-  const db = c.get("db")
-
-  try {
-    const { content, conversationId } = await AIService.chat({
-      db,
-      userId,
-      message: body.message,
-      conversationId: body.conversation_id,
-      apiKey: c.env.AI_GATEWAY_API_KEY,
-    })
-
-    return c.json({
-      message: {
-        role: "assistant",
-        content,
-      },
-      conversation_id: conversationId,
-    })
-  } catch (error) {
-    console.error("Chat error:", error)
-    return c.json({ error: "AI service error" }, 500)
-  }
-})
-
-// Streaming chat endpoint
-app.openapi(chatStreamRoute, async (c) => {
-  const userId = c.get("userId")
-  const body = c.req.valid("json")
-  const db = c.get("db")
-
-  try {
-    const { result, conversationId, saveResponse } = await AIService.streamChat(
-      {
+    try {
+      const { content, conversationId } = await AIService.chat({
         db,
         userId,
         message: body.message,
         conversationId: body.conversation_id,
         apiKey: c.env.AI_GATEWAY_API_KEY,
-      },
-    )
+      })
 
-    let fullResponse = ""
+      return c.json({
+        message: {
+          role: "assistant",
+          content,
+        },
+        conversation_id: conversationId,
+      })
+    } catch (error) {
+      console.error("Chat error:", error)
+      return c.json({ error: "AI service error" }, 500)
+    }
+  })
+  .openapi(chatStreamRoute, async (c) => {
+    const userId = c.get("userId")
+    const body = c.req.valid("json")
+    const db = c.get("db")
 
-    // Return SSE stream
-    return stream(c, async (stream) => {
-      // Set headers for SSE
-      c.header("Content-Type", "text/event-stream")
-      c.header("Cache-Control", "no-cache")
-      c.header("Connection", "keep-alive")
-
-      // Send conversation_id first
-      await stream.write(
-        `data: ${JSON.stringify({ type: "conversation_id", conversation_id: conversationId })}\n\n`,
+    try {
+      const { result, conversationId, saveResponse } = await AIService.streamChat(
+        {
+          db,
+          userId,
+          message: body.message,
+          conversationId: body.conversation_id,
+          apiKey: c.env.AI_GATEWAY_API_KEY,
+        },
       )
 
-      // Stream text chunks
-      for await (const textPart of result.textStream) {
-        fullResponse += textPart
+      let fullResponse = ""
+
+      return stream(c, async (stream) => {
+        c.header("Content-Type", "text/event-stream")
+        c.header("Cache-Control", "no-cache")
+        c.header("Connection", "keep-alive")
+
         await stream.write(
-          `data: ${JSON.stringify({ type: "text", content: textPart })}\n\n`,
+          `data: ${JSON.stringify({ type: "conversation_id", conversation_id: conversationId })}\n\n`,
         )
-      }
 
-      // Send done event
-      await stream.write(`data: ${JSON.stringify({ type: "done" })}\n\n`)
+        for await (const textPart of result.textStream) {
+          fullResponse += textPart
+          await stream.write(
+            `data: ${JSON.stringify({ type: "text", content: textPart })}\n\n`,
+          )
+        }
 
-      // Save complete response to database
-      await saveResponse(fullResponse)
-    })
-  } catch (error) {
-    console.error("Stream error:", error)
-    return c.json({ error: "AI service error" }, 500)
-  }
-})
+        await stream.write(`data: ${JSON.stringify({ type: "done" })}\n\n`)
 
-// List conversations
-app.openapi(listConversationsRoute, async (c) => {
-  const userId = c.get("userId")
-  const { page, limit } = c.req.valid("query")
-  const db = c.get("db")
-  const offset = (page - 1) * limit
+        await saveResponse(fullResponse)
+      })
+    } catch (error) {
+      console.error("Stream error:", error)
+      return c.json({ error: "AI service error" }, 500)
+    }
+  })
+  .openapi(listConversationsRoute, async (c) => {
+    const userId = c.get("userId")
+    const { page, limit } = c.req.valid("query")
+    const db = c.get("db")
+    const offset = (page - 1) * limit
 
-  const conversations = await db
-    .select()
-    .from(chatConversations)
-    .where(eq(chatConversations.user_id, userId))
-    .orderBy(desc(chatConversations.updated_at))
-    .limit(limit)
-    .offset(offset)
+    const conversations = await db
+      .select()
+      .from(chatConversations)
+      .where(eq(chatConversations.user_id, userId))
+      .orderBy(desc(chatConversations.updated_at))
+      .limit(limit)
+      .offset(offset)
 
-  return c.json({ conversations, page, limit })
-})
+    return c.json({ conversations, page, limit })
+  })
+  .openapi(getConversationRoute, async (c) => {
+    const userId = c.get("userId")
+    const { id } = c.req.valid("param")
+    const db = c.get("db")
 
-// Get conversation with messages
-app.openapi(getConversationRoute, async (c) => {
-  const userId = c.get("userId")
-  const { id } = c.req.valid("param")
-  const db = c.get("db")
+    const [conversation] = await db
+      .select()
+      .from(chatConversations)
+      .where(
+        and(eq(chatConversations.id, id), eq(chatConversations.user_id, userId)),
+      )
+      .limit(1)
 
-  const [conversation] = await db
-    .select()
-    .from(chatConversations)
-    .where(
-      and(eq(chatConversations.id, id), eq(chatConversations.user_id, userId)),
-    )
-    .limit(1)
+    if (!conversation) {
+      return c.json({ error: "Conversation not found" }, 404)
+    }
 
-  if (!conversation) {
-    return c.json({ error: "Conversation not found" }, 404)
-  }
+    const messages = await db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.conversation_id, id))
+      .orderBy(chatMessages.created_at)
 
-  const messages = await db
-    .select()
-    .from(chatMessages)
-    .where(eq(chatMessages.conversation_id, id))
-    .orderBy(chatMessages.created_at)
-
-  return c.json({ conversation, messages })
-})
+    return c.json({ conversation, messages })
+  })
 
 export default app

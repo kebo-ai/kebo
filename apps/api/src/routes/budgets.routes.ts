@@ -4,8 +4,6 @@ import { authMiddleware } from "@/middleware"
 import { BudgetService } from "@/services"
 import type { AppEnv } from "@/types/env"
 
-const app = new OpenAPIHono<AppEnv>()
-
 const BudgetParamsSchema = z.object({
   id: z.string().uuid(),
 })
@@ -73,56 +71,54 @@ const categoryDetailsRoute = createRoute({
   responses: { 200: { description: "Category details with transactions" } },
 })
 
-app.use("/*", authMiddleware)
+const base = new OpenAPIHono<AppEnv>()
+base.use("/*", authMiddleware)
 
-app.openapi(listRoute, async (c) => {
-  const userId = c.get("userId")
-  const budgets = await BudgetService.list(c.get("db"), userId)
-  return c.json({ data: budgets }, 200)
-})
-
-app.openapi(getRoute, async (c) => {
-  const userId = c.get("userId")
-  const { id } = c.req.valid("param")
-  const budget = await BudgetService.getById(c.get("db"), userId, id)
-  if (!budget) {
-    return c.json({ error: "Budget not found" }, 404)
-  }
-  return c.json(budget, 200)
-})
-
-app.openapi(upsertRoute, async (c) => {
-  const userId = c.get("userId")
-  const body = c.req.valid("json")
-  const budget = await BudgetService.upsert(c.get("db"), userId, body)
-  return c.json(budget, 200)
-})
-
-app.openapi(deleteRoute, async (c) => {
-  const userId = c.get("userId")
-  const { id } = c.req.valid("param")
-  try {
-    await BudgetService.delete(c.get("db"), userId, id)
-    return c.json({ success: true }, 200)
-  } catch {
-    return c.json({ error: "Budget not found" }, 404)
-  }
-})
-
-app.openapi(categoryDetailsRoute, async (c) => {
-  const userId = c.get("userId")
-  const { budgetId, categoryId } = c.req.valid("param")
-  try {
-    const details = await BudgetService.getCategoryDetails(
-      c.get("db"),
-      userId,
-      budgetId,
-      categoryId,
-    )
-    return c.json(details, 200)
-  } catch (error) {
-    return c.json({ error: (error as Error).message }, 404)
-  }
-})
+const app = base
+  .openapi(listRoute, async (c) => {
+    const userId = c.get("userId")
+    const budgets = await BudgetService.list(c.get("db"), userId)
+    return c.json({ data: budgets }, 200)
+  })
+  .openapi(getRoute, async (c) => {
+    const userId = c.get("userId")
+    const { id } = c.req.valid("param")
+    const budget = await BudgetService.getById(c.get("db"), userId, id)
+    if (!budget) {
+      return c.json({ error: "Budget not found" }, 404)
+    }
+    return c.json(budget, 200)
+  })
+  .openapi(upsertRoute, async (c) => {
+    const userId = c.get("userId")
+    const body = c.req.valid("json")
+    const budget = await BudgetService.upsert(c.get("db"), userId, body)
+    return c.json(budget, 200)
+  })
+  .openapi(deleteRoute, async (c) => {
+    const userId = c.get("userId")
+    const { id } = c.req.valid("param")
+    try {
+      await BudgetService.delete(c.get("db"), userId, id)
+      return c.json({ success: true }, 200)
+    } catch {
+      return c.json({ error: "Budget not found" }, 404)
+    }
+  })
+  .openapi(categoryDetailsRoute, async (c) => {
+    const userId = c.get("userId")
+    const { budgetId, categoryId } = c.req.valid("param")
+    try {
+      const details = await BudgetService.getCategoryDetails(
+        c.get("db"),
+        userId,
+        budgetId,
+        categoryId,
+      )
+      return c.json(details, 200)
+    } catch (error) {
+      return c.json({ error: (error as Error).message }, 404)
+    }
+  })
 
 export default app

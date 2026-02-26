@@ -6,7 +6,7 @@ import {
   useQueryClient,
   keepPreviousData,
 } from "@tanstack/react-query"
-import { api } from "../client"
+import { getApiClient, unwrap } from "../rpc"
 import { markMutationSettled } from "@/lib/realtime/invalidation-tracker"
 import { queryKeys } from "../keys"
 import { queryConfig } from "../query-config"
@@ -18,6 +18,8 @@ import type {
   Category,
   UserBalance,
 } from "../types"
+
+const client = getApiClient()
 
 interface TransactionFilters {
   account_id?: string
@@ -34,22 +36,26 @@ interface TransactionsResponse {
 }
 
 export function useTransactions(filters?: TransactionFilters) {
-  const params = new URLSearchParams()
-
-  if (filters?.account_id) params.set("account_id", filters.account_id)
-  if (filters?.category_id) params.set("category_id", filters.category_id)
-  if (filters?.transaction_type)
-    params.set("transaction_type", filters.transaction_type)
-  if (filters?.month) params.set("month", filters.month)
-  if (filters?.limit) params.set("limit", String(filters.limit))
-  if (filters?.offset) params.set("offset", String(filters.offset))
-
-  const queryString = params.toString()
-  const endpoint = `/transactions${queryString ? `?${queryString}` : ""}`
-
   return useQuery({
     queryKey: queryKeys.transactions.list(filters as Record<string, unknown>),
-    queryFn: () => api.get<TransactionsResponse>(endpoint),
+    queryFn: async () =>
+      unwrap<TransactionsResponse>(
+        await client.transactions.$get({
+          query: {
+            page: filters?.offset
+              ? Math.floor(filters.offset / (filters?.limit || 20)) + 1
+              : undefined,
+            limit: filters?.limit,
+            transactionType: filters?.transaction_type as
+              | "Income"
+              | "Expense"
+              | "Transfer"
+              | undefined,
+            accountIds: filters?.account_id,
+            categoryIds: filters?.category_id,
+          },
+        })
+      ),
     ...queryConfig.transactions,
     placeholderData: keepPreviousData,
   })
@@ -62,7 +68,10 @@ export function useRecentTransactions(limit: number = 5) {
 export function useTransaction(id: string) {
   return useQuery({
     queryKey: queryKeys.transactions.detail(id),
-    queryFn: () => api.get<Transaction>(`/transactions/${id}`),
+    queryFn: async () =>
+      unwrap<Transaction>(
+        await client.transactions[":id"].$get({ param: { id } })
+      ),
     enabled: !!id,
     ...queryConfig.transactions,
   })
@@ -72,8 +81,10 @@ export function useCreateTransaction() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: CreateTransactionInput) =>
-      api.post<Transaction>("/transactions", data),
+    mutationFn: async (data: CreateTransactionInput) =>
+      unwrap<Transaction>(
+        await client.transactions.$post({ json: data as never })
+      ),
     onMutate: async (data) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.transactions.all })
       await queryClient.cancelQueries({ queryKey: queryKeys.balance.all })
@@ -179,8 +190,10 @@ export function useCreateTransfer() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: CreateTransferInput) =>
-      api.post<Transaction>("/transactions/transfer", data),
+    mutationFn: async (data: CreateTransferInput) =>
+      unwrap<Transaction>(
+        await client.transactions.transfer.$post({ json: data as never })
+      ),
     onMutate: async (data) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.transactions.all })
 
@@ -254,13 +267,19 @@ export function useUpdateTransaction() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       id,
       data,
     }: {
       id: string
       data: Partial<CreateTransactionInput>
-    }) => api.put<Transaction>(`/transactions/${id}`, data),
+    }) =>
+      unwrap<Transaction>(
+        await client.transactions[":id"].$put({
+          param: { id },
+          json: data as never,
+        })
+      ),
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({
         queryKey: queryKeys.transactions.detail(id),
@@ -305,7 +324,10 @@ export function useDeleteTransaction() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => api.delete(`/transactions/${id}`),
+    mutationFn: async (id: string) =>
+      unwrap<{ success: boolean }>(
+        await client.transactions[":id"].$delete({ param: { id } })
+      ),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.transactions.all })
 

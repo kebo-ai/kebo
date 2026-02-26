@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery, keepPreviousData } from "@tanstack/react-query"
-import { api } from "../client"
+import { getApiClient, unwrap } from "../rpc"
 import { queryKeys } from "../keys"
 import { queryConfig } from "../query-config"
 import type {
@@ -9,6 +9,8 @@ import type {
   ExpenseReportByCategory,
   ReportGranularity,
 } from "../types"
+
+const client = getApiClient()
 
 interface IncomeExpenseParams {
   periodDate?: string // YYYY-MM-DD format
@@ -20,37 +22,37 @@ interface ExpenseByCategoryParams {
 }
 
 export function useIncomeExpenseReport(params?: IncomeExpenseParams) {
-  const searchParams = new URLSearchParams()
-
-  if (params?.periodDate) searchParams.set("periodDate", params.periodDate)
-  if (params?.granularity) searchParams.set("granularity", params.granularity)
-
-  const queryString = searchParams.toString()
-  const endpoint = `/reports/income-expense${queryString ? `?${queryString}` : ""}`
-
   return useQuery({
     queryKey: queryKeys.reports.incomeExpense(
       params as Record<string, unknown>
     ),
-    queryFn: () => api.get<IncomeExpenseReport>(endpoint),
+    queryFn: async () =>
+      unwrap<IncomeExpenseReport>(
+        await client.reports["income-expense"].$get({
+          query: {
+            periodDate: params?.periodDate,
+            granularity: params?.granularity,
+          },
+        })
+      ),
     ...queryConfig.reports,
     placeholderData: keepPreviousData,
   })
 }
 
 export function useExpenseByCategory(params?: ExpenseByCategoryParams) {
-  const searchParams = new URLSearchParams()
-
-  if (params?.periodDate) searchParams.set("periodDate", params.periodDate)
-
-  const queryString = searchParams.toString()
-  const endpoint = `/reports/expense-by-category${queryString ? `?${queryString}` : ""}`
-
   return useQuery({
     queryKey: queryKeys.reports.expenseByCategory(
       params as Record<string, unknown>
     ),
-    queryFn: () => api.get<ExpenseReportByCategory>(endpoint),
+    queryFn: async () =>
+      unwrap<ExpenseReportByCategory>(
+        await client.reports["expense-by-category"].$get({
+          query: {
+            periodDate: params?.periodDate,
+          },
+        })
+      ),
     ...queryConfig.reports,
     placeholderData: keepPreviousData,
   })

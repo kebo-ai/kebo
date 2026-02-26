@@ -4,14 +4,11 @@ import {
   HydrationBoundary,
 } from "@tanstack/react-query"
 import { createClient } from "@/lib/auth/server"
-import { createServerApi } from "@/lib/api/server"
+import { createServerApiClient } from "@/lib/api/rpc-server"
+import { unwrap } from "@/lib/api/rpc"
 import { queryKeys } from "@/lib/api/keys"
 import type { UserBalance, Account, Transaction } from "@/lib/api/types"
 import { DashboardContent } from "./dashboard-content"
-
-interface DataResponse<T> {
-  data: T
-}
 
 interface TransactionsResponse {
   data: Transaction[]
@@ -29,24 +26,29 @@ export default async function DashboardPage() {
     user?.user_metadata?.full_name?.split(" ")[0] || "there"
 
   if (session?.access_token) {
-    const api = createServerApi(session.access_token)
+    const api = createServerApiClient(session.access_token)
     const queryClient = new QueryClient()
 
     await Promise.all([
       queryClient.prefetchQuery({
         queryKey: queryKeys.balance.all,
-        queryFn: () => api.get<UserBalance>("/transactions/balance"),
+        queryFn: async () =>
+          unwrap<UserBalance>(await api.transactions.balance.$get()),
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.transactions.list({ limit: 5 } as Record<string, unknown>),
-        queryFn: () =>
-          api.get<TransactionsResponse>("/transactions?limit=5"),
+        queryFn: async () =>
+          unwrap<TransactionsResponse>(
+            await api.transactions.$get({ query: { limit: 5 } })
+          ),
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.accounts.list(),
         queryFn: async () => {
-          const response = await api.get<DataResponse<Account[]>>("/accounts")
-          return response.data
+          const res = await unwrap<{ data: Account[] }>(
+            await api.accounts.$get()
+          )
+          return res.data
         },
       }),
     ])

@@ -4,8 +4,6 @@ import { banks } from "@/db/schema"
 import { authMiddleware } from "@/middleware"
 import type { AppEnv } from "@/types/env"
 
-const app = new OpenAPIHono<AppEnv>()
-
 const BankParamsSchema = z.object({
   id: z.string().uuid(),
 })
@@ -116,123 +114,99 @@ const deleteBankRoute = createRoute({
 })
 
 // All bank routes require authentication
-app.use("/*", authMiddleware)
+const base = new OpenAPIHono<AppEnv>()
+base.use("/*", authMiddleware)
 
-app.openapi(listRoute, async (c) => {
-  const db = c.get("db")
-
-  const result = await db
-    .select()
-    .from(banks)
-    .where(eq(banks.is_deleted, false))
-
-  return c.json({ data: result }, 200)
-})
-
-app.openapi(searchRoute, async (c) => {
-  const { q, country } = c.req.valid("query")
-  const db = c.get("db")
-
-  const conditions = [eq(banks.is_deleted, false), ilike(banks.name, `%${q}%`)]
-
-  if (country) {
-    conditions.push(
-      or(eq(banks.country_code, country), eq(banks.country_code, "GLOBAL"))!,
-    )
-  }
-
-  const result = await db
-    .select()
-    .from(banks)
-    .where(and(...conditions))
-    .limit(20)
-
-  return c.json({ data: result }, 200)
-})
-
-app.openapi(byCountryRoute, async (c) => {
-  const { code } = c.req.valid("param")
-  const db = c.get("db")
-
-  const result = await db
-    .select()
-    .from(banks)
-    .where(
-      and(
-        eq(banks.is_deleted, false),
-        or(eq(banks.country_code, code), eq(banks.country_code, "GLOBAL")),
-      ),
-    )
-
-  return c.json({ data: result }, 200)
-})
-
-app.openapi(getBankRoute, async (c) => {
-  const { id } = c.req.valid("param")
-  const db = c.get("db")
-
-  const [bank] = await db
-    .select()
-    .from(banks)
-    .where(and(eq(banks.id, id), eq(banks.is_deleted, false)))
-
-  if (!bank) {
-    return c.json({ error: "Bank not found" }, 404)
-  }
-
-  return c.json({ data: bank }, 200)
-})
-
-app.openapi(createBankRoute, async (c) => {
-  const body = c.req.valid("json")
-  const db = c.get("db")
-
-  try {
-    const [bank] = await db.insert(banks).values(body).returning()
-
-    return c.json({ data: bank }, 201)
-  } catch (error: unknown) {
-    // Handle unique constraint violation on name
-    if (error instanceof Error && error.message.includes("unique constraint")) {
-      return c.json({ error: "Bank with this name already exists" }, 409)
+const app = base
+  .openapi(listRoute, async (c) => {
+    const db = c.get("db")
+    const result = await db
+      .select()
+      .from(banks)
+      .where(eq(banks.is_deleted, false))
+    return c.json({ data: result }, 200)
+  })
+  .openapi(searchRoute, async (c) => {
+    const { q, country } = c.req.valid("query")
+    const db = c.get("db")
+    const conditions = [eq(banks.is_deleted, false), ilike(banks.name, `%${q}%`)]
+    if (country) {
+      conditions.push(
+        or(eq(banks.country_code, country), eq(banks.country_code, "GLOBAL"))!,
+      )
     }
-    throw error
-  }
-})
-
-app.openapi(updateBankRoute, async (c) => {
-  const { id } = c.req.valid("param")
-  const body = c.req.valid("json")
-  const db = c.get("db")
-
-  const [bank] = await db
-    .update(banks)
-    .set({ ...body, updated_at: new Date() })
-    .where(and(eq(banks.id, id), eq(banks.is_deleted, false)))
-    .returning()
-
-  if (!bank) {
-    return c.json({ error: "Bank not found" }, 404)
-  }
-
-  return c.json({ data: bank }, 200)
-})
-
-app.openapi(deleteBankRoute, async (c) => {
-  const { id } = c.req.valid("param")
-  const db = c.get("db")
-
-  const [bank] = await db
-    .update(banks)
-    .set({ is_deleted: true, deleted_at: new Date(), updated_at: new Date() })
-    .where(and(eq(banks.id, id), eq(banks.is_deleted, false)))
-    .returning()
-
-  if (!bank) {
-    return c.json({ error: "Bank not found" }, 404)
-  }
-
-  return c.json({ success: true }, 200)
-})
+    const result = await db
+      .select()
+      .from(banks)
+      .where(and(...conditions))
+      .limit(20)
+    return c.json({ data: result }, 200)
+  })
+  .openapi(byCountryRoute, async (c) => {
+    const { code } = c.req.valid("param")
+    const db = c.get("db")
+    const result = await db
+      .select()
+      .from(banks)
+      .where(
+        and(
+          eq(banks.is_deleted, false),
+          or(eq(banks.country_code, code), eq(banks.country_code, "GLOBAL")),
+        ),
+      )
+    return c.json({ data: result }, 200)
+  })
+  .openapi(getBankRoute, async (c) => {
+    const { id } = c.req.valid("param")
+    const db = c.get("db")
+    const [bank] = await db
+      .select()
+      .from(banks)
+      .where(and(eq(banks.id, id), eq(banks.is_deleted, false)))
+    if (!bank) {
+      return c.json({ error: "Bank not found" }, 404)
+    }
+    return c.json({ data: bank }, 200)
+  })
+  .openapi(createBankRoute, async (c) => {
+    const body = c.req.valid("json")
+    const db = c.get("db")
+    try {
+      const [bank] = await db.insert(banks).values(body).returning()
+      return c.json({ data: bank }, 201)
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes("unique constraint")) {
+        return c.json({ error: "Bank with this name already exists" }, 409)
+      }
+      throw error
+    }
+  })
+  .openapi(updateBankRoute, async (c) => {
+    const { id } = c.req.valid("param")
+    const body = c.req.valid("json")
+    const db = c.get("db")
+    const [bank] = await db
+      .update(banks)
+      .set({ ...body, updated_at: new Date() })
+      .where(and(eq(banks.id, id), eq(banks.is_deleted, false)))
+      .returning()
+    if (!bank) {
+      return c.json({ error: "Bank not found" }, 404)
+    }
+    return c.json({ data: bank }, 200)
+  })
+  .openapi(deleteBankRoute, async (c) => {
+    const { id } = c.req.valid("param")
+    const db = c.get("db")
+    const [bank] = await db
+      .update(banks)
+      .set({ is_deleted: true, deleted_at: new Date(), updated_at: new Date() })
+      .where(and(eq(banks.id, id), eq(banks.is_deleted, false)))
+      .returning()
+    if (!bank) {
+      return c.json({ error: "Bank not found" }, 404)
+    }
+    return c.json({ success: true }, 200)
+  })
 
 export default app

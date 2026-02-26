@@ -3,8 +3,6 @@ import { authMiddleware } from "@/middleware"
 import { ReportService } from "@/services"
 import type { AppEnv } from "@/types/env"
 
-const app = new OpenAPIHono<AppEnv>()
-
 // Schema for expense by category (monthly report)
 const ExpenseByCategoryQuerySchema = z.object({
   periodDate: z
@@ -53,33 +51,34 @@ const incomeExpenseRoute = createRoute({
   responses: { 200: { description: "Income vs expense report" } },
 })
 
-app.use("/*", authMiddleware)
+const base = new OpenAPIHono<AppEnv>()
+base.use("/*", authMiddleware)
 
-app.openapi(expenseByCategoryRoute, async (c) => {
-  const userId = c.get("userId")
-  const query = c.req.valid("query")
-  const report = await ReportService.getExpenseReportByCategory(
-    c.get("db"),
-    userId,
-    {
-      periodDate: query.periodDate,
-    },
-  )
-  return c.json(report, 200)
-})
-
-app.openapi(incomeExpenseRoute, async (c) => {
-  const userId = c.get("userId")
-  const query = c.req.valid("query")
-  const report = await ReportService.getIncomeExpenseReport(
-    c.get("db"),
-    userId,
-    {
-      periodDate: query.periodDate,
-      granularity: query.granularity,
-    },
-  )
-  return c.json(report, 200)
-})
+const app = base
+  .openapi(expenseByCategoryRoute, async (c) => {
+    const userId = c.get("userId")
+    const query = c.req.valid("query")
+    const report = await ReportService.getExpenseReportByCategory(
+      c.get("db"),
+      userId,
+      {
+        periodDate: query.periodDate,
+      },
+    )
+    return c.json(report, 200)
+  })
+  .openapi(incomeExpenseRoute, async (c) => {
+    const userId = c.get("userId")
+    const query = c.req.valid("query")
+    const report = await ReportService.getIncomeExpenseReport(
+      c.get("db"),
+      userId,
+      {
+        periodDate: query.periodDate,
+        granularity: query.granularity,
+      },
+    )
+    return c.json(report, 200)
+  })
 
 export default app

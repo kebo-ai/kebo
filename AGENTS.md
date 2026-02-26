@@ -2,15 +2,33 @@
 
 This document provides essential information for AI coding agents working in the Kebo codebase.
 
+## Intent Layer
+
+**Before modifying code in a subdirectory, read its AGENTS.md first** to understand local patterns and invariants.
+
+- **API**: `apps/api/AGENTS.md` — Hono REST API with Drizzle ORM, deployed to Vercel
+- **Dashboard**: `apps/dashboard/AGENTS.md` — Next.js financial dashboard with TanStack Query + Supabase realtime
+- **Marketing**: `apps/marketing/AGENTS.md` — Next.js marketing site with i18n (es/en/pt)
+- **Mobile**: `apps/mobile/AGENTS.md` — Expo/React Native app with MobX-State-Tree
+- **Shared**: `packages/shared/AGENTS.md` — Shared TypeScript types and constants
+
+### Global Invariants
+
+- All apps share Supabase as the backend (auth + database)
+- Shared types live in `@kebo/shared` — never duplicate type definitions across apps
+- Biome for linting/formatting everywhere — never use ESLint or Prettier
+- Environment variables: `NEXT_PUBLIC_` (web), `EXPO_PUBLIC_` (mobile), plain (API)
+
 ## Project Overview
 
-Kebo is a personal finance app with a mobile app, web dashboard, and marketing website. It's a **Turborepo monorepo** using **Bun** as the package manager.
+Kebo is a personal finance app with a mobile app, web dashboard, API, and marketing website. It's a **Turborepo monorepo** using **Bun** as the package manager.
 
 | App | Path | Framework | Description |
 |-----|------|-----------|-------------|
+| API | `apps/api` | Hono + Drizzle ORM | REST API (Vercel serverless) |
 | Dashboard | `apps/dashboard` | Next.js 16 + React 19 | Authenticated financial dashboard |
 | Marketing | `apps/marketing` | Next.js 16 + React 19 | Public marketing/landing website |
-| Mobile | `apps/mobile` | Expo SDK 52 + React Native | Main mobile application |
+| Mobile | `apps/mobile` | Expo SDK 54 + React Native | Main mobile application |
 | Shared | `packages/shared` | TypeScript | Shared types and constants |
 
 ## Build/Lint/Test Commands
@@ -159,7 +177,7 @@ static async fetchData() {
 ### Mobile App (React Native/Expo)
 
 - **State Management**: MobX-State-Tree
-- **Navigation**: React Navigation (native stack + bottom tabs)
+- **Navigation**: expo-router (file-based) with native tabs and sheets
 - **Styling**: twrnc (Tailwind for React Native)
 - **i18n**: i18next with `translate()` function
 

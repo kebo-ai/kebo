@@ -1,3 +1,4 @@
 {
-  "ignoreCommand": "npx turbo-ignore"
+  "ignoreCommand": "npx turbo-ignore",  
+  "scope": "crafter-station"
 }

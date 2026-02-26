@@ -2,8 +2,11 @@
 
 import { useState, useCallback } from "react"
 import { useMutation } from "@tanstack/react-query"
-import { api, streamChat, type StreamChatCallbacks } from "../client"
-import type { ChatMessage, SendChatMessageInput } from "../types"
+import { streamChat, type StreamChatCallbacks } from "../client"
+import { getApiClient, unwrap } from "../rpc"
+import type { ChatMessage } from "../types"
+
+const client = getApiClient()
 
 interface ChatResponse {
   message: ChatMessage
@@ -15,8 +18,10 @@ interface ChatResponse {
  */
 export function useSendChatMessage() {
   return useMutation({
-    mutationFn: (data: SendChatMessageInput) =>
-      api.post<ChatResponse>("/ai/chat", data),
+    mutationFn: async (data: { message: string; conversation_id?: string }) =>
+      unwrap<ChatResponse>(
+        await client.ai.chat.$post({ json: data as never })
+      ),
   })
 }
 

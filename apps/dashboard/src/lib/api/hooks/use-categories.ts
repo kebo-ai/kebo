@@ -1,21 +1,21 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { api } from "../client"
+import { getApiClient, unwrap } from "../rpc"
 import { queryKeys } from "../keys"
 import { queryConfig } from "../query-config"
-import type { Category, CreateCategoryInput, TransactionType } from "../types"
+import type { Category, TransactionType } from "../types"
 
-interface DataResponse<T> {
-  data: T
-}
+const client = getApiClient()
 
 export function useCategories() {
   return useQuery({
     queryKey: queryKeys.categories.list(),
     queryFn: async () => {
-      const response = await api.get<DataResponse<Category[]>>("/categories")
-      return response.data
+      const res = await unwrap<{ data: Category[] }>(
+        await client.categories.$get({ query: {} })
+      )
+      return res.data
     },
     ...queryConfig.categories,
   })
@@ -43,20 +43,24 @@ export function useIncomeCategories() {
 }
 
 export function useCategory(id: string) {
-  return useQuery({
-    queryKey: queryKeys.categories.detail(id),
-    queryFn: () => api.get<Category>(`/categories/${id}`),
-    enabled: !!id,
-    ...queryConfig.categories,
-  })
+  const { data: categories, ...rest } = useCategories()
+  return {
+    ...rest,
+    data: categories?.find((c) => c.id === id),
+  }
 }
 
 export function useCreateCategory() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: CreateCategoryInput) =>
-      api.post<Category>("/categories", data),
+    mutationFn: async (data: {
+      name: string
+      type: TransactionType
+      icon_url?: string
+      icon_emoji?: string
+      color_id?: number
+    }) => unwrap<Category>(await client.categories.$post({ json: data })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.categories.all })
     },
@@ -67,13 +71,22 @@ export function useUpdateCategory() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       id,
       data,
     }: {
       id: string
-      data: Partial<CreateCategoryInput>
-    }) => api.put<Category>(`/categories/${id}`, data),
+      data: Partial<{
+        name: string
+        type: TransactionType
+        icon_url?: string
+        icon_emoji?: string
+        color_id?: number
+      }>
+    }) =>
+      unwrap<Category>(
+        await client.categories[":id"].$put({ param: { id }, json: data })
+      ),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.categories.all })
       queryClient.invalidateQueries({
@@ -88,7 +101,10 @@ export function useDeleteCategory() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => api.delete(`/categories/${id}`),
+    mutationFn: async (id: string) =>
+      unwrap<{ success: boolean }>(
+        await client.categories[":id"].$delete({ param: { id } })
+      ),
     onMutate: async (id) => {
       await queryClient.cancelQueries({
         queryKey: queryKeys.categories.list(),

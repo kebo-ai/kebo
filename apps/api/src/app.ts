@@ -60,27 +60,32 @@ export function createApp() {
     return c.json({ status: "post_works", timestamp: new Date().toISOString() })
   })
 
-  // DEBUG: POST with auth but no body parsing/DB
-  app.post("/debug-post-auth", authMiddleware, (c) => {
-    console.log("[debug-post-auth] handler reached, userId:", c.get("userId"))
-    return c.json({ status: "auth_post_works", userId: c.get("userId") })
-  })
-
-  // DEBUG: POST with auth + body reading ONLY (no DB)
-  app.post("/debug-post-body", authMiddleware, async (c) => {
+  // DEBUG: POST with body reading ONLY (no auth, no DB)
+  app.post("/debug-body", async (c) => {
     console.log("[debug-body] about to read body")
     const body = await c.req.json()
     console.log("[debug-body] body read OK:", JSON.stringify(body).slice(0, 100))
     return c.json({ status: "body_read_works", keys: Object.keys(body) })
   })
 
-  // DEBUG: POST with auth + DB SELECT only (no body reading)
-  app.post("/debug-post-db", authMiddleware, async (c) => {
+  // DEBUG: POST with DB SELECT only (no auth, no body reading)
+  app.post("/debug-db", async (c) => {
     console.log("[debug-db] about to query")
     const db = c.get("db")
     const result = await db.execute(sql`SELECT 1 as test`)
     console.log("[debug-db] query OK:", result)
     return c.json({ status: "db_works", result })
+  })
+
+  // DEBUG: POST with body + DB SELECT (no auth)
+  app.post("/debug-body-db", async (c) => {
+    console.log("[debug-body-db] reading body")
+    const body = await c.req.json()
+    console.log("[debug-body-db] body OK, querying db")
+    const db = c.get("db")
+    const result = await db.execute(sql`SELECT 1 as test`)
+    console.log("[debug-body-db] db OK")
+    return c.json({ status: "body_and_db_work", keys: Object.keys(body), result })
   })
 
   // Register API routes — capture return for RPC type inference

@@ -52,6 +52,12 @@ export function createApp() {
     c.json({ status: "ok", timestamp: new Date().toISOString() }),
   )
 
+  // DEBUG: bare POST test - no auth, no body parsing
+  app.post("/debug-post", (c) => {
+    console.log("[debug-post] handler reached")
+    return c.json({ status: "post_works", timestamp: new Date().toISOString() })
+  })
+
   // Register API routes — capture return for RPC type inference
   const appWithRoutes = registerRoutes(app)
 

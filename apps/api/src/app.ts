@@ -3,6 +3,7 @@ import { apiReference } from "@scalar/hono-api-reference"
 import { cors } from "hono/cors"
 import { secureHeaders } from "hono/secure-headers"
 import {
+  authMiddleware,
   dbMiddleware,
   errorHandler,
   loggerMiddleware,
@@ -56,6 +57,12 @@ export function createApp() {
   app.post("/debug-post", (c) => {
     console.log("[debug-post] handler reached")
     return c.json({ status: "post_works", timestamp: new Date().toISOString() })
+  })
+
+  // DEBUG: POST with auth but no body parsing/DB
+  app.post("/debug-post-auth", authMiddleware, (c) => {
+    console.log("[debug-post-auth] handler reached, userId:", c.get("userId"))
+    return c.json({ status: "auth_post_works", userId: c.get("userId") })
   })
 
   // Register API routes — capture return for RPC type inference

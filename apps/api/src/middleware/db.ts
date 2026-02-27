@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory"
 import { drizzle } from "drizzle-orm/postgres-js"
-import postgres from "postgres"
+import postgres, { type Sql } from "postgres"
 import * as schema from "@/db/schema"
 import type { AppEnv } from "@/types/env"
 
@@ -31,22 +31,36 @@ export const dbMiddleware = createMiddleware<AppEnv>(async (c, next) => {
       statement_timeout: "15000" as unknown as number,
     },
   })
-  const db = drizzle(client, { schema })
-  c.set("db", db)
 
-  // Set Supabase RLS context so auth.uid() works for INSERT/UPDATE/DELETE policies.
-  // The JWT is decoded (not verified) here — authMiddleware handles proper verification.
+  // Extract JWT claims for Supabase RLS context.
+  // Decoded (not verified) here — authMiddleware handles proper verification.
   const authHeader = c.req.header("Authorization")
-  if (authHeader?.startsWith("Bearer ")) {
-    const payload = decodeJWTPayload(authHeader.substring(7))
-    if (payload?.sub) {
-      await client`SELECT set_config('request.jwt.claims', ${JSON.stringify(payload)}, false)`
-      await client`SET ROLE authenticated`
-    }
-  }
+  const payload = authHeader?.startsWith("Bearer ")
+    ? decodeJWTPayload(authHeader.substring(7))
+    : null
 
   try {
-    await next()
+    if (payload?.sub) {
+      // Wrap the entire request in a transaction so the pooler (Supavisor
+      // in transaction mode, port 6543) pins a single backend connection.
+      // This guarantees set_config + SET ROLE + all queries share the same
+      // connection and the RLS context is preserved.
+      // TransactionSql is runtime-compatible with Sql but typed differently,
+      // so we cast to keep drizzle happy.
+      await client.begin(async (tx) => {
+        const sql = tx as unknown as Sql
+        await sql`SELECT set_config('request.jwt.claims', ${JSON.stringify(payload)}, true)`
+        await sql`SET LOCAL ROLE authenticated`
+        const db = drizzle(sql, { schema })
+        c.set("db", db)
+        await next()
+      })
+    } else {
+      // No auth token (e.g. /health) — no RLS context needed
+      const db = drizzle(client, { schema })
+      c.set("db", db)
+      await next()
+    }
   } finally {
     await client.end({ timeout: 5 }).catch(() => {})
   }

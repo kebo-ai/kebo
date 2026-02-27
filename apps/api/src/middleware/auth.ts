@@ -53,6 +53,7 @@ async function verifyJWT(token: string, secret: string): Promise<JWTPayload> {
 }
 
 export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
+  console.log("[auth] start", c.req.method, c.req.path)
   const authHeader = c.req.header("Authorization")
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -64,7 +65,9 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
   const token = authHeader.substring(7)
 
   try {
+    console.log("[auth] verifying JWT")
     const payload = await verifyJWT(token, c.env.SUPABASE_JWT_SECRET)
+    console.log("[auth] JWT verified, sub:", payload.sub)
 
     if (!payload.sub) {
       throw new HTTPException(401, {
@@ -80,7 +83,9 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
     c.set("userId", payload.sub)
     c.set("userEmail", payload.email)
 
+    console.log("[auth] calling next()")
     await next()
+    console.log("[auth] next() returned")
   } catch (error) {
     if (error instanceof HTTPException) {
       throw error

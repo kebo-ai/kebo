@@ -10,15 +10,9 @@ export const dbMiddleware = createMiddleware<AppEnv>(async (c, next) => {
     max: 1,
     idle_timeout: 20,
     connect_timeout: 10,
-    connection: {
-      statement_timeout: "15000" as unknown as number,
-    },
   })
   const db = drizzle(client, { schema })
   c.set("db", db)
-  try {
-    await next()
-  } finally {
-    await client.end({ timeout: 0 }).catch(() => {})
-  }
+  await next()
+  await client.end({ timeout: 0 })
 })

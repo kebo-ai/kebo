@@ -1,4 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi"
+import { sql } from "drizzle-orm"
 import { apiReference } from "@scalar/hono-api-reference"
 import { cors } from "hono/cors"
 import { secureHeaders } from "hono/secure-headers"
@@ -63,6 +64,22 @@ export function createApp() {
   app.post("/debug-post-auth", authMiddleware, (c) => {
     console.log("[debug-post-auth] handler reached, userId:", c.get("userId"))
     return c.json({ status: "auth_post_works", userId: c.get("userId") })
+  })
+
+  // DEBUG: POST with auth + manual body reading + DB insert
+  app.post("/debug-post-insert", authMiddleware, async (c) => {
+    console.log("[debug-insert] reading body")
+    const body = await c.req.json()
+    console.log("[debug-insert] body:", body.description)
+    const db = c.get("db")
+    console.log("[debug-insert] got db, inserting...")
+    const result = await db.execute(
+      sql`INSERT INTO transactions (user_id, account_id, amount, currency, transaction_type, date, description, category_id)
+          VALUES (${c.get("userId")}, ${body.account_id}, ${body.amount}, ${body.currency}, ${body.transaction_type}, ${body.date}, ${body.description}, ${body.category_id})
+          RETURNING id, description`
+    )
+    console.log("[debug-insert] done:", result)
+    return c.json({ status: "insert_works", result })
   })
 
   // Register API routes — capture return for RPC type inference

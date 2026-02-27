@@ -13,15 +13,16 @@ import transactionsRoutes from "./transactions.routes"
 import usersRoutes from "./users.routes"
 
 export function registerRoutes(app: OpenAPIHono<AppEnv>) {
-  app.route("/transactions", transactionsRoutes)
-  app.route("/categories", categoriesRoutes)
-  app.route("/accounts", accountsRoutes)
-  app.route("/banks", banksRoutes)
-  app.route("/budgets", budgetsRoutes)
-  app.route("/reports", reportsRoutes)
-  app.route("/users", usersRoutes)
-  app.route("/reference", referenceRoutes)
-  app.route("/reviews", reviewsRoutes)
-  app.route("/ai", aiRoutes)
-  app.route("/admin", adminRoutes)
+  return app
+    .route("/transactions", transactionsRoutes)
+    .route("/categories", categoriesRoutes)
+    .route("/accounts", accountsRoutes)
+    .route("/banks", banksRoutes)
+    .route("/budgets", budgetsRoutes)
+    .route("/reports", reportsRoutes)
+    .route("/users", usersRoutes)
+    .route("/reference", referenceRoutes)
+    .route("/reviews", reviewsRoutes)
+    .route("/ai", aiRoutes)
+    .route("/admin", adminRoutes)
 }

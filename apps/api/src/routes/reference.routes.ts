@@ -4,8 +4,6 @@ import { accountTypes, dynamicBanners, icons } from "@/db/schema"
 import { optionalAuthMiddleware } from "@/middleware"
 import type { AppEnv } from "@/types/env"
 
-const app = new OpenAPIHono<AppEnv>()
-
 const BannerQuerySchema = z.object({
   language: z.string().default("en"),
   appVersion: z.string().optional(),
@@ -37,41 +35,33 @@ const bannersRoute = createRoute({
   responses: { 200: { description: "Dynamic banners" } },
 })
 
-app.use("/*", optionalAuthMiddleware)
+const base = new OpenAPIHono<AppEnv>()
+base.use("/*", optionalAuthMiddleware)
 
-app.openapi(iconsRoute, async (c) => {
-  const db = c.get("db")
-
-  const result = await db
-    .select()
-    .from(icons)
-    .where(eq(icons.is_deleted, false))
-
-  return c.json({ data: result }, 200)
-})
-
-app.openapi(accountTypesRoute, async (c) => {
-  const db = c.get("db")
-
-  const result = await db
-    .select()
-    .from(accountTypes)
-    .where(eq(accountTypes.is_deleted, false))
-
-  return c.json({ data: result }, 200)
-})
-
-app.openapi(bannersRoute, async (c) => {
-  const db = c.get("db")
-
-  // Get all banners - filtering by language/version should be done in application logic
-  // since the banner data is stored as JSONB
-  const result = await db
-    .select()
-    .from(dynamicBanners)
-    .where(eq(dynamicBanners.visible, true))
-
-  return c.json({ data: result }, 200)
-})
+const app = base
+  .openapi(iconsRoute, async (c) => {
+    const db = c.get("db")
+    const result = await db
+      .select()
+      .from(icons)
+      .where(eq(icons.is_deleted, false))
+    return c.json({ data: result }, 200)
+  })
+  .openapi(accountTypesRoute, async (c) => {
+    const db = c.get("db")
+    const result = await db
+      .select()
+      .from(accountTypes)
+      .where(eq(accountTypes.is_deleted, false))
+    return c.json({ data: result }, 200)
+  })
+  .openapi(bannersRoute, async (c) => {
+    const db = c.get("db")
+    const result = await db
+      .select()
+      .from(dynamicBanners)
+      .where(eq(dynamicBanners.visible, true))
+    return c.json({ data: result }, 200)
+  })
 
 export default app

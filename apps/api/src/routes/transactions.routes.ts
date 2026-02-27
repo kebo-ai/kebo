@@ -3,8 +3,6 @@ import { authMiddleware } from "@/middleware"
 import { TransactionService } from "@/services"
 import type { AppEnv } from "@/types/env"
 
-const app = new OpenAPIHono<AppEnv>()
-
 const TransactionParamsSchema = z.object({
   id: z.string().uuid().openapi({ description: "Transaction ID" }),
 })
@@ -196,110 +194,105 @@ const balanceRoute = createRoute({
 })
 
 // Apply middleware and handlers
-app.use("/*", authMiddleware)
+const base = new OpenAPIHono<AppEnv>()
+base.use("/*", authMiddleware)
 
-app.openapi(listRoute, async (c) => {
-  const userId = c.get("userId")
-  const query = c.req.valid("query")
-  const result = await TransactionService.list(c.get("db"), userId, {
-    ...query,
-    accountIds: query.accountIds?.split(",").filter(Boolean),
-    categoryIds: query.categoryIds?.split(",").filter(Boolean),
+const app = base
+  .openapi(listRoute, async (c) => {
+    const userId = c.get("userId")
+    const query = c.req.valid("query")
+    const result = await TransactionService.list(c.get("db"), userId, {
+      ...query,
+      accountIds: query.accountIds?.split(",").filter(Boolean),
+      categoryIds: query.categoryIds?.split(",").filter(Boolean),
+    })
+    return c.json(result, 200)
   })
-  return c.json(result, 200)
-})
-
-// Register /balance and /recurring BEFORE /:id to avoid route conflicts
-app.openapi(balanceRoute, async (c) => {
-  const userId = c.get("userId")
-  const balance = await TransactionService.getBalance(c.get("db"), userId)
-  return c.json(balance, 200)
-})
-
-app.openapi(recurringRoute, async (c) => {
-  const userId = c.get("userId")
-  const transactions = await TransactionService.getRecurring(
-    c.get("db"),
-    userId,
-  )
-  return c.json({ data: transactions }, 200)
-})
-
-app.openapi(transferRoute, async (c) => {
-  const userId = c.get("userId")
-  const body = c.req.valid("json")
-
-  if (body.fromAccountId === body.toAccountId) {
-    return c.json({ error: "Cannot transfer to the same account" }, 400)
-  }
-
-  try {
-    const result = await TransactionService.createTransfer(
+  // Register /balance and /recurring BEFORE /:id to avoid route conflicts
+  .openapi(balanceRoute, async (c) => {
+    const userId = c.get("userId")
+    const balance = await TransactionService.getBalance(c.get("db"), userId)
+    return c.json(balance, 200)
+  })
+  .openapi(recurringRoute, async (c) => {
+    const userId = c.get("userId")
+    const transactions = await TransactionService.getRecurring(
       c.get("db"),
       userId,
-      body,
     )
-    return c.json(result, 201)
-  } catch (error) {
-    if (error instanceof Error && error.message.includes("do not belong")) {
-      return c.json({ error: "One or both accounts not found" }, 403)
+    return c.json({ data: transactions }, 200)
+  })
+  .openapi(transferRoute, async (c) => {
+    const userId = c.get("userId")
+    const body = c.req.valid("json")
+
+    if (body.fromAccountId === body.toAccountId) {
+      return c.json({ error: "Cannot transfer to the same account" }, 400)
     }
-    throw error
-  }
-})
 
-app.openapi(getRoute, async (c) => {
-  const userId = c.get("userId")
-  const { id } = c.req.valid("param")
-  const transaction = await TransactionService.getById(c.get("db"), userId, id)
-  if (!transaction) {
-    return c.json({ error: "Transaction not found" }, 404)
-  }
-  return c.json(transaction, 200)
-})
-
-app.openapi(createTransactionRoute, async (c) => {
-  const userId = c.get("userId")
-  const body = c.req.valid("json")
-  const transaction = await TransactionService.create(c.get("db"), userId, {
-    ...body,
-    date: new Date(body.date),
-    recurrence_end_date: body.recurrence_end_date
-      ? new Date(body.recurrence_end_date)
-      : undefined,
+    try {
+      const result = await TransactionService.createTransfer(
+        c.get("db"),
+        userId,
+        body,
+      )
+      return c.json(result, 201)
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("do not belong")) {
+        return c.json({ error: "One or both accounts not found" }, 403)
+      }
+      throw error
+    }
   })
-  return c.json(transaction, 201)
-})
-
-app.openapi(updateRoute, async (c) => {
-  const userId = c.get("userId")
-  const { id } = c.req.valid("param")
-  const body = c.req.valid("json")
-  const transaction = await TransactionService.update(c.get("db"), userId, id, {
-    ...body,
-    date: body.date ? new Date(body.date) : undefined,
-    recurrence_end_date: body.recurrence_end_date
-      ? new Date(body.recurrence_end_date)
-      : undefined,
+  .openapi(getRoute, async (c) => {
+    const userId = c.get("userId")
+    const { id } = c.req.valid("param")
+    const transaction = await TransactionService.getById(c.get("db"), userId, id)
+    if (!transaction) {
+      return c.json({ error: "Transaction not found" }, 404)
+    }
+    return c.json(transaction, 200)
   })
-  if (!transaction) {
-    return c.json({ error: "Transaction not found" }, 404)
-  }
-  return c.json(transaction, 200)
-})
-
-app.openapi(deleteRoute, async (c) => {
-  const userId = c.get("userId")
-  const { id } = c.req.valid("param")
-  const transaction = await TransactionService.softDelete(
-    c.get("db"),
-    userId,
-    id,
-  )
-  if (!transaction) {
-    return c.json({ error: "Transaction not found" }, 404)
-  }
-  return c.json({ success: true }, 200)
-})
+  .openapi(createTransactionRoute, async (c) => {
+    const userId = c.get("userId")
+    const body = c.req.valid("json")
+    const transaction = await TransactionService.create(c.get("db"), userId, {
+      ...body,
+      date: new Date(body.date),
+      recurrence_end_date: body.recurrence_end_date
+        ? new Date(body.recurrence_end_date)
+        : undefined,
+    })
+    return c.json(transaction, 201)
+  })
+  .openapi(updateRoute, async (c) => {
+    const userId = c.get("userId")
+    const { id } = c.req.valid("param")
+    const body = c.req.valid("json")
+    const transaction = await TransactionService.update(c.get("db"), userId, id, {
+      ...body,
+      date: body.date ? new Date(body.date) : undefined,
+      recurrence_end_date: body.recurrence_end_date
+        ? new Date(body.recurrence_end_date)
+        : undefined,
+    })
+    if (!transaction) {
+      return c.json({ error: "Transaction not found" }, 404)
+    }
+    return c.json(transaction, 200)
+  })
+  .openapi(deleteRoute, async (c) => {
+    const userId = c.get("userId")
+    const { id } = c.req.valid("param")
+    const transaction = await TransactionService.softDelete(
+      c.get("db"),
+      userId,
+      id,
+    )
+    if (!transaction) {
+      return c.json({ error: "Transaction not found" }, 404)
+    }
+    return c.json({ success: true }, 200)
+  })
 
 export default app

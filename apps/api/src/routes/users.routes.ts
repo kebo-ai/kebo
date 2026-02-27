@@ -3,8 +3,6 @@ import { authMiddleware } from "@/middleware"
 import { UserService } from "@/services"
 import type { AppEnv } from "@/types/env"
 
-const app = new OpenAPIHono<AppEnv>()
-
 const UpdateProfileSchema = z.object({
   full_name: z.string().min(1).max(100).optional(),
   country: z.string().max(2).optional(),
@@ -45,28 +43,28 @@ const deleteAccountRoute = createRoute({
   responses: { 200: { description: "Account deleted" } },
 })
 
-app.use("/*", authMiddleware)
+const base = new OpenAPIHono<AppEnv>()
+base.use("/*", authMiddleware)
 
-app.openapi(getProfileRoute, async (c) => {
-  const userId = c.get("userId")
-  const profile = await UserService.getProfile(c.get("db"), userId)
-  if (!profile) {
-    return c.json({ error: "Profile not found" }, 404)
-  }
-  return c.json(profile, 200)
-})
-
-app.openapi(updateProfileRoute, async (c) => {
-  const userId = c.get("userId")
-  const body = c.req.valid("json")
-  const profile = await UserService.updateProfile(c.get("db"), userId, body)
-  return c.json(profile, 200)
-})
-
-app.openapi(deleteAccountRoute, async (c) => {
-  const userId = c.get("userId")
-  await UserService.hardDelete(c.get("db"), userId)
-  return c.json({ success: true, message: "Account deleted" }, 200)
-})
+const app = base
+  .openapi(getProfileRoute, async (c) => {
+    const userId = c.get("userId")
+    const profile = await UserService.getProfile(c.get("db"), userId)
+    if (!profile) {
+      return c.json({ error: "Profile not found" }, 404)
+    }
+    return c.json(profile, 200)
+  })
+  .openapi(updateProfileRoute, async (c) => {
+    const userId = c.get("userId")
+    const body = c.req.valid("json")
+    const profile = await UserService.updateProfile(c.get("db"), userId, body)
+    return c.json(profile, 200)
+  })
+  .openapi(deleteAccountRoute, async (c) => {
+    const userId = c.get("userId")
+    await UserService.hardDelete(c.get("db"), userId)
+    return c.json({ success: true, message: "Account deleted" }, 200)
+  })
 
 export default app

@@ -3,8 +3,6 @@ import { EmbeddingService } from "@/services/embedding.service"
 import { adminRateLimitMiddleware, adminBodyLimit } from "@/middleware"
 import type { AppEnv } from "@/types/env"
 
-const app = new OpenAPIHono<AppEnv>()
-
 /**
  * Timing-safe comparison to prevent timing attacks on admin key.
  * Pads shorter string to match length so XOR loop always runs
@@ -25,14 +23,16 @@ function timingSafeEqual(a: string, b: string): boolean {
   return result === 0
 }
 
+const base = new OpenAPIHono<AppEnv>()
+
 // Rate limit admin endpoints (5 req/min per IP)
-app.use("/*", adminRateLimitMiddleware)
+base.use("/*", adminRateLimitMiddleware)
 
 // Larger body limit for document ingestion (5MB)
-app.use("/*", adminBodyLimit)
+base.use("/*", adminBodyLimit)
 
 // Admin key middleware (timing-safe comparison)
-app.use("/*", async (c, next) => {
+base.use("/*", async (c, next) => {
   const apiKey = c.req.header("X-Admin-Key")
   if (!apiKey || !timingSafeEqual(apiKey, c.env.ADMIN_API_KEY)) {
     return c.json({ error: "Unauthorized" }, 401)
@@ -90,38 +90,37 @@ const deleteSourceRoute = createRoute({
   },
 })
 
-app.openapi(ingestDocumentRoute, async (c) => {
-  const body = c.req.valid("json")
-  const db = c.get("db")
+const app = base
+  .openapi(ingestDocumentRoute, async (c) => {
+    const body = c.req.valid("json")
+    const db = c.get("db")
 
-  try {
-    const count = await EmbeddingService.ingestDocument(
-      db,
-      c.env.AI_GATEWAY_API_KEY,
-      body.content,
-      body.source,
-      body.page,
-    )
+    try {
+      const count = await EmbeddingService.ingestDocument(
+        db,
+        c.env.AI_GATEWAY_API_KEY,
+        body.content,
+        body.source,
+        body.page,
+      )
 
-    return c.json({ success: true, chunks_created: count })
-  } catch (error) {
-    console.error("Ingestion error:", error)
-    return c.json({ error: "Ingestion failed" }, 500)
-  }
-})
+      return c.json({ success: true, chunks_created: count })
+    } catch (error) {
+      console.error("Ingestion error:", error)
+      return c.json({ error: "Ingestion failed" }, 500)
+    }
+  })
+  .openapi(listSourcesRoute, async (c) => {
+    const db = c.get("db")
+    const sources = await EmbeddingService.listSources(db)
+    return c.json({ sources })
+  })
+  .openapi(deleteSourceRoute, async (c) => {
+    const { source } = c.req.valid("param")
+    const db = c.get("db")
 
-app.openapi(listSourcesRoute, async (c) => {
-  const db = c.get("db")
-  const sources = await EmbeddingService.listSources(db)
-  return c.json({ sources })
-})
-
-app.openapi(deleteSourceRoute, async (c) => {
-  const { source } = c.req.valid("param")
-  const db = c.get("db")
-
-  await EmbeddingService.deleteBySource(db, source)
-  return c.json({ success: true, deleted_source: source })
-})
+    await EmbeddingService.deleteBySource(db, source)
+    return c.json({ success: true, deleted_source: source })
+  })
 
 export default app

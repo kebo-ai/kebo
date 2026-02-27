@@ -1,11 +1,9 @@
 import { OpenAPIHono } from "@hono/zod-openapi"
 import { apiReference } from "@scalar/hono-api-reference"
-import { drizzle } from "drizzle-orm/postgres-js"
 import { cors } from "hono/cors"
 import { secureHeaders } from "hono/secure-headers"
-import postgres from "postgres"
-import * as schema from "@/db/schema"
 import {
+  dbMiddleware,
   errorHandler,
   loggerMiddleware,
   rateLimitMiddleware,
@@ -44,18 +42,7 @@ export function createApp() {
   app.use("*", rateLimitMiddleware)
 
   // Database initialization middleware
-  app.use("*", async (c, next) => {
-    const client = postgres(c.env.DATABASE_URL, {
-      prepare: false,
-      max: 1,
-      idle_timeout: 20,
-      connect_timeout: 10,
-    })
-    const db = drizzle(client, { schema })
-    c.set("db", db)
-    await next()
-    await client.end({ timeout: 0 })
-  })
+  app.use("*", dbMiddleware)
 
   // Error handler
   app.onError(errorHandler)
@@ -65,11 +52,11 @@ export function createApp() {
     c.json({ status: "ok", timestamp: new Date().toISOString() }),
   )
 
-  // Register API routes
-  registerRoutes(app)
+  // Register API routes — capture return for RPC type inference
+  const appWithRoutes = registerRoutes(app)
 
-  // OpenAPI documentation
-  app.doc("/openapi.json", {
+  // OpenAPI documentation (imperative on app — doesn't affect RPC types)
+  appWithRoutes.doc("/openapi.json", {
     openapi: "3.1.0",
     info: {
       title: "Kebo API",
@@ -84,7 +71,7 @@ export function createApp() {
   })
 
   // Register security scheme
-  app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
+  appWithRoutes.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
     type: "http",
     scheme: "bearer",
     bearerFormat: "JWT",
@@ -92,7 +79,7 @@ export function createApp() {
   })
 
   // Scalar API reference UI
-  app.get(
+  appWithRoutes.get(
     "/docs",
     apiReference({
       spec: {
@@ -110,5 +97,7 @@ export function createApp() {
     }),
   )
 
-  return app
+  return appWithRoutes
 }
+
+export type AppType = ReturnType<typeof createApp>

@@ -1,15 +1,18 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { api } from "../client"
+import { getApiClient, unwrap } from "../rpc"
 import { queryKeys } from "../keys"
 import { queryConfig } from "../query-config"
-import type { Profile, UpdateProfileInput } from "../types"
+import type { Profile } from "../types"
+
+const client = getApiClient()
 
 export function useProfile() {
   return useQuery({
     queryKey: queryKeys.profile.all,
-    queryFn: () => api.get<Profile>("/users/profile"),
+    queryFn: async () =>
+      unwrap<Profile>(await client.users.profile.$get()),
     ...queryConfig.profile,
   })
 }
@@ -18,8 +21,12 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: UpdateProfileInput) =>
-      api.put<Profile>("/users/profile", data),
+    mutationFn: async (data: {
+      full_name?: string
+      country?: string
+      currency?: string
+      avatar_url?: string
+    }) => unwrap<Profile>(await client.users.profile.$put({ json: data })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.all })
     },
@@ -28,9 +35,9 @@ export function useUpdateProfile() {
 
 export function useDeleteUserAccount() {
   return useMutation({
-    mutationFn: (confirmationText: string) =>
-      api.delete(
-        `/users/delete?confirmation=${encodeURIComponent(confirmationText)}`
+    mutationFn: async () =>
+      unwrap<{ success: boolean; message: string }>(
+        await client.users.$delete()
       ),
   })
 }

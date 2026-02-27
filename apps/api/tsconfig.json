@@ -7,6 +7,10 @@
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "baseUrl": ".",
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declarationDir": "./dist/types",
     "paths": {
       "@/*": ["./src/*"],
       "@kebo/shared": ["../../packages/shared/src"],

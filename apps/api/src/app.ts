@@ -66,20 +66,21 @@ export function createApp() {
     return c.json({ status: "auth_post_works", userId: c.get("userId") })
   })
 
-  // DEBUG: POST with auth + manual body reading + DB insert
-  app.post("/debug-post-insert", authMiddleware, async (c) => {
-    console.log("[debug-insert] reading body")
+  // DEBUG: POST with auth + body reading ONLY (no DB)
+  app.post("/debug-post-body", authMiddleware, async (c) => {
+    console.log("[debug-body] about to read body")
     const body = await c.req.json()
-    console.log("[debug-insert] body:", body.description)
+    console.log("[debug-body] body read OK:", JSON.stringify(body).slice(0, 100))
+    return c.json({ status: "body_read_works", keys: Object.keys(body) })
+  })
+
+  // DEBUG: POST with auth + DB SELECT only (no body reading)
+  app.post("/debug-post-db", authMiddleware, async (c) => {
+    console.log("[debug-db] about to query")
     const db = c.get("db")
-    console.log("[debug-insert] got db, inserting...")
-    const result = await db.execute(
-      sql`INSERT INTO transactions (user_id, account_id, amount, currency, transaction_type, date, description, category_id)
-          VALUES (${c.get("userId")}, ${body.account_id}, ${body.amount}, ${body.currency}, ${body.transaction_type}, ${body.date}, ${body.description}, ${body.category_id})
-          RETURNING id, description`
-    )
-    console.log("[debug-insert] done:", result)
-    return c.json({ status: "insert_works", result })
+    const result = await db.execute(sql`SELECT 1 as test`)
+    console.log("[debug-db] query OK:", result)
+    return c.json({ status: "db_works", result })
   })
 
   // Register API routes — capture return for RPC type inference

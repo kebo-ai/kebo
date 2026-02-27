@@ -17,12 +17,15 @@ export default async function handler(req, res) {
 
   // Buffer the body for non-GET/HEAD requests
   if (req.method !== "GET" && req.method !== "HEAD") {
-    if (req.body) {
-      // Vercel with NODEJS_HELPERS=1 provides req.body as a Buffer
+    if (typeof req.body === "string") {
+      // Body is already a string
       init.body = req.body
-    } else if (req.rawBody) {
-      // Some Vercel versions use rawBody
-      init.body = req.rawBody
+    } else if (req.body instanceof Buffer) {
+      // Body is a raw Buffer
+      init.body = req.body
+    } else if (req.body && typeof req.body === "object") {
+      // Vercel NODEJS_HELPERS parses JSON bodies into objects - re-serialize
+      init.body = JSON.stringify(req.body)
     } else {
       // Fallback: manually buffer the stream
       const chunks = []
@@ -38,8 +41,21 @@ export default async function handler(req, res) {
   const request = new Request(url, init)
   const response = await app.fetch(request, process.env)
 
-  // Write response back to Vercel's res object
-  res.writeHead(response.status, Object.fromEntries(response.headers.entries()))
+  // Write response headers
+  const responseHeaders = {}
+  response.headers.forEach((value, key) => {
+    const existing = responseHeaders[key]
+    if (existing) {
+      responseHeaders[key] = Array.isArray(existing)
+        ? [...existing, value]
+        : [existing, value]
+    } else {
+      responseHeaders[key] = value
+    }
+  })
+  res.writeHead(response.status, responseHeaders)
+
+  // Write response body
   if (response.body) {
     const reader = response.body.getReader()
     while (true) {

@@ -38,7 +38,8 @@ export function createApp() {
   )
 
   // Body size limit (1MB for all routes by default)
-  app.use("*", defaultBodyLimit)
+  // DISABLED FOR DEBUGGING - testing if bodyLimit consumes body stream on Vercel
+  // app.use("*", defaultBodyLimit)
 
   // Global rate limiting (60 req/min per user or IP)
   app.use("*", rateLimitMiddleware)

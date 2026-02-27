@@ -12,6 +12,7 @@ Does NOT own: client-side state, UI, or auth UI flows (those live in dashboard/m
 - `src/app.ts` — `createApp()` factory: middleware stack + route registration
 - `src/index.ts` — Vercel export
 - `src/dev.ts` — Local dev server (port 8787, reads `.dev.vars`)
+- `api/index.js` — **Vercel serverless function entry point.** Custom handler that buffers `req.body` before creating Web Request. Do NOT replace with `@hono/node-server`'s `getRequestListener` — it has a body stream bug that causes POST requests to hang on Vercel.
 
 ## Structure
 
@@ -27,7 +28,7 @@ src/
 
 ## Contracts & Invariants
 
-- **DB connection is per-request** — `max: 1` with aggressive timeouts, always closed in `finally`. Intentional for Vercel serverless.
+- **DB connection is per-request** — `max: 1` with aggressive timeouts, closed with `client.end({ timeout: 0 })` after `next()`. The `timeout: 0` is critical — any other value causes deadlocks on Vercel serverless.
 - **`userId` always comes from verified JWT** — never trusted from request body/query. Set via `c.set("userId", payload.sub)`.
 - **Static routes before `/:id`** — e.g., `/balance` and `/recurring` registered before `/:id` in transactions. Hono matches first-registered. Comments in code flag this.
 - **Admin auth is separate** — uses `X-Admin-Key` header with timing-safe comparison, not JWT.
@@ -79,6 +80,8 @@ Adding a new route:
 - Never query without filtering by `user_id` for user-owned tables
 - Never put `/:id` routes before static path routes (e.g., `/balance`)
 - Never hardcode DB credentials — always use `DATABASE_URL` from env
+- Never use `getRequestListener` from `@hono/node-server` in `api/index.js` — it hangs on POST body reads on Vercel
+- Never change `client.end({ timeout: 0 })` in db middleware — other timeout values deadlock on Vercel
 
 ## AI / RAG
 

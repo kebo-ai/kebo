@@ -27,12 +27,9 @@ export async function proxy(request: NextRequest) {
 
   const code = request.nextUrl.searchParams.get("code")
 
-  console.log("[Proxy]", request.nextUrl.pathname, code ? `code=${code.slice(0, 8)}...` : "no code")
-
   // If an auth code arrives, exchange it for a session right here
   if (code && request.nextUrl.pathname.startsWith("/")) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    console.log("[Proxy] Exchange result:", error ? error.message : "success")
 
     const url = request.nextUrl.clone()
     url.searchParams.delete("code")

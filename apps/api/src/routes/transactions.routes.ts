@@ -254,19 +254,9 @@ const app = base
     return c.json(transaction, 200)
   })
   .openapi(createTransactionRoute, async (c) => {
-    console.log("[tx] handler start")
     const userId = c.get("userId")
-    console.log("[tx] userId:", userId)
     const body = c.req.valid("json")
-    console.log("[tx] body parsed:", body.description)
 
-    // DEBUG: bypass INSERT to isolate the issue
-    if (body.description === "debug_bypass_test") {
-      console.log("[tx] returning fake response")
-      return c.json({ id: "fake", description: "bypass_test" } as any, 201)
-    }
-
-    console.log("[tx] calling TransactionService.create")
     const transaction = await TransactionService.create(c.get("db"), userId, {
       ...body,
       date: new Date(body.date),
@@ -274,7 +264,6 @@ const app = base
         ? new Date(body.recurrence_end_date)
         : undefined,
     })
-    console.log("[tx] create returned:", transaction?.id)
     return c.json(transaction, 201)
   })
   .openapi(updateRoute, async (c) => {

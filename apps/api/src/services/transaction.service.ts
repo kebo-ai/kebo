@@ -184,7 +184,6 @@ export class TransactionService {
     userId: string,
     data: Omit<NewTransaction, "id" | "user_id" | "created_at" | "updated_at">,
   ) {
-    console.log("[svc] about to insert")
     const [result] = await db
       .insert(transactions)
       .values({
@@ -192,7 +191,6 @@ export class TransactionService {
         user_id: userId,
       })
       .returning()
-    console.log("[svc] insert done, id:", result?.id)
 
     return result
   }

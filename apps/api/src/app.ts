@@ -1,10 +1,8 @@
 import { OpenAPIHono } from "@hono/zod-openapi"
-import { sql } from "drizzle-orm"
 import { apiReference } from "@scalar/hono-api-reference"
 import { cors } from "hono/cors"
 import { secureHeaders } from "hono/secure-headers"
 import {
-  authMiddleware,
   dbMiddleware,
   errorHandler,
   loggerMiddleware,
@@ -38,8 +36,7 @@ export function createApp() {
   )
 
   // Body size limit (1MB for all routes by default)
-  // DISABLED FOR DEBUGGING - testing if bodyLimit consumes body stream on Vercel
-  // app.use("*", defaultBodyLimit)
+  app.use("*", defaultBodyLimit)
 
   // Global rate limiting (60 req/min per user or IP)
   app.use("*", rateLimitMiddleware)
@@ -54,40 +51,6 @@ export function createApp() {
   app.get("/health", (c) =>
     c.json({ status: "ok", timestamp: new Date().toISOString() }),
   )
-
-  // DEBUG: bare POST test - no auth, no body parsing
-  app.post("/debug-post", (c) => {
-    console.log("[debug-post] handler reached")
-    return c.json({ status: "post_works", timestamp: new Date().toISOString() })
-  })
-
-  // DEBUG: POST with body reading ONLY (no auth, no DB)
-  app.post("/debug-body", async (c) => {
-    console.log("[debug-body] about to read body")
-    const body = await c.req.json()
-    console.log("[debug-body] body read OK:", JSON.stringify(body).slice(0, 100))
-    return c.json({ status: "body_read_works", keys: Object.keys(body) })
-  })
-
-  // DEBUG: POST with DB SELECT only (no auth, no body reading)
-  app.post("/debug-db", async (c) => {
-    console.log("[debug-db] about to query")
-    const db = c.get("db")
-    const result = await db.execute(sql`SELECT 1 as test`)
-    console.log("[debug-db] query OK:", result)
-    return c.json({ status: "db_works", result })
-  })
-
-  // DEBUG: POST with body + DB SELECT (no auth)
-  app.post("/debug-body-db", async (c) => {
-    console.log("[debug-body-db] reading body")
-    const body = await c.req.json()
-    console.log("[debug-body-db] body OK, querying db")
-    const db = c.get("db")
-    const result = await db.execute(sql`SELECT 1 as test`)
-    console.log("[debug-body-db] db OK")
-    return c.json({ status: "body_and_db_work", keys: Object.keys(body), result })
-  })
 
   // Register API routes — capture return for RPC type inference
   const appWithRoutes = registerRoutes(app)

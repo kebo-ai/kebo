@@ -23,24 +23,59 @@ export function useRealtimeSync({
     if (!enabled) return
 
     const supabase = createClient()
-    let channel: RealtimeChannel
+    let channel: RealtimeChannel | null = null
+    let authSubscription: { unsubscribe: () => void } | null = null
 
-    channel = supabase
-      .channel(`realtime-${table}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table },
-        () => {
-          if (wasMutationSettled(table)) return
-          for (const key of invalidateKeys) {
-            queryClient.invalidateQueries({ queryKey: key as unknown[] })
+    function subscribe() {
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
+
+      channel = supabase
+        .channel(`realtime-${table}`)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table },
+          () => {
+            if (wasMutationSettled(table)) return
+            for (const key of invalidateKeys) {
+              queryClient.invalidateQueries({ queryKey: key as unknown[] })
+            }
           }
-        }
-      )
-      .subscribe()
+        )
+        .subscribe((status, err) => {
+          if (status === "SUBSCRIBED") {
+            console.log(`[realtime] ${table}: SUBSCRIBED`)
+          } else if (status === "CHANNEL_ERROR") {
+            console.error(`[realtime] ${table}: CHANNEL_ERROR`, err?.message)
+          } else if (status === "TIMED_OUT") {
+            console.warn(`[realtime] ${table}: TIMED_OUT`)
+          }
+        })
+    }
+
+    // Only subscribe if we have a session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        console.warn(`[realtime] ${table}: skipping, no session`)
+        return
+      }
+      subscribe()
+    })
+
+    // Re-subscribe when auth state changes (e.g. token refresh)
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "TOKEN_REFRESHED" || event === "SIGNED_IN") {
+        subscribe()
+      }
+    })
+    authSubscription = data.subscription
 
     return () => {
-      supabase.removeChannel(channel)
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
+      authSubscription?.unsubscribe()
     }
   }, [table, enabled]) // eslint-disable-line react-hooks/exhaustive-deps
 }

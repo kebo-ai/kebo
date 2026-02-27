@@ -5,7 +5,6 @@ import "./globals.css"
 import { Analytics } from "@vercel/analytics/react"
 import { ReactNode } from "react"
 import { QueryProvider } from "@/lib/api/providers/QueryProvider"
-import { RealtimeSyncProvider } from "@/lib/realtime/realtime-provider"
 import { Toaster } from "@/components/ui/sonner"
 
 const geistSans = localFont({
@@ -49,9 +48,7 @@ export default function RootLayout({
         >
           <Analytics />
           <QueryProvider>
-            <RealtimeSyncProvider>
-              {children}
-            </RealtimeSyncProvider>
+            {children}
             <Toaster />
           </QueryProvider>
         </ThemeProvider>

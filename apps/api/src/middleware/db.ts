@@ -19,6 +19,6 @@ export const dbMiddleware = createMiddleware<AppEnv>(async (c, next) => {
   try {
     await next()
   } finally {
-    await client.end({ timeout: 5 }).catch(() => {})
+    await client.end({ timeout: 0 }).catch(() => {})
   }
 })

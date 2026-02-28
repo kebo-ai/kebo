@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
+import { checkRateLimit } from "@/lib/ratelimit";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -7,6 +8,9 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited = await checkRateLimit(_req);
+  if (limited) return limited;
+
   const { id } = await params;
 
   const session = await db.query.sessions.findFirst({
@@ -30,6 +34,9 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited2 = await checkRateLimit(req);
+  if (limited2) return limited2;
+
   const { id } = await params;
   const body = await req.json();
   const { tax, tip, status } = body as {

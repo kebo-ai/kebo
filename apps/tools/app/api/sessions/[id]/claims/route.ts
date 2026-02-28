@@ -1,9 +1,13 @@
 import { db } from "@/db";
 import { claims } from "@/db/schema";
+import { checkRateLimit } from "@/lib/ratelimit";
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  const limited = await checkRateLimit(req);
+  if (limited) return limited;
+
   const { itemId, memberId } = (await req.json()) as {
     itemId: string;
     memberId: string;
@@ -36,6 +40,9 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const limited2 = await checkRateLimit(req);
+  if (limited2) return limited2;
+
   const { itemId, memberId } = (await req.json()) as {
     itemId: string;
     memberId: string;

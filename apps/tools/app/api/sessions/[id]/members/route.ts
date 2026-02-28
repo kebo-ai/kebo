@@ -14,18 +14,6 @@ export async function POST(
     name: string;
   };
 
-  // Check if member already exists for this fingerprint + session
-  const existing = await db.query.members.findFirst({
-    where: and(
-      eq(members.sessionId, sessionId),
-      eq(members.fingerprint, fingerprint)
-    ),
-  });
-
-  if (existing) {
-    return NextResponse.json(existing);
-  }
-
   const memberId = nanoid();
   const member = {
     id: memberId,

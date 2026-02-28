@@ -1,3 +1,4 @@
+import { checkRateLimit, ocrRatelimit } from "@/lib/ratelimit";
 import { gateway } from "@ai-sdk/gateway";
 import { Mistral } from "@mistralai/mistralai";
 import { generateObject } from "ai";
@@ -32,6 +33,9 @@ IMPORTANT:
 - Infer currency from symbols: $ → USD, € → EUR, £ → GBP, ¥ → JPY, etc.`;
 
 export async function POST(req: Request) {
+  const limited = await checkRateLimit(req, ocrRatelimit);
+  if (limited) return limited;
+
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
 

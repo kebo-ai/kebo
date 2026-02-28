@@ -1,9 +1,13 @@
 import { db } from "@/db";
 import { items, members, sessions } from "@/db/schema";
+import { checkRateLimit } from "@/lib/ratelimit";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  const limited = await checkRateLimit(req);
+  if (limited) return limited;
+
   const body = await req.json();
   const {
     title,

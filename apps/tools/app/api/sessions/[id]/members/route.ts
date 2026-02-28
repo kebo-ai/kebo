@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { members } from "@/db/schema";
+import { checkRateLimit } from "@/lib/ratelimit";
 import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
@@ -8,6 +9,9 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const limited = await checkRateLimit(req);
+  if (limited) return limited;
+
   const { id: sessionId } = await params;
   const { fingerprint, name } = (await req.json()) as {
     fingerprint: string;

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Instrument_Serif } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { FingerprintProvider } from "@/providers/fingerprint-provider";
@@ -48,6 +49,7 @@ export default function RootLayout({
               <Toaster />
             </FingerprintProvider>
           </QueryProvider>
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>

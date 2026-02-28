@@ -26,7 +26,8 @@
     "supabase:migrate": "supabase migration up",
     "supabase:diff": "supabase db diff",
     "supabase:push": "supabase db push",
-    "db:seed": "bun run --cwd apps/api db:seed"
+    "db:seed": "bun run --cwd apps/api db:seed",
+    "tools": "bun run --cwd apps/tools"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",

@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { DivvyCharacter } from "@/components/divvy-character";
 import { Camera, Link2, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import * as m from "motion/react-client";
 
@@ -28,23 +28,21 @@ export default function Home() {
             animate={{ rotate: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
           >
-            <DivvyCharacter size={140} />
+            <Image
+              src="/divvy-animals.png"
+              alt="Divvy"
+              width={320}
+              height={320}
+              priority
+            />
           </m.div>
-          <m.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-            className="text-5xl font-display tracking-tight"
-          >
-            Divvy
-          </m.h1>
           <m.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
             className="text-muted-foreground text-lg max-w-xs"
           >
-            Split restaurant bills fairly. Scan, share, claim.
+            Split the bill, not the friendship.
           </m.p>
         </m.div>
 
@@ -87,8 +85,8 @@ export default function Home() {
                 }}
                 className="flex items-center gap-4 p-4 rounded-xl bg-card border"
               >
-                <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
-                  <step.icon className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center flex-shrink-0">
+                  <step.icon className="w-5 h-5 text-accent" />
                 </div>
                 <div>
                   <p className="font-semibold text-sm">{step.title}</p>

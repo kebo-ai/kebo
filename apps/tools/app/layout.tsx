@@ -19,7 +19,10 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: "Divvy - Split the Bill",
-  description: "Scan a receipt, share with friends, claim your items. Fair splits, zero friction.",
+  description: "Split the bill, not the friendship.",
+  openGraph: {
+    images: [{ url: "/divvy-og.png", width: 1200, height: 630 }],
+  },
 };
 
 export const viewport: Viewport = {

@@ -11,6 +11,12 @@
       ],
       "@kebo/shared/*": [
         "../../packages/shared/src/*"
+      ],
+      "@kebo/api": [
+        "../../apps/api/src"
+      ],
+      "@kebo/api/*": [
+        "../../apps/api/src/*"
       ]
     }
   },

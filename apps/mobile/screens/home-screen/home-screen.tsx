@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import logger from "@/utils/logger";
-import React, { FC, useEffect, useState, useCallback, memo } from "react";
+import React, { FC, useEffect, useState, useCallback, useRef, memo } from "react";
 import {
   View,
   ScrollView,
@@ -254,6 +254,41 @@ const insecureExiting = new Keyframe({
   100: { opacity: 0, transform: TRANSFORM_INSECURE, easing: BALANCE_EASING },
 });
 
+// Transaction list entering — depth rise with subtle overshoot
+const transactionEntering = new Keyframe({
+  0: {
+    opacity: 0,
+    transform: [
+      { perspective: 600 },
+      { translateY: 25 },
+      { scale: 0.88 },
+      { rotateX: "-8deg" },
+    ],
+  },
+  65: {
+    opacity: 1,
+    transform: [
+      { perspective: 600 },
+      { translateY: -2 },
+      { scale: 1.02 },
+      { rotateX: "0.5deg" },
+    ],
+    easing: Easing.out(Easing.cubic),
+  },
+  100: {
+    opacity: 1,
+    transform: [
+      { perspective: 600 },
+      { translateY: 0 },
+      { scale: 1 },
+      { rotateX: "0deg" },
+    ],
+    easing: Easing.out(Easing.ease),
+  },
+});
+const TRANSACTION_ANIM_DURATION = 420;
+const TRANSACTION_ANIM_COOLDOWN = 2000;
+
 const BalanceDisplay = memo(
   ({
     isVisible,
@@ -367,6 +402,12 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const analytics = useAnalytics();
+  const animatedIdsRef = useRef(new Set<string>());
+  const animCooldownRef = useRef(false);
+  const animKeySetRef = useRef(new Set<string>());
+  const snapshotIdsRef = useRef(new Set<string>());
+  const hasInitialLoadRef = useRef(false);
+  const [focusTick, setFocusTick] = useState(0);
 
   const queryClient = useQueryClient();
   const { data: balance } = useBalance();
@@ -385,11 +426,6 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     getModalTexts,
   } = useReviewModal();
 
-  const {
-    categoryStoreModel: { getCategories },
-    accountStoreModel: { getListAccount },
-    profileModel: { full_name },
-  } = useStores();
 
   useEffect(() => {
     const loadBalanceVisibility = async () => {
@@ -417,10 +453,40 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     }, [checkEligibility])
   );
 
+  // Seed animated set with initial data so existing items skip animation
   useEffect(() => {
-    getCategories();
-    getListAccount();
-  }, [getCategories, getListAccount]);
+    if (!hasInitialLoadRef.current && transactions.length > 0) {
+      hasInitialLoadRef.current = true;
+      snapshotIdsRef.current = new Set(transactions.map(t => t.id));
+    }
+  }, [transactions]);
+
+  // When returning to Home, detect new transactions and animate them
+  useFocusEffect(
+    useCallback(() => {
+      if (!hasInitialLoadRef.current) return;
+
+      const currentIds = (txResponse?.data ?? []).map((t: Transaction) => t.id);
+      const newSinceFocus = currentIds.filter(
+        (id: string) => !snapshotIdsRef.current.has(id) && snapshotIdsRef.current.size > 0
+      );
+
+      if (newSinceFocus.length > 0) {
+        // Remove from animated set so they'll be "new" on next render
+        newSinceFocus.forEach((id: string) => animatedIdsRef.current.delete(id));
+        // Delay for the navigation transition to settle, then trigger animation
+        const timeout = setTimeout(() => setFocusTick(c => c + 1), 350);
+        return () => {
+          clearTimeout(timeout);
+          snapshotIdsRef.current = new Set((txResponse?.data ?? []).map((t: Transaction) => t.id));
+        };
+      }
+
+      return () => {
+        snapshotIdsRef.current = new Set((txResponse?.data ?? []).map((t: Transaction) => t.id));
+      };
+    }, [txResponse])
+  );
 
   useEffect(() => {
     if (profile) {
@@ -438,7 +504,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     setIsRefreshing(false);
   }, [queryClient]);
 
-  const firstName = (full_name || "").split(" ")[0];
+  const firstName = (profile?.full_name || "").split(" ")[0];
 
   const handleDelete = useCallback((transactionId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -479,15 +545,44 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
 
   const renderTransactionItemWrapper = useCallback(
     (item: Transaction) => {
+      // Initial load — track items silently, page FadeIn handles the entrance
+      if (!hasInitialLoadRef.current) {
+        animatedIdsRef.current.add(item.id);
+        return (
+          <Animated.View>
+            <TransactionItem
+              transaction={item}
+              onPress={handleTransactionPress}
+              formatAmount={formatAmount}
+            />
+          </Animated.View>
+        );
+      }
+
+      const isNew = !animatedIdsRef.current.has(item.id);
+      animatedIdsRef.current.add(item.id);
+
+      const shouldAnimate = isNew && !animCooldownRef.current;
+      if (shouldAnimate) {
+        animCooldownRef.current = true;
+        animKeySetRef.current.add(item.id);
+        setTimeout(() => { animCooldownRef.current = false; }, TRANSACTION_ANIM_COOLDOWN);
+      }
+
       return (
-        <TransactionItem
-          transaction={item}
-          onPress={handleTransactionPress}
-          formatAmount={formatAmount}
-        />
+        <Animated.View
+          key={animKeySetRef.current.has(item.id) ? `${item.id}-e` : item.id}
+          entering={shouldAnimate ? transactionEntering.duration(TRANSACTION_ANIM_DURATION) : undefined}
+        >
+          <TransactionItem
+            transaction={item}
+            onPress={handleTransactionPress}
+            formatAmount={formatAmount}
+          />
+        </Animated.View>
       );
     },
-    [handleTransactionPress, formatAmount]
+    [handleTransactionPress, formatAmount, focusTick]
   );
 
   const renderHiddenItem = useCallback(

@@ -37,6 +37,7 @@ import i18n from "@/i18n/i18n";
 import logger from "@/utils/logger";
 
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
+import { useExpenseCategories, useIncomeCategories, useAccounts } from "@/lib/api/hooks";
 import { NumberPad } from "@/components/transaction/number-pad";
 import { AmountDisplay } from "@/components/transaction/amount-display";
 import { TransactionTypeToggle } from "@/components/transaction/transaction-type-toggle";
@@ -51,9 +52,10 @@ export const TransactionScreen: FC<TransactionScreenProps> = observer(
     const rootStore = useStores() as RootStore;
     const {
       transactionModel,
-      categoryStoreModel: { expenseCategories, incomeCategories },
-      accountStoreModel: { accounts },
     } = rootStore;
+    const { data: expenseCategories = [] } = useExpenseCategories();
+    const { data: incomeCategories = [] } = useIncomeCategories();
+    const { data: accounts = [] } = useAccounts();
 
     const {
       updateField,

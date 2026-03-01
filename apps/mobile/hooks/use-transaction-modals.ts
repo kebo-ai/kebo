@@ -3,7 +3,6 @@ import { useStores } from '@/models/helpers/use-stores';
 import { FormikProps } from 'formik';
 import { TransactionFormValues, TransactionType } from '@/types/transaction';
 import { ITransaction } from '@/models/transaction/transaction';
-import { Account } from '@/models/account/account';
 import { Category } from '@/models/category/category';
 
 interface TransactionModalsProps {
@@ -21,19 +20,16 @@ export const useTransactionModals = (
 
   const {
     transactionModel,
-    accountStoreModel,
   } = useStores();
 
-  const { 
-    setSelectedAccount, 
-    setSelectedFromAccount, 
-    setSelectedToAccount, 
+  const {
+    setSelectedAccount,
+    setSelectedFromAccount,
+    setSelectedToAccount,
     setSelectedCategory,
     from_account_id,
     to_account_id
   } = transactionModel as ITransaction;
-
-  const { accounts } = accountStoreModel;
 
   const handleBankModalSelect = (selected: { id: string; name?: string; icon_url?: string }) => {
     const accountData = {
@@ -82,4 +78,4 @@ export const useTransactionModals = (
     from_account_id,
     to_account_id,
   };
-}; 
+};

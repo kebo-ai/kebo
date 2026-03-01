@@ -10,7 +10,6 @@ import {
 import tw from "@/hooks/use-tailwind";
 import { colors } from "@/theme/colors";
 import { useCurrencyFormatter } from "./common/currency-formatter";
-import { useStores } from "@/models/helpers/use-stores";
 
 interface InputAmountProps {
   value: string;
@@ -42,7 +41,6 @@ export const InputAmount = React.forwardRef<TextInput, InputAmountProps>(
       ...restProps
     } = props;
 
-    useStores();
     const inputRef = useRef<TextInput>(null);
     const { getSymbol, userCurrency, locale } = useCurrencyFormatter();
     

@@ -23,7 +23,6 @@ import { CategoriesList } from "@/components/common/categories-list";
 import * as Haptics from "expo-haptics";
 import CustomAlert from "@/components/common/custom-alert";
 import { showToast } from "@/components/ui/custom-toast";
-import { useStores } from "@/models/helpers/use-stores";
 import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { load, save } from "@/utils/storage";
 import { REPORTS_INCOME_PERIOD } from "@/utils/storage/storage-keys";
@@ -74,7 +73,6 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
   function ReportsIncomeScreen() {
     const router = useRouter();
     const { theme } = useTheme();
-    const { categoryStoreModel } = useStores();
     const [period, setPeriod] = useState<PeriodType>(periodOptions[1]);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedYearIndex, setSelectedYearIndex] = useState(
@@ -304,7 +302,6 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
           "success",
           translate("components:categoryModal.deleteCategorySuccess")
         );
-        await categoryStoreModel.getCategories();
       } catch (error) {
         logger.error("Error deleting category:", error);
         showToast("error", translate("components:categoryModal.errorCategory"));
@@ -312,7 +309,7 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
         setIsDeleteAlertVisible(false);
         setCategoryToDelete(null);
       }
-    }, [categoryToDelete, categoryStoreModel, deleteCategoryMutation]);
+    }, [categoryToDelete, deleteCategoryMutation]);
 
     const handleCloseDeleteAlert = () => {
       setIsDeleteAlertVisible(false);

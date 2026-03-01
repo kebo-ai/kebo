@@ -16,15 +16,15 @@ import { Screen } from "@/components/screen";
 import CustomHeader from "@/components/common/custom-header";
 import CustomIconModal from "@/components/common/custom-icon-modal";
 import { useStores } from "@/models/helpers/use-stores";
-import { IconModel } from "@/models/icon/icon";
 import CustomButton from "@/components/common/custom-button";
+import { useIcons } from "@/lib/api/hooks";
+import type { IconItem } from "@/lib/api/hooks/use-icons";
 import { getIconSuggestions } from "@/services/category-service";
 import { useCreateCategory, useUpdateCategory } from "@/lib/api/hooks";
 import { ArrowDownIconSvg } from "@/components/icons/arrow-down-icon";
 import { showToast } from "@/components/ui/custom-toast";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Instance } from "mobx-state-tree";
 import { EditIconSvg } from "@/components/icons/edit-icon-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import EmojiKeyboard, { EmojiType } from "rn-emoji-keyboard";
@@ -61,9 +61,7 @@ export const NewCategoryScreen: React.FC = () => {
 
   const [isCategoryIconVisible, setCategoryIconVisible] =
     useState<boolean>(false);
-  const [selectedIcon, setSelectedIcon] = useState<Instance<
-    typeof IconModel
-  > | null>(null);
+  const [selectedIcon, setSelectedIcon] = useState<IconItem | null>(null);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
   const [suggestedIcons, setSuggestedIcons] = useState<string[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
@@ -91,9 +89,9 @@ export const NewCategoryScreen: React.FC = () => {
   };
 
   const {
-    categoryStoreModel: { getIcons, icons },
     transactionModel,
   } = useStores();
+  const { data: icons = [] } = useIcons();
 
   const createCategoryMutation = useCreateCategory();
   const updateCategoryMutation = useUpdateCategory();
@@ -173,8 +171,6 @@ export const NewCategoryScreen: React.FC = () => {
     isInitialized.current = true;
 
     const initializeForm = async () => {
-      await getIcons();
-
       setSuggestedIcons([]);
       setSelectedSuggestionIndex(0);
 
@@ -205,7 +201,7 @@ export const NewCategoryScreen: React.FC = () => {
     initializeForm();
   }, []);
 
-  const handleIconSelect = (icon: Instance<typeof IconModel>) => {
+  const handleIconSelect = (icon: IconItem) => {
     setSelectedIcon(icon);
     formik.setFieldValue("icon_url", icon.url);
     setCategoryIconVisible(false);

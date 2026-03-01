@@ -38,4 +38,8 @@ export const queryConfig = {
     staleTime: 30 * MINUTE,
     gcTime: 60 * MINUTE,
   },
+  icons: {
+    staleTime: 30 * MINUTE,
+    gcTime: 60 * MINUTE,
+  },
 }

@@ -9,6 +9,42 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import Animated, { Easing, Keyframe } from "react-native-reanimated";
+
+// Transaction list entering — depth rise with subtle overshoot
+const transactionEntering = new Keyframe({
+  0: {
+    opacity: 0,
+    transform: [
+      { perspective: 600 },
+      { translateY: 25 },
+      { scale: 0.88 },
+      { rotateX: "-8deg" },
+    ],
+  },
+  65: {
+    opacity: 1,
+    transform: [
+      { perspective: 600 },
+      { translateY: -2 },
+      { scale: 1.02 },
+      { rotateX: "0.5deg" },
+    ],
+    easing: Easing.out(Easing.cubic),
+  },
+  100: {
+    opacity: 1,
+    transform: [
+      { perspective: 600 },
+      { translateY: 0 },
+      { scale: 1 },
+      { rotateX: "0deg" },
+    ],
+    easing: Easing.out(Easing.ease),
+  },
+});
+const TRANSACTION_ANIM_DURATION = 420;
+const TRANSACTION_ANIM_COOLDOWN = 2000;
 import { Text } from "@/components/ui";
 import { Screen } from "@/components/screen";
 import { useTransactions, useDeleteTransaction } from "@/lib/api/hooks";
@@ -34,6 +70,7 @@ import * as Haptics from "expo-haptics";
 import { InteractionManager } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useStores } from "@/models/helpers/use-stores";
+import { useCategories } from "@/lib/api/hooks";
 import { AccountIconSvg } from "@/components/icons/account-svg";
 import { CalendarIconSvg } from "@/components/icons/calendar-svg";
 import { MultiCategoryModal } from "@/components/common/multi-category-modal";
@@ -136,6 +173,8 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     const [allTransactions, setAllTransactions] = useState<ApiTransaction[]>([]);
     const [showScrollToTop, setShowScrollToTop] = useState(false);
     const scrollViewRef = useRef<ScrollView>(null);
+    const animatedIdsRef = useRef(new Set<string>());
+    const animCooldownRef = useRef(false);
     const ITEMS_PER_PAGE = 15;
     const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
     const [transactionToDelete, setTransactionToDelete] = useState<
@@ -156,8 +195,7 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     const [selectedType, setSelectedType] = useState<
       "Ingreso" | "Gasto" | null
     >(null);
-    const { categoryStoreModel } = useStores();
-    const categories = categoryStoreModel.categories;
+    const { data: categories = [] } = useCategories();
     const currentLocale = i18n.language.split("-")[0];
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
@@ -445,13 +483,24 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
         index: number,
         transactions: Transaction[]
       ) => {
+        const isNew = !animatedIdsRef.current.has(transaction.id);
+        animatedIdsRef.current.add(transaction.id);
+
+        const shouldAnimate = isNew && !animCooldownRef.current;
+        if (shouldAnimate) {
+          animCooldownRef.current = true;
+          setTimeout(() => { animCooldownRef.current = false; }, TRANSACTION_ANIM_COOLDOWN);
+        }
+
         return (
-          <TransactionList
-            transaction={transaction}
-            index={index}
-            transactions={transactions}
-            handleEditTransaction={handleEditTransaction}
-          />
+          <Animated.View entering={shouldAnimate ? transactionEntering.duration(TRANSACTION_ANIM_DURATION) : undefined}>
+            <TransactionList
+              transaction={transaction}
+              index={index}
+              transactions={transactions}
+              handleEditTransaction={handleEditTransaction}
+            />
+          </Animated.View>
         );
       },
       [handleEditTransaction]

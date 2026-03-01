@@ -97,12 +97,10 @@ export function useCreateTransaction() {
 
   return useMutation({
     mutationFn: async (data: CreateTransactionInput) => {
-      logger.debug("[useCreateTransaction] mutationFn called, posting to API...", JSON.stringify(data))
       try {
         const result = await unwrap<Transaction>(
           await client.transactions.$post({ json: data as never })
         )
-        logger.debug("[useCreateTransaction] API success, id:", result.id)
         return result
       } catch (err: any) {
         logger.error("[useCreateTransaction] API error:", err, "data:", JSON.stringify(err?.data))
@@ -110,7 +108,6 @@ export function useCreateTransaction() {
       }
     },
     onMutate: async (data) => {
-      logger.debug("[useCreateTransaction] onMutate called")
       await queryClient.cancelQueries({ queryKey: queryKeys.transactions.all })
       await queryClient.cancelQueries({ queryKey: queryKeys.balance.all })
 
@@ -119,8 +116,6 @@ export function useCreateTransaction() {
       const listQueries = queryCache.findAll({
         queryKey: queryKeys.transactions.lists(),
       })
-      logger.debug("[useCreateTransaction] Found", listQueries.length, "list queries to update")
-
       const snapshots: Array<{
         key: readonly unknown[]
         data: TransactionsResponse
@@ -205,8 +200,7 @@ export function useCreateTransaction() {
         queryClient.setQueryData(queryKeys.balance.all, context.previousBalance)
       }
     },
-    onSettled: (_data, error) => {
-      logger.debug("[useCreateTransaction] onSettled - error:", error ?? "none")
+    onSettled: () => {
       markMutationSettled("transactions")
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all })
       queryClient.invalidateQueries({ queryKey: queryKeys.balance.all })

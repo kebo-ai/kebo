@@ -32,7 +32,7 @@ import {
 import { useFormik } from "formik";
 import { showToast } from "@/components/ui/custom-toast";
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
-import { useUpdateTransaction } from "@/lib/api/hooks";
+import { useUpdateTransaction, useExpenseCategories, useIncomeCategories, useAccounts } from "@/lib/api/hooks";
 import { useTransactionDates } from "@/hooks/use-transaction-dates";
 import { CategorySnapshotIn } from "@/models/category/category";
 import { useSharedValue } from "react-native-reanimated";
@@ -73,9 +73,6 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
 
     const {
       categoryStoreModel: {
-        getCategories,
-        expenseCategories,
-        incomeCategories,
         getInitialCategory,
       },
       transactionModel: {
@@ -101,10 +98,11 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
         account_id,
         setEditingMode,
       },
-      bankStoreModel: { getListBanks },
-      accountStoreModel: { getListAccountType, getListAccount, accounts },
       uiStoreModel: { showLoader, hideLoader },
     } = useStores();
+    const { data: expenseCategories = [] } = useExpenseCategories();
+    const { data: incomeCategories = [] } = useIncomeCategories();
+    const { data: accounts = [] } = useAccounts();
 
     const updateTransactionMutation = useUpdateTransaction();
 
@@ -256,9 +254,6 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
 
     useEffect(() => {
       loadTransactionData();
-      getListBanks();
-      getListAccountType();
-      getListAccount();
     }, [params.transactionId]);
 
     useEffect(() => {

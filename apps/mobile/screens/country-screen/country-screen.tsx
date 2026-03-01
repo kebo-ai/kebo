@@ -11,8 +11,9 @@ import { useTheme } from "@/hooks/use-theme";
 import { showToast } from "@/components/ui/custom-toast";
 import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
-import { updateUserProfile } from "@/services/user-service";
-import { getUserInfo } from "@/utils/auth-utils";
+import { useProfile, useUpdateProfile } from "@/lib/api/hooks";
+import { queryKeys } from "@/lib/api/keys";
+import { useQueryClient } from "@tanstack/react-query";
 import * as Localization from "expo-localization";
 
 interface CountryScreenProps {}
@@ -183,23 +184,24 @@ const countries = [
 export const CountryScreen: FC<CountryScreenProps> = observer(
   function CountryScreen() {
     const router = useRouter();
-    const rootStore = useStores();
     const { theme } = useTheme();
     const {
       profileModel,
       uiStoreModel: { showLoader, hideLoader },
-      bankStoreModel: { getListBanksByCountry },
-    } = rootStore;
+    } = useStores();
+    const { data: profile } = useProfile();
+    const updateProfileMutation = useUpdateProfile();
+    const queryClient = useQueryClient();
 
     const [selectedCountry, setSelectedCountry] = React.useState(
-      profileModel.country || Localization.getLocales()[0]?.regionCode || "CO"
+      profile?.country || Localization.getLocales()[0]?.regionCode || "CO"
     );
 
     useEffect(() => {
-      if (profileModel.country) {
-        setSelectedCountry(profileModel.country);
+      if (profile?.country) {
+        setSelectedCountry(profile.country);
       }
-    }, [profileModel.country]);
+    }, [profile?.country]);
 
     const handleCountryChange = async (countryCode: string) => {
       try {
@@ -210,30 +212,25 @@ export const CountryScreen: FC<CountryScreenProps> = observer(
           throw new Error("Country not found");
         }
 
-        const response = await updateUserProfile({
+        await updateProfileMutation.mutateAsync({
           country: countryCode,
           currency: selectedCountryData.currency,
         });
 
-        if (response.success) {
-          setSelectedCountry(countryCode);
+        setSelectedCountry(countryCode);
 
-          profileModel.setCountryAndCurrency(
-            countryCode,
-            selectedCountryData.currency
-          );
+        profileModel.setCountryAndCurrency(
+          countryCode,
+          selectedCountryData.currency
+        );
 
-          await getUserInfo(rootStore);
-          await getListBanksByCountry(countryCode);
+        await queryClient.invalidateQueries({ queryKey: queryKeys.banks.all });
 
-          showToast("success", translate("countryScreen:successChangeCountry"));
+        showToast("success", translate("countryScreen:successChangeCountry"));
 
-          setTimeout(() => {
-            router.back();
-          }, 100);
-        } else {
-          throw new Error(response.error || "Failed to update country");
-        }
+        setTimeout(() => {
+          router.back();
+        }, 100);
       } catch (error) {
         logger.error("Error updating country:", error);
         showToast("error", translate("countryScreen:errorChangeCountry"));

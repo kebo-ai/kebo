@@ -36,7 +36,7 @@ export const useTransactionForm = (navigation: any) => {
   const formik = useFormik({
     initialValues: {
       account: "",
-      date: moment().format("YYYY-MM-DD HH:mm:ss.SSS Z"),
+      date: moment().toISOString(),
       displayDate: moment()
         .locale(currentLocale)
         .format("dddd, D MMMM")
@@ -111,13 +111,10 @@ export const useTransactionForm = (navigation: any) => {
             };
 
         // Fire mutation FIRST so onMutate updates cache before home screen renders
-        logger.debug("[TransactionForm] Mutation data:", JSON.stringify(mutationData));
         if (isTransfer) {
           createTransfer.mutate(mutationData as any);
-          logger.debug("[TransactionForm] Transfer mutation fired");
         } else {
           createTransaction.mutate(mutationData as any);
-          logger.debug("[TransactionForm] Transaction mutation fired");
         }
 
         // Then navigate — home screen will see optimistically updated cache

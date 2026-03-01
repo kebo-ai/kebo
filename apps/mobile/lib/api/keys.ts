@@ -62,4 +62,7 @@ export const queryKeys = {
   profile: {
     all: ["profile"] as const,
   },
+  icons: {
+    all: ["icons"] as const,
+  },
 }

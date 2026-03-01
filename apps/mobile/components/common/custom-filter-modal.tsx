@@ -11,7 +11,7 @@ import tw from "twrnc";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { colors } from "@/theme/colors";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { useStores } from "@/models/helpers/use-stores";
+import { useExpenseCategories, useIncomeCategories, useAccounts } from "@/lib/api/hooks";
 import moment from "moment";
 import "moment/locale/es";
 import i18n from "@/i18n/i18n";
@@ -42,14 +42,9 @@ const CustomFilterModal: React.FC<CustomFilterModalProps> = ({
   const [isAccountModalVisible, setAccountModalVisible] = useState(false);
   const [isTypeModalVisible, setTypeModalVisible] = useState(false);
 
-  const { categoryStoreModel, accountStoreModel } = useStores();
-  const { getCategories, expenseCategories, incomeCategories } =
-    categoryStoreModel;
-  const { accounts } = accountStoreModel;
-
-  useEffect(() => {
-    getCategories();
-  }, []);
+  const { data: expenseCategories = [] } = useExpenseCategories();
+  const { data: incomeCategories = [] } = useIncomeCategories();
+  const { data: accounts = [] } = useAccounts();
 
   const resetFilters = () => {
     setStartDate("");

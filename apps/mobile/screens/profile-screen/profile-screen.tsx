@@ -38,7 +38,7 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { PencilSvg } from "@/components/icons/pencil-svg";
 import { LanguageService } from "@/services/language-service";
 import * as StoreReview from "expo-store-review";
-import { useProfile, useUpdateProfile } from "@/lib/api/hooks";
+import { useProfile, useUpdateProfile, useExpenseCategories, useIncomeCategories } from "@/lib/api/hooks";
 import { queryKeys } from "@/lib/api/keys";
 
 let DeviceInfo: any = null;
@@ -68,8 +68,9 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
     const nameInputRef = useRef<TextInput>(null);
     const {
       uiStoreModel: { showLoader, hideLoader },
-      categoryStoreModel: { expenseCategories, incomeCategories },
     } = useStores();
+    const { data: expenseCategories = [] } = useExpenseCategories();
+    const { data: incomeCategories = [] } = useIncomeCategories();
     const analytics = useAnalytics();
     const { permissionsGranted } = useNotifications();
 

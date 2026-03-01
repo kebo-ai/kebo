@@ -19,10 +19,8 @@ import { colors } from "@/theme/colors";
 import { navigate } from "@/navigators";
 import { useStores } from "@/models/helpers/use-stores";
 import { observer } from "mobx-react-lite";
-import {
-  deleteAccountService,
-  getAccountsWithBalance,
-} from "@/services/account-service";
+import { getAccountsWithBalance } from "@/services/account-service";
+import { useAccounts, useDeleteAccount } from "@/lib/api/hooks";
 import { showToast } from "@/components/ui/custom-toast";
 import CustomAlert from "./custom-alert";
 import { translate } from "@/i18n";
@@ -69,14 +67,10 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
     hideBankActions = false,
   }) => {
     const {
-      accountStoreModel: {
-        getListAccount,
-        accounts,
-        deleteAccountById,
-        AccountsWithBalance,
-      },
       transactionModel: { updateField },
     } = useStores();
+    const { data: accounts = [] } = useAccounts();
+    const deleteAccountMutation = useDeleteAccount();
     const { getSymbol, formatAmount } = useCurrencyFormatter();
     const { theme } = useTheme();
 
@@ -89,7 +83,6 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
 
     useEffect(() => {
       if (visible) {
-        getListAccount();
         getAccountsWithBalance().then((data) => {
           if (data) setAccountsWithBalance(data);
         });
@@ -119,12 +112,10 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
 
       setIsDeleting(true);
       try {
-        const result = await deleteAccountService(bankToDelete);
-        if (result.kind === "ok") {
-          setIsUpdating(true);
-          await getListAccount();
+        await deleteAccountMutation.mutateAsync(bankToDelete);
 
-          const remainingAccounts = bankOptions.filter(
+        setIsUpdating(true);
+        const remainingAccounts = bankOptions.filter(
             (account) => account.id !== bankToDelete
           );
           if (remainingAccounts.length > 0) {
@@ -186,9 +177,6 @@ const CustomBankModal: React.FC<CustomBankModalProps> = observer(
             "success",
             translate("components:bankModal.deleteAccountSuccess")
           );
-        } else {
-          showToast("error", translate("components:bankModal.errorAccount"));
-        }
       } catch (error) {
         showToast("error", translate("components:bankModal.errorAccount"));
       } finally {

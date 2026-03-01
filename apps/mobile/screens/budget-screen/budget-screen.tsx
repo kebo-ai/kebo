@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   ScrollView,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
@@ -22,7 +23,6 @@ import { BudgetResponse } from "@/types/transaction";
 import type { Category } from "@/lib/api/types";
 import { useCategories } from "@/lib/api/hooks";
 import { showToast } from "@/components/ui/custom-toast";
-import CustomAlert from "@/components/common/custom-alert";
 import * as Haptics from "expo-haptics";
 import moment from "moment";
 import "moment/locale/es";
@@ -60,10 +60,6 @@ export const BudgetScreen: FC<BudgetScreenProps> =
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const { data: categories = [] } = useCategories();
-    const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
-    const [categoryToDelete, setCategoryToDelete] = useState<string | null>(
-      null
-    );
     const [openRow, setOpenRow] = useState<string | null>(null);
     const hasLoadedRef = useRef(false);
 
@@ -167,18 +163,23 @@ export const BudgetScreen: FC<BudgetScreenProps> =
       [budgetId]
     );
 
-    const handleConfirmDelete = useCallback(async () => {
-      if (categoryToDelete) {
-        await handleDeleteCategory(categoryToDelete);
-      }
-      setIsDeleteAlertVisible(false);
-      setCategoryToDelete(null);
-    }, [categoryToDelete, handleDeleteCategory]);
-
     const handleConfirmDeleteCategory = useCallback((categoryId: string) => {
-      setCategoryToDelete(categoryId);
-      setIsDeleteAlertVisible(true);
-    }, []);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      Alert.alert(
+        translate("budgetScreen:deleteCategory"),
+        translate("budgetScreen:deleteCategoryConfirmationMessage"),
+        [
+          { text: translate("common:cancel"), style: "cancel" },
+          {
+            text: translate("common:delete"),
+            style: "destructive",
+            onPress: () => {
+              handleDeleteCategory(categoryId);
+            },
+          },
+        ]
+      );
+    }, [handleDeleteCategory]);
 
     const onRowClose = useCallback(() => setOpenRow(null), []);
 
@@ -368,21 +369,6 @@ export const BudgetScreen: FC<BudgetScreenProps> =
           </View>
         </ScrollView>
         )}
-        <CustomAlert
-          visible={isDeleteAlertVisible}
-          title={translate("budgetScreen:deleteCategory")}
-          message={translate("budgetScreen:deleteCategoryConfirmationMessage")}
-          onConfirm={() => {
-            handleConfirmDelete();
-          }}
-          onCancel={() => {
-            setIsDeleteAlertVisible(false);
-            setCategoryToDelete(null);
-          }}
-          type="danger"
-          confirmText={translate("common:delete")}
-          cancelText={translate("common:cancel")}
-        />
       </View>
     );
   };

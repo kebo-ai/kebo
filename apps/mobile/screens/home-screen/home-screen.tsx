@@ -20,7 +20,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { Text, Icon } from "@/components/ui";
-import { TransactionService } from "@/services/transaction-service";
 import tw from "twrnc";
 import moment from "moment";
 import "moment/locale/es";
@@ -29,7 +28,10 @@ import { useTheme } from "@/hooks/use-theme";
 import { Stack, useRouter } from "expo-router";
 import { useFocusEffect } from "expo-router";
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
-import { getUserInfo } from "@/utils/auth-utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { useBalance, useRecentTransactions, useDeleteTransaction, useProfile } from "@/lib/api/hooks";
+import { queryKeys } from "@/lib/api/keys";
+import type { Transaction } from "@/lib/api/types";
 import { SpentSvg } from "@/components/icons/spent-svg";
 import { TranferSvg } from "@/components/icons/tranfer-svg";
 import { IncomeSvg } from "@/components/icons/income-svg";
@@ -57,23 +59,6 @@ import { useAnalytics } from "@/hooks/use-analytics";
 import { initializeUserAnalytics } from "@/utils/analytics-utils";
 
 interface HomeScreenProps {}
-
-// Define a type for transactions
-interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  date: string;
-  transaction_type: string;
-  category_icon_url?: string;
-  bank_url?: string;
-  category_name?: string;
-  category_id?: string;
-  is_recurring?: boolean;
-  metadata?: {
-    auto_generated?: boolean;
-  };
-}
 
 // Extracted Transaction Item Component for Memoization
 const TransactionItem = memo(
@@ -198,7 +183,7 @@ const TransactionItem = memo(
                   <Text weight="medium" color={theme.textPrimary}>
                     {categoryText}
                   </Text>
-                  {transaction.metadata?.auto_generated && (
+                  {!!transaction.metadata?.auto_generated && (
                     <View style={tw`ml-1 w-5 h-5 items-center justify-center`}>
                       <RecurrenceIconHomeSvg width={20} height={20} />
                     </View>
@@ -376,15 +361,20 @@ const keboWiseOptions = [
 export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
   const router = useRouter();
   const { theme } = useTheme();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [user, setUser] = useState<any>(null);
-  const [userBalance, setUserBalance] = useState<any>(null);
   const [openRow, setOpenRow] = useState<string | null>(null);
   const { formatAmount } = useCurrencyFormatter();
   const rootStore = useStores();
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const analytics = useAnalytics();
+
+  const queryClient = useQueryClient();
+  const { data: balance } = useBalance();
+  const { data: txResponse } = useRecentTransactions(5);
+  const { data: profile } = useProfile();
+  const deleteTransaction = useDeleteTransaction();
+
+  const transactions = txResponse?.data ?? [];
 
   const {
     isVisible: isReviewModalVisible,
@@ -427,51 +417,26 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     }, [checkEligibility])
   );
 
-  const fetchUserBalance = useCallback(async () => {
-    try {
-      const balance = await TransactionService.getUserBalance();
-      setUserBalance(balance);
-    } catch (error) {
-      logger.error("Error fetching user balance:", error);
-    }
-  }, []);
-
-  const fetchTransactions = useCallback(async () => {
-    try {
-      const userInfo = await getUserInfo(rootStore);
-      setUser(userInfo);
-
-      await initializeUserAnalytics(analytics, rootStore);
-
-      const data = await TransactionService.getTransactions();
-      const sortedTransactions =
-        data?.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        ) || [];
-      setTransactions(sortedTransactions);
-      await fetchUserBalance();
-    } catch (error) {
-      logger.error("Error fetching transactions:", error);
-    }
-  }, [rootStore, fetchUserBalance]);
-
   useEffect(() => {
     getCategories();
-    fetchTransactions();
     getListAccount();
-  }, [getCategories, fetchTransactions, getListAccount]);
+  }, [getCategories, getListAccount]);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchTransactions();
-    }, [fetchTransactions])
-  );
+  useEffect(() => {
+    if (profile) {
+      initializeUserAnalytics(analytics, rootStore);
+    }
+  }, [profile, analytics, rootStore]);
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
-    await fetchTransactions();
+    await Promise.all([
+      queryClient.refetchQueries({ queryKey: queryKeys.balance.all }),
+      queryClient.refetchQueries({ queryKey: queryKeys.transactions.all }),
+      queryClient.refetchQueries({ queryKey: queryKeys.profile.all }),
+    ]);
     setIsRefreshing(false);
-  }, [fetchTransactions]);
+  }, [queryClient]);
 
   const firstName = (full_name || "").split(" ")[0];
 
@@ -485,18 +450,13 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
         {
           text: translate("homeScreen:delete"),
           style: "destructive",
-          onPress: async () => {
-            try {
-              await TransactionService.deleteTransaction(transactionId);
-              fetchTransactions();
-            } catch (error) {
-              logger.error("Error deleting transaction:", error);
-            }
+          onPress: () => {
+            deleteTransaction.mutate(transactionId);
           },
         },
       ]
     );
-  }, [fetchTransactions]);
+  }, [deleteTransaction]);
 
   const handleTransactionPress = useCallback(
     (transaction: Transaction) => {
@@ -641,8 +601,8 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
             isVisible={isBalanceVisible}
             onToggle={handleBalanceVisibilityToggle}
             formattedBalance={
-              userBalance
-                ? formatAmount(userBalance.total_balance)
+              balance
+                ? formatAmount(balance.total_balance)
                 : formatAmount(0)
             }
           />
@@ -698,7 +658,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
       </View>
     );
   }, [
-    userBalance,
+    balance,
     formatAmount,
     navigateToTransaction,
     navigateToSelectBank,
@@ -750,10 +710,9 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
 
   const onRowClose = useCallback(() => setOpenRow(null), []);
 
-  const avatarSource =
-    user?.profile?.avatar_url || user?.user?.user_metadata?.avatar_url
-      ? { uri: user?.profile?.avatar_url || user?.user?.user_metadata?.avatar_url }
-      : require("@/assets/icons/kebo-profile.png");
+  const avatarSource = profile?.avatar_url
+    ? { uri: profile.avatar_url }
+    : require("@/assets/icons/kebo-profile.png");
 
   return (
     <>

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import React, { FC, useEffect, useState, useCallback, useRef } from "react";
+import React, { FC, useEffect, useState, useCallback, useRef, useMemo } from "react";
 import {
   View,
   TouchableOpacity,
@@ -18,38 +18,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { translate } from "@/i18n";
 import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import CustomBudgetCard from "@/components/common/custom-budget-card";
-import { budgetService } from "@/services/budget-service";
-import { Stack, useFocusEffect, useRouter } from "expo-router";
+import { useBudgets, useDeleteBudget } from "@/lib/api/hooks";
+import { useProfile } from "@/lib/api/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/api/keys";
+import { Stack, useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { showToast } from "@/components/ui/custom-toast";
 import BudgetIntroSlider from "@/components/common/budget-intro-slider";
 import { load, save } from "@/utils/storage/storage";
-import { supabase } from "@/config/supabase";
 import logger from "@/utils/logger";
 import moment from "moment";
 import { useAnalytics } from "@/hooks/use-analytics";
-
-interface BudgetOption {
-  id: string;
-  custom_name: string;
-  start_date: string;
-  end_date: string;
-  is_recurrent: boolean;
-  budget_amount: number;
-  user_id: string;
-}
-
-interface Budget {
-  id: string;
-  budget: BudgetOption;
-  total_metrics: {
-    total_amount: number;
-    total_spent: number;
-    total_remaining: number;
-    total_budget: number;
-    overall_progress_percentage: number;
-  };
-}
 
 interface Slide {
   key: string;
@@ -65,24 +45,42 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
     const router = useRouter();
     const { theme } = useTheme();
     const analytics = useAnalytics();
-    const [budgets, setBudgets] = useState<Budget[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const queryClient = useQueryClient();
+    const { data: budgetsData, isLoading: loading } = useBudgets();
+    const { data: profile } = useProfile();
+    const deleteBudgetMutation = useDeleteBudget();
     const [showIntroSlider, setShowIntroSlider] = useState(false);
     const [isCheckingIntro, setIsCheckingIntro] = useState(true);
-    const [userName, setUserName] = useState("");
     const [isRefreshing, setIsRefreshing] = useState(false);
     const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
 
-    useEffect(() => {
-      const getUserData = async () => {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        setUserName(user?.user_metadata.full_name || "");
-      };
-      getUserData();
-    }, []);
+    const userName = profile?.full_name || "";
+
+    const budgets = useMemo(() => {
+      if (!budgetsData) return [];
+      return [...budgetsData].sort((a, b) => {
+        const dateA = moment(a.start_date).valueOf();
+        const dateB = moment(b.start_date).valueOf();
+        return dateB - dateA;
+      });
+    }, [budgetsData]);
+
+    const budgetItems = useMemo(() => {
+      return budgets.map((b) => ({
+        id: b.id,
+        budget: {
+          custom_name: b.custom_name || "",
+          start_date: b.start_date,
+          end_date: b.end_date,
+        },
+        total_metrics: {
+          total_budget: Number(b.budget_amount),
+          total_spent: Number(b.total_spent || 0),
+          total_remaining: Number(b.total_remaining || 0),
+          overall_progress_percentage: Number(b.progress_percentage || 0),
+        },
+      }));
+    }, [budgets]);
 
     const TRANSLATIONS = {
       welcome: "budgetOnboarding:welcome" as const,
@@ -133,86 +131,45 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
       checkIntroShown();
     }, [checkIntroShown]);
 
-    const parseDate = (dateString: string) => {
-      return moment(dateString, "DD/MM/YYYY").toDate();
-    };
-
-    const checkAndLoadBudgets = useCallback(async () => {
-      try {
-        if (isInitialLoad) {
-          setLoading(true);
-        }
-        const budgetsList = await budgetService.listBudgets();
-
-        const sortedBudgets = [...budgetsList].sort((a, b) => {
-          const dateA = parseDate(a.budget.start_date);
-          const dateB = parseDate(b.budget.start_date);
-
-          if (dateA.getTime() === dateB.getTime()) {
-            return b.budget.id.localeCompare(a.budget.id);
-          }
-          return dateB.getTime() - dateA.getTime();
-        });
-
-        const budgetsWithId = sortedBudgets.map((budget) => ({
-          ...budget,
-          id: budget.budget.id,
-        }));
-
-        setBudgets(budgetsWithId);
-      } catch (error) {
-        logger.error("Error checking/loading budgets:", error);
-      } finally {
-        setLoading(false);
-        setIsInitialLoad(false);
-      }
-    }, [isInitialLoad]);
-
-    useEffect(() => {
-      checkAndLoadBudgets();
-    }, [checkAndLoadBudgets]);
-
-    useFocusEffect(
-      useCallback(() => {
-        checkAndLoadBudgets();
-      }, [checkAndLoadBudgets])
-    );
-
     const handleRefresh = useCallback(async () => {
       setIsRefreshing(true);
-      await checkAndLoadBudgets();
+      await queryClient.refetchQueries({ queryKey: queryKeys.budgets.all });
       setIsRefreshing(false);
-    }, [checkAndLoadBudgets]);
+    }, [queryClient]);
 
-    const handleDelete = useCallback((budgetId: string) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      swipeableRefs.current[budgetId]?.close();
-      Alert.alert(
-        translate("budgetScreen:deleteBudget"),
-        translate("budgetScreen:deleteConfirmationMessage"),
-        [
-          { text: translate("common:cancel"), style: "cancel" },
-          {
-            text: translate("common:delete"),
-            style: "destructive",
-            onPress: async () => {
-              try {
-                const success = await budgetService.deleteBudget(budgetId);
-                if (success) {
-                  showToast("success", translate("budgetScreen:budgetDeleted"));
-                  await checkAndLoadBudgets();
-                } else {
-                  showToast("error", translate("budgetScreen:errorDeletingBudget"));
+    const handleDelete = useCallback(
+      (budgetId: string) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        swipeableRefs.current[budgetId]?.close();
+        Alert.alert(
+          translate("budgetScreen:deleteBudget"),
+          translate("budgetScreen:deleteConfirmationMessage"),
+          [
+            { text: translate("common:cancel"), style: "cancel" },
+            {
+              text: translate("common:delete"),
+              style: "destructive",
+              onPress: async () => {
+                try {
+                  await deleteBudgetMutation.mutateAsync(budgetId);
+                  showToast(
+                    "success",
+                    translate("budgetScreen:budgetDeleted")
+                  );
+                } catch (error) {
+                  logger.error("Error deleting budget:", error);
+                  showToast(
+                    "error",
+                    translate("budgetScreen:errorDeletingBudget")
+                  );
                 }
-              } catch (error) {
-                logger.error("Error deleting budget:", error);
-                showToast("error", translate("budgetScreen:errorDeletingBudget"));
-              }
+              },
             },
-          },
-        ]
-      );
-    }, [checkAndLoadBudgets]);
+          ]
+        );
+      },
+      [deleteBudgetMutation]
+    );
 
     const renderRightActions = useCallback(
       (progress: Animated.AnimatedInterpolation<number>, budgetId: string) => {
@@ -270,7 +227,7 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
       );
     }
 
-    if (loading && budgets.length === 0) {
+    if (loading && budgetItems.length === 0) {
       return (
         <View style={tw`flex-1 justify-center items-center`}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -304,12 +261,12 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
           }
         >
           <View style={tw`px-4 py-4`}>
-            {loading && budgets.length > 0 && (
+            {loading && budgetItems.length > 0 && (
               <View style={tw`py-2 items-center`}>
                 <ActivityIndicator size="small" color={colors.primary} />
               </View>
             )}
-            {budgets.length === 0 ? (
+            {budgetItems.length === 0 ? (
               <View style={tw`items-center mt-10`}>
                 <KeboSadIconSvg width={50} height={50} />
                 <Text color={theme.textSecondary} style={tw`text-center mt-2`}>
@@ -318,12 +275,12 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
               </View>
             ) : (
               <View style={tw`mt-2 mb-20 gap-3`}>
-                {budgets.map((budgetData) => (
+                {budgetItems.map((budgetData) => (
                   <Swipeable
                     key={budgetData.id}
                     ref={(ref) => { swipeableRefs.current[budgetData.id] = ref; }}
                     renderRightActions={(progress) =>
-                      renderRightActions(progress, budgetData.budget.id)
+                      renderRightActions(progress, budgetData.id)
                     }
                     rightThreshold={40}
                     overshootRight={false}
@@ -341,7 +298,7 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                         router.push({
                           pathname: "/(authenticated)/budget/[budgetId]",
-                          params: { budgetId: budgetData.budget.id },
+                          params: { budgetId: budgetData.id },
                         });
                       }}
                     >
@@ -350,7 +307,7 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
                         onArrowPress={() => {
                           router.push({
                             pathname: "/(authenticated)/budget/[budgetId]",
-                            params: { budgetId: budgetData.budget.id },
+                            params: { budgetId: budgetData.id },
                           });
                         }}
                       />

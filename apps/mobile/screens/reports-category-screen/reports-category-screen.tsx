@@ -1,5 +1,5 @@
 import logger from "@/utils/logger";
-import React, { FC, useState, useEffect, useCallback, memo } from "react";
+import React, { FC, useState, useEffect, useCallback, useMemo } from "react";
 import {
   Platform,
   View,
@@ -22,8 +22,7 @@ import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 import { CustomBarCategory } from "@/components/common/custom-bar-category";
 import * as Haptics from "expo-haptics";
 import CustomAlert from "@/components/common/custom-alert";
-import { ChartService } from "@/services/chart-service";
-import { deleteCategoryService } from "@/services/category-service";
+import { useExpenseByCategory, useDeleteCategory } from "@/lib/api/hooks";
 import { showToast } from "@/components/ui/custom-toast";
 import { CategoriesList } from "@/components/common/categories-list";
 import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
@@ -35,6 +34,7 @@ interface CategoryData {
   id: string;
   name: string;
   icon: string;
+  icon_url: string;
   emoji: string;
   amount: number;
   color: string;
@@ -49,18 +49,14 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
     const screenWidth = Dimensions.get("window").width - 32;
     const [availableMonths, setAvailableMonths] = useState<string[]>([]);
     const [selectedMonthIndex, setSelectedMonthIndex] = useState(0);
-    const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
     const selectedMonth = availableMonths[selectedMonthIndex] || "";
     const { formatAmount } = useCurrencyFormatter();
-    const [categories, setCategories] = useState<CategoryData[]>([]);
     const [categoryToDelete, setCategoryToDelete] = useState<string | null>(
       null
     );
     const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
     const [openRow, setOpenRow] = useState<string | null>(null);
     const [renderHiddenItem, setRenderHiddenItem] = useState<any>(null);
-    const [total, setTotal] = useState(0);
     const [tooltipVisible, setTooltipVisible] = useState(false);
     const [tooltipData, setTooltipData] = useState<CategoryData | null>(null);
     const [activeBarIndex, setActiveBarIndex] = useState<number | null>(null);
@@ -93,41 +89,31 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
       fetchAvailableMonths();
     }, [fetchAvailableMonths]);
 
-    const fetchChartData = useCallback(async () => {
-      if (!selectedMonth) return;
+    const periodDate = selectedMonth ? moment(selectedMonth).format("YYYY-MM-DD") : undefined;
+    const { data: reportData, isLoading } = useExpenseByCategory(
+      periodDate ? { periodDate } : undefined
+    );
 
-      try {
-        setIsLoading(true);
-        const periodDate = moment(selectedMonth).toDate();
-        const response = await ChartService.getExpenseReportByCategory(
-          periodDate
-        );
+    const deleteCategoryMutation = useDeleteCategory();
 
-        setTotal(response.total);
+    const total = reportData?.total ?? 0;
 
-        const formattedData = response.data_categories.map((cat) => ({
-          id: cat.id,
-          name: cat.name,
-          icon: cat.icon,
-          emoji: cat.icon,
-          amount: cat.amount,
-          color: cat.bar_color,
-          percentage: cat.percentage * 100,
-          transaction_count: cat.transaction_count,
-        }));
+    const categoryData = useMemo(() => {
+      if (!reportData?.data_categories) return [];
+      return reportData.data_categories.map((cat) => ({
+        id: cat.id,
+        name: cat.name,
+        icon: cat.icon,
+        icon_url: cat.icon,
+        emoji: cat.icon,
+        amount: cat.amount,
+        color: cat.bar_color,
+        percentage: cat.percentage * 100,
+        transaction_count: cat.transaction_count,
+      }));
+    }, [reportData]);
 
-        setCategoryData(formattedData);
-        setCategories(formattedData);
-      } catch (error) {
-        logger.error("Error fetching chart data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }, [selectedMonth]);
-
-    useEffect(() => {
-      fetchChartData();
-    }, [fetchChartData]);
+    const categories = categoryData;
 
     const handlePrevMonth = () => {
       if (selectedMonthIndex > 0) {
@@ -150,19 +136,11 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
     const handleConfirmDelete = useCallback(async () => {
       if (categoryToDelete) {
         try {
-          const result = await deleteCategoryService(categoryToDelete);
-          if (result.kind === "ok") {
-            showToast(
-              "success",
-              translate("components:categoryModal.deleteCategorySuccess")
-            );
-            await fetchChartData();
-          } else {
-            showToast(
-              "error",
-              translate("components:categoryModal.errorCategory")
-            );
-          }
+          await deleteCategoryMutation.mutateAsync(categoryToDelete);
+          showToast(
+            "success",
+            translate("components:categoryModal.deleteCategorySuccess")
+          );
         } catch (error) {
           logger.error("Error deleting category:", error);
           showToast(
@@ -173,7 +151,7 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
       }
       setIsDeleteAlertVisible(false);
       setCategoryToDelete(null);
-    }, [categoryToDelete, fetchChartData]);
+    }, [categoryToDelete, deleteCategoryMutation]);
 
     const renderTransactionItemWrapper = useCallback(
       (item: CategoryData) => {
@@ -248,8 +226,8 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
       setCategoryToDelete(null);
     }, []);
 
-    const showTooltip = (item: CategoryData, idx: number, x: number) => {
-      setTooltipData(item);
+    const showTooltip = (item: any, idx: number, x: number) => {
+      setTooltipData(item as CategoryData);
       setActiveBarIndex(idx);
       setTooltipX(x);
       setTooltipVisible(true);

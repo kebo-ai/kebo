@@ -18,11 +18,8 @@ import CustomIconModal from "@/components/common/custom-icon-modal";
 import { useStores } from "@/models/helpers/use-stores";
 import { IconModel } from "@/models/icon/icon";
 import CustomButton from "@/components/common/custom-button";
-import {
-  createCategoryUser,
-  updateCategoryService,
-  getIconSuggestions,
-} from "@/services/category-service";
+import { getIconSuggestions } from "@/services/category-service";
+import { useCreateCategory, useUpdateCategory } from "@/lib/api/hooks";
 import { ArrowDownIconSvg } from "@/components/icons/arrow-down-icon";
 import { showToast } from "@/components/ui/custom-toast";
 import { useFormik } from "formik";
@@ -94,9 +91,12 @@ export const NewCategoryScreen: React.FC = () => {
   };
 
   const {
-    categoryStoreModel: { getIcons, getCategories, icons, createCategory },
+    categoryStoreModel: { getIcons, icons },
     transactionModel,
   } = useStores();
+
+  const createCategoryMutation = useCreateCategory();
+  const updateCategoryMutation = useUpdateCategory();
 
   const formik = useFormik<CategoryFormValues>({
     initialValues: {
@@ -133,19 +133,21 @@ export const NewCategoryScreen: React.FC = () => {
         let categoryId;
 
         if (params?.isEditing) {
-          await updateCategoryService(params?.categoryData?.id || "", {
-            name: values.name,
-            icon_url: values.icon_url,
-            type: values.type,
+          await updateCategoryMutation.mutateAsync({
+            id: params?.categoryData?.id || "",
+            data: {
+              name: values.name,
+              icon_url: values.icon_url,
+              type: values.type,
+            },
           });
           categoryId = params?.categoryData?.id;
         } else {
-          const category = await createCategory({
+          const category = await createCategoryMutation.mutateAsync({
             type: values.type,
             name: values.name,
             icon_url: values.icon_url,
           });
-
           categoryId = category.id;
           showToast(
             "success",
@@ -153,7 +155,6 @@ export const NewCategoryScreen: React.FC = () => {
           );
         }
 
-        getCategories();
         transactionModel.setSelectedCategory({
           id: categoryId || "",
           name: values.name,

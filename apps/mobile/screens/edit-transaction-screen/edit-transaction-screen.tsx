@@ -32,7 +32,7 @@ import {
 import { useFormik } from "formik";
 import { showToast } from "@/components/ui/custom-toast";
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
-import { TransactionService } from "@/services/transaction-service";
+import { useUpdateTransaction } from "@/lib/api/hooks";
 import { useTransactionDates } from "@/hooks/use-transaction-dates";
 import { CategorySnapshotIn } from "@/models/category/category";
 import { useSharedValue } from "react-native-reanimated";
@@ -106,6 +106,8 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
       uiStoreModel: { showLoader, hideLoader },
     } = useStores();
 
+    const updateTransactionMutation = useUpdateTransaction();
+
     const currentLocale = i18n.language.startsWith("es") ? "es" : "en";
 
     // --- Number entry ---
@@ -154,42 +156,23 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
             formattedDate = originalDate.format("YYYY-MM-DD HH:mm:ss.SSS Z");
           }
 
-          const result = await TransactionService.updateTransaction(
-            params.transactionId!,
-            {
+          await updateTransactionMutation.mutateAsync({
+            id: params.transactionId!,
+            data: {
               amount: amount,
               description: description,
               date: formattedDate,
-              transaction_type: transaction_type as
-                | "Expense"
-                | "Income"
-                | "Transfer",
+              transaction_type: transaction_type as "Expense" | "Income" | "Transfer",
               category_id: category_id || undefined,
-              account_id:
-                transaction_type === "Transfer"
-                  ? undefined
-                  : account_id || undefined,
-              from_account_id: from_account_id || undefined,
-              to_account_id: to_account_id || undefined,
+              account_id: transaction_type === "Transfer" ? undefined : account_id || undefined,
               is_recurring: values.recurrence !== RecurrenceType.NEVER,
-              recurrence_cadence: values.recurrence_cadence,
-              recurrence_end_date: values.recurrence_end_date,
-              metadata: { note: values.note },
-            }
-          );
+              recurrence_cadence: values.recurrence_cadence as any,
+              recurrence_end_date: values.recurrence_end_date || undefined,
+            },
+          });
 
-          if (result) {
-            router.back();
-            showToast(
-              "success",
-              translate("editTransaction:successMessageEdit")
-            );
-          } else {
-            showToast(
-              "error",
-              translate("transactionScreen:errorMessageTransaction")
-            );
-          }
+          router.back();
+          showToast("success", translate("editTransaction:successMessageEdit"));
           updateField("amount", 0);
         } catch (error) {
           logger.error("Error updating transaction:", error);
@@ -220,7 +203,7 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
               | "Investment"
               | "Other"
           );
-          updateField("amount", Number(transaction.amount.toFixed(2)));
+          updateField("amount", Number(Number(transaction.amount).toFixed(2)));
           updateField("description", transaction.description || "");
           updateField("category_id", transaction.category_id || "");
           updateField("category_name", transaction.category_name || "");
@@ -236,7 +219,7 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
           updateField("to_account_url", transaction.to_account_url || "");
 
           // Initialize number entry with the transaction amount
-          const cents = Math.round(Number(transaction.amount.toFixed(2)) * 100);
+          const cents = Math.round(Number(Number(transaction.amount).toFixed(2)) * 100);
           numberEntry.setFromCents(cents);
 
           formik.setValues({

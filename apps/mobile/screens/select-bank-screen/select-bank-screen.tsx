@@ -1,7 +1,6 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
-import { useStores } from "@/models/helpers/use-stores";
 import tw from "@/hooks/use-tailwind";
 import {
   View,
@@ -17,6 +16,7 @@ import { SearchIconSvg } from "@/components/icons/search-svg";
 import * as Localization from "expo-localization";
 import { translate } from "@/i18n";
 import { useTheme } from "@/hooks/use-theme";
+import { useBanksByCountry, useSearchBanks, useProfile } from "@/lib/api/hooks";
 
 interface Bank {
   id: string;
@@ -36,11 +36,6 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
       fromScreen?: string;
     }>();
 
-    const {
-      bankStoreModel: { getListBanksByCountry, banks, searchBanksByCountry },
-      uiStoreModel: { showLoader, hideLoader, isLoading },
-      profileModel,
-    } = useStores();
     const [searchQuery, setSearchQuery] = useState("");
     const { theme, isDark } = useTheme();
 
@@ -49,21 +44,13 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
     const fromBankModal = params.fromBankModal === "true";
     const fromScreen = params.fromScreen;
 
+    const { data: profile } = useProfile();
     const deviceRegion = Localization.getLocales()[0]?.regionCode || "US";
-    const userCountry = profileModel?.country || deviceRegion;
+    const userCountry = profile?.country || deviceRegion;
 
-    useEffect(() => {
-      const timeoutId = setTimeout(() => {
-        if (searchQuery.trim()) {
-          showLoader();
-          searchBanksByCountry(searchQuery, userCountry).finally(() => hideLoader());
-        } else {
-          showLoader();
-          getListBanksByCountry(userCountry).finally(() => hideLoader());
-        }
-      }, 500);
-      return () => clearTimeout(timeoutId);
-    }, [searchQuery, userCountry]);
+    const { data: banksByCountry = [] } = useBanksByCountry(userCountry);
+    const { data: searchResults } = useSearchBanks(searchQuery.trim());
+    const banks = searchQuery.trim() ? (searchResults ?? []) : banksByCountry;
 
     return (
       <>
@@ -119,7 +106,7 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
           <View
             style={[tw`rounded-2xl overflow-hidden`, { borderWidth: 1, borderColor: theme.border, backgroundColor: theme.surface }]}
           >
-            {banks?.map((bank, index) => (
+            {banks.map((bank, index) => (
               <TouchableOpacity
                 key={bank.id}
                 onPress={() => {
@@ -139,7 +126,7 @@ export const SelectBankScreen: FC<SelectBankScreenProps> = observer(
                 }}
                 style={[
                   tw`flex-row items-center h-[54px] gap-3 px-4`,
-                  index < (banks?.length ?? 0) - 1 && { borderBottomWidth: 1, borderBottomColor: theme.border },
+                  index < banks.length - 1 && { borderBottomWidth: 1, borderBottomColor: theme.border },
                 ]}
               >
                 <Image

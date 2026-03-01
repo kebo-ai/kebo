@@ -216,11 +216,12 @@ export function useCreateTransfer() {
 
   return useMutation({
     mutationFn: async (data: CreateTransferInput) =>
-      unwrap<Transaction>(
+      unwrap<{ expense: Transaction; income: Transaction }>(
         await client.transactions.transfer.$post({ json: data as never })
       ),
     onMutate: async (data) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.transactions.all })
+      await queryClient.cancelQueries({ queryKey: queryKeys.balance.all })
 
       const queryCache = queryClient.getQueryCache()
       const listQueries = queryCache.findAll({
@@ -235,28 +236,52 @@ export function useCreateTransfer() {
       const accounts = queryClient.getQueryData<Account[]>(
         queryKeys.accounts.list()
       )
+      const categoriesData = queryClient.getQueryData<Category[]>(
+        queryKeys.categories.list()
+      )
       const fromAccount = accounts?.find((a) => a.id === data.from_account_id)
+      const toAccount = accounts?.find((a) => a.id === data.to_account_id)
+      const transferCategory = categoriesData?.find((c) => c.type === "Transfer")
 
       const now = new Date().toISOString()
-      const optimisticTransaction: Transaction = {
-        id: tempId(),
+      const shared = {
         user_id: "",
-        account_id: data.from_account_id,
         from_account_id: data.from_account_id,
         to_account_id: data.to_account_id,
         amount: data.amount,
         currency: data.currency,
-        transaction_type: "Transfer",
         date: data.date,
         description: data.description,
         is_recurring: false,
         is_deleted: false,
         created_at: now,
         updated_at: now,
+        category_id: transferCategory?.id,
+        category_name: transferCategory?.name,
+        category_icon_url: transferCategory?.icon_url,
+        category_icon_emoji: transferCategory?.icon_emoji,
+      }
+
+      const expenseTx: Transaction = {
+        ...shared,
+        id: tempId(),
+        account_id: data.from_account_id,
+        transaction_type: "Expense",
         account_name: fromAccount?.customized_name || fromAccount?.name,
         bank_name: fromAccount?.bank_name,
         bank_url: fromAccount?.bank_url,
         bank_id: fromAccount?.bank_id,
+      }
+
+      const incomeTx: Transaction = {
+        ...shared,
+        id: tempId(),
+        account_id: data.to_account_id,
+        transaction_type: "Income",
+        account_name: toAccount?.customized_name || toAccount?.name,
+        bank_name: toAccount?.bank_name,
+        bank_url: toAccount?.bank_url,
+        bank_id: toAccount?.bank_id,
       }
 
       for (const query of listQueries) {
@@ -264,19 +289,27 @@ export function useCreateTransfer() {
         if (cached) {
           snapshots.push({ key: query.queryKey, data: cached })
           queryClient.setQueryData<TransactionsResponse>(query.queryKey, {
-            data: [optimisticTransaction, ...cached.data],
-            total: cached.total + 1,
+            data: [expenseTx, incomeTx, ...cached.data],
+            total: cached.total + 2,
           })
         }
       }
 
-      return { snapshots }
+      // Optimistic balance: transfer is net-zero globally
+      const previousBalance = queryClient.getQueryData<UserBalance>(
+        queryKeys.balance.all
+      )
+
+      return { snapshots, previousBalance }
     },
     onError: (_err, _data, context) => {
       if (context?.snapshots) {
         for (const { key, data } of context.snapshots) {
           queryClient.setQueryData(key, data)
         }
+      }
+      if (context?.previousBalance) {
+        queryClient.setQueryData(queryKeys.balance.all, context.previousBalance)
       }
     },
     onSettled: () => {

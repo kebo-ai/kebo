@@ -241,6 +241,7 @@ const app = base
           fromAccountId: body.from_account_id,
           toAccountId: body.to_account_id,
           amount: body.amount,
+          currency: body.currency,
           description: body.description,
           date: body.date,
         },

@@ -20,6 +20,7 @@ interface CreateTransferParams {
   fromAccountId: string
   toAccountId: string
   amount: string
+  currency?: string
   description?: string
   date: string
 }
@@ -264,22 +265,58 @@ export class TransactionService {
         throw new Error("One or both accounts do not belong to this user")
       }
 
-      // Create the main transfer transaction
-      const [transferTx] = await tx
+      // Look up the user's "Transfer" category
+      const [transferCategory] = await tx
+        .select({ id: categories.id })
+        .from(categories)
+        .where(
+          and(
+            eq(categories.user_id, userId),
+            eq(categories.type, "Transfer"),
+            eq(categories.is_deleted, false),
+          ),
+        )
+        .limit(1)
+
+      const categoryId = transferCategory?.id ?? null
+      const transferDate = new Date(params.date)
+      const description = params.description ?? "Transfer"
+      const currency = params.currency ?? "USD"
+
+      // Create two transactions: Expense from source, Income to destination
+      const [expenseTx] = await tx
         .insert(transactions)
         .values({
           user_id: userId,
           account_id: params.fromAccountId,
+          from_account_id: params.fromAccountId,
           to_account_id: params.toAccountId,
-          transaction_type: "Transfer",
+          transaction_type: "Expense",
           amount: params.amount,
-          currency: "USD", // Default currency
-          description: params.description ?? "Transfer",
-          date: new Date(params.date),
+          currency,
+          category_id: categoryId,
+          description,
+          date: transferDate,
         })
         .returning()
 
-      return transferTx
+      const [incomeTx] = await tx
+        .insert(transactions)
+        .values({
+          user_id: userId,
+          account_id: params.toAccountId,
+          from_account_id: params.fromAccountId,
+          to_account_id: params.toAccountId,
+          transaction_type: "Income",
+          amount: params.amount,
+          currency,
+          category_id: categoryId,
+          description,
+          date: transferDate,
+        })
+        .returning()
+
+      return { expense: expenseTx, income: incomeTx }
     })
   }
 

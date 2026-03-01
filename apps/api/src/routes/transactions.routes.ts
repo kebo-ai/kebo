@@ -68,12 +68,15 @@ const CreateTransactionSchema = z.object({
 })
 
 const CreateTransferSchema = z.object({
-  fromAccountId: z.string().uuid(),
-  toAccountId: z.string().uuid(),
+  from_account_id: z.string().uuid(),
+  to_account_id: z.string().uuid(),
   amount: z
-    .string()
-    .regex(/^\d+(\.\d{1,2})?$/, "Invalid amount format")
-    .refine((val) => parseFloat(val) > 0, { message: "Amount must be greater than zero" }),
+    .union([z.string(), z.number()])
+    .transform((val) => String(val))
+    .refine((val) => /^\d+(\.\d{1,2})?$/.test(val) && parseFloat(val) > 0, {
+      message: "Amount must be a positive number with up to 2 decimal places",
+    }),
+  currency: z.string().length(3).optional(),
   description: z.string().optional(),
   date: z.string().datetime(),
 })
@@ -226,7 +229,7 @@ const app = base
     const userId = c.get("userId")
     const body = c.req.valid("json")
 
-    if (body.fromAccountId === body.toAccountId) {
+    if (body.from_account_id === body.to_account_id) {
       return c.json({ error: "Cannot transfer to the same account" }, 400)
     }
 
@@ -234,7 +237,13 @@ const app = base
       const result = await TransactionService.createTransfer(
         c.get("db"),
         userId,
-        body,
+        {
+          fromAccountId: body.from_account_id,
+          toAccountId: body.to_account_id,
+          amount: body.amount,
+          description: body.description,
+          date: body.date,
+        },
       )
       return c.json(result, 201)
     } catch (error) {

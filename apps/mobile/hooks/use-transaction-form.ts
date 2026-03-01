@@ -7,6 +7,7 @@ import { RecurrenceType, RecurrenceCadenceEnum, TransactionType } from "@/types/
 import { showToast } from "@/components/ui/custom-toast";
 import i18n from "@/i18n/i18n";
 import { runInAction } from "mobx";
+import { useCreateTransaction, useCreateTransfer } from "@/lib/api/hooks";
 
 type TransactionSuccessMessages = {
   [key in TransactionType]: TxKeyPath;
@@ -26,6 +27,9 @@ export const useTransactionForm = (navigation: any) => {
     transactionModel,
     uiStoreModel: { showLoader, hideLoader },
   } = useStores();
+
+  const createTransaction = useCreateTransaction();
+  const createTransfer = useCreateTransfer();
 
   const currentLocale = i18n.language.startsWith("es") ? "es" : "en";
 
@@ -78,13 +82,48 @@ export const useTransactionForm = (navigation: any) => {
           successMessages[transactionModel.transaction_type as TransactionType] || DEFAULT_SUCCESS_MESSAGE
         );
 
-        // Navigate immediately (optimistic)
+        // Capture mutation data before navigation/reset
+        // API expects ISO 8601 datetime — combine selected date with current time
+        const apiDate = selectedDateMoment.isValid()
+          ? moment(selectedDateMoment.format("YYYY-MM-DD") + "T" + now.format("HH:mm:ss.SSSZ")).toISOString()
+          : now.toISOString();
+        const isTransfer = transactionModel.transaction_type === "Transfer";
+        const mutationData = isTransfer
+          ? {
+              from_account_id: transactionModel.from_account_id,
+              to_account_id: transactionModel.to_account_id,
+              amount: transactionModel.amount,
+              currency: transactionModel.currency,
+              date: apiDate,
+              description: transactionModel.description || undefined,
+            }
+          : {
+              account_id: transactionModel.account_id,
+              amount: transactionModel.amount,
+              currency: transactionModel.currency,
+              transaction_type: transactionModel.transaction_type as "Expense" | "Income",
+              date: apiDate,
+              description: transactionModel.description || undefined,
+              category_id: transactionModel.category_id || undefined,
+              is_recurring: transactionModel.is_recurring,
+              recurrence_cadence: transactionModel.recurrence_cadence || undefined,
+              recurrence_end_date: transactionModel.recurrence_end_date || undefined,
+            };
+
+        // Fire mutation FIRST so onMutate updates cache before home screen renders
+        logger.debug("[TransactionForm] Mutation data:", JSON.stringify(mutationData));
+        if (isTransfer) {
+          createTransfer.mutate(mutationData as any);
+          logger.debug("[TransactionForm] Transfer mutation fired");
+        } else {
+          createTransaction.mutate(mutationData as any);
+          logger.debug("[TransactionForm] Transaction mutation fired");
+        }
+
+        // Then navigate — home screen will see optimistically updated cache
         navigation.navigate("Home", { transactionCreated: true });
         resetForm();
         showToast("success", successMessage);
-
-        // Save in background
-        await transactionModel.saveTransaction();
 
         runInAction(() => {
           transactionModel.updateField("amount", 0);

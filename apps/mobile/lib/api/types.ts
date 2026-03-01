@@ -112,8 +112,15 @@ export interface Account {
   account_type?: string
 }
 
-export interface AccountWithBalance extends Account {
-  sum__total_balance: number
+export interface AccountWithBalance {
+  account_id: string
+  account_name: string
+  customized_name: string | null
+  account_type: string
+  icon_url: string | null
+  base_balance: string
+  transactions_total: string
+  total_balance: string
 }
 
 export interface CreateAccountInput {

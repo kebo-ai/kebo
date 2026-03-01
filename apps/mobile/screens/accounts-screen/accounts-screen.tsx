@@ -33,7 +33,6 @@ interface BankOption {
   icon_url: string | null;
   description: string;
   balance: number;
-  sum__total_balance?: number;
   account_type_id: string;
   account_type: string;
 }
@@ -189,14 +188,14 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
 
     const getTotalBalance = (accountId: string) => {
       const found = accountsWithBalanceData.find(
-        (acc) => acc.id === accountId
+        (acc) => acc.account_id === accountId
       );
-      return found ? Number(found.sum__total_balance) : 0;
+      return found ? Number(found.total_balance) : 0;
     };
 
     const getAccountType = (accountId: string) => {
       const found = accountsWithBalanceData.find(
-        (acc) => acc.id === accountId
+        (acc) => acc.account_id === accountId
       );
       const accountType = found?.account_type ?? "-";
 
@@ -228,9 +227,7 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
               pathname: "/(authenticated)/transactions",
               params: {
                 origin: "Accounts",
-                initialFilters: JSON.stringify({
-                  accountIds: [data.item.id],
-                }),
+                accountIds: JSON.stringify([data.item.id]),
               },
             });
           }}

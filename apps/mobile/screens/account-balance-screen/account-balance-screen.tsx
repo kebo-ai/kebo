@@ -1,37 +1,27 @@
-import React, { FC, useState, useEffect, useRef, useMemo } from "react";
+import React, { FC, useState, useEffect, useMemo } from "react";
 import logger from "@/utils/logger";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
 import tw from "@/hooks/use-tailwind";
-import {
-  View,
-  Image,
-  Platform,
-  TextInput,
-  TouchableWithoutFeedback,
-  Keyboard,
-  KeyboardAvoidingView,
-  ScrollView,
-} from "react-native";
+import { View, Keyboard } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import { standardHeader } from "@/theme/header-options";
-import CustomListItemOption from "@/components/common/custom-list-item-option";
 import { useStores } from "@/models/helpers/use-stores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import ModalAccountType from "@/components/modal-account-type";
 import { useAccountTypes, useCreateAccount, useUpdateAccount, useAccount } from "@/lib/api/hooks";
 import { showToast } from "@/components/ui/custom-toast";
-import {
-  currencyMap,
-  useCurrencyFormatter,
-} from "@/components/common/currency-formatter";
+import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 import { translate } from "@/i18n";
-import * as Localization from "expo-localization";
-import { AccountBalanceInput } from "@/components/account-balance-input";
 import { useTheme } from "@/hooks/use-theme";
-import CustomButton from "@/components/common/custom-button";
+import { useNumberEntry } from "@/hooks/use-number-entry";
+import { useShakeAnimation } from "@/hooks/use-shake-animation";
+import { AmountDisplay } from "@/components/transaction/amount-display";
+import { NumberPad } from "@/components/transaction/number-pad";
+import { TransactionFieldRow } from "@/components/transaction/transaction-field-row";
 
 interface BankOption {
   id: string;
@@ -56,17 +46,6 @@ interface SafeAccountType {
 
 interface AccountBalanceScreenProps {}
 
-const locale = Localization.getLocales()[0]?.languageTag || "en-US";
-
-const getDecimalSeparator = () => {
-  const numberWithDecimal = 1.1;
-  const formatted = new Intl.NumberFormat(locale).format(numberWithDecimal);
-  return formatted.replace(/\d/g, "")[0];
-};
-
-const isCustomBank = (selectedBank: { name?: string }) =>
-  selectedBank.name?.toLowerCase() === "banco personalizado";
-
 const cloneAccountType = (accountType: any): SafeAccountType => {
   if (!accountType) return { id: "" };
 
@@ -84,7 +63,11 @@ const cloneAccountType = (accountType: any): SafeAccountType => {
 export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
   function AccountBalanceScreen() {
     const router = useRouter();
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
+    const { decimalSeparator } = useCurrencyFormatter();
+    const insets = useSafeAreaInsets();
+    const numberEntry = useNumberEntry(2);
+    const amountShake = useShakeAnimation();
     const params = useLocalSearchParams<{
       selectedBank?: string;
       accountId?: string;
@@ -130,8 +113,6 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
     const { data: accountDetailData, isLoading: isLoadingDetail } = useAccount(
       isEditing && accountId ? accountId : ""
     );
-    const amountInputRef = useRef<TextInput>(null);
-    const hasFocusedRef = useRef(false);
 
     const isCashBank =
       selectedBank.name?.toLowerCase() ===
@@ -143,14 +124,25 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
           (type) => type.type_name?.toLowerCase() !== "efectivo"
         );
 
+    const bankDisplayName =
+      selectedBank.name === "Banco Personalizado"
+        ? translate("components:bankModal.customBank")
+        : selectedBank.name === "Efectivo"
+        ? translate("modalAccount:cash")
+        : selectedBank.name || "";
+
     // Populate formik from fetched account detail (editing mode)
     useEffect(() => {
       if (isEditing && accountDetailData && accountTypes.length > 0) {
+        const balance = Number(accountDetailData.balance ?? 0);
+        const cents = Math.round(balance * 100);
+        numberEntry.setFromCents(cents);
+
         const foundType = accountTypes.find(
           (t) => t.id === accountDetailData.account_type_id
         );
         formik.setValues({
-          balance: Number(accountDetailData.balance ?? 0),
+          balance,
           accountType: foundType ? cloneAccountType(foundType) : { id: "" },
           description: accountDetailData.customized_name ?? "",
         });
@@ -178,38 +170,14 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
       }
     }, [accountTypes, isCashBank, isEditing]);
 
+    // Sync number entry -> formik balance
     useEffect(() => {
-      const focusTimeout = setTimeout(() => {
-        if (amountInputRef.current && !hasFocusedRef.current) {
-          Keyboard.dismiss();
-          requestAnimationFrame(() => {
-            setTimeout(() => {
-              amountInputRef.current?.focus();
-              if (
-                Platform.OS === "android" &&
-                isEditing &&
-                formik.values.balance > 0
-              ) {
-                const length = formik.values.balance.toString().length;
-                amountInputRef.current?.setNativeProps({
-                  selection: { start: length, end: length },
-                });
-              }
-              hasFocusedRef.current = true;
-            }, 100);
-          });
-        }
-      }, 500);
-
-      return () => {
-        clearTimeout(focusTimeout);
-        hasFocusedRef.current = false;
-        Keyboard.dismiss();
-      };
-    }, []);
+      const balance = numberEntry.amountInCents / 100;
+      formik.setFieldValue("balance", balance);
+    }, [numberEntry.amountInCents]);
 
     const validationSchema = useMemo(() => {
-      const isCustomBank =
+      const isCustom =
         selectedBank.name?.toLowerCase() === "banco personalizado";
 
       return Yup.object().shape({
@@ -225,7 +193,7 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
           })
           .required(translate("accountBalanceScreen:typeAccount")),
         description: Yup.string().when([], {
-          is: () => isCustomBank,
+          is: () => isCustom,
           then: (schema) =>
             schema.required(translate("accountBalanceScreen:requiredName")),
           otherwise: (schema) => schema,
@@ -355,21 +323,15 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
       },
     });
 
-    const translateType = (type: string | undefined) => {
-      switch (type) {
-        case "Efectivo":
-          return translate("modalAccount:cash");
-        case "Transferencia":
-          return translate("modalAccount:checkingAccount");
-        case "Cuenta de Ahorro":
-          return translate("modalAccount:savingsAccount");
-        case "Tarjeta de Credito":
-          return translate("modalAccount:creditCard");
-        case "Cuenta Corriente":
-          return translate("modalAccount:currentAccount");
-        default:
-          return type;
+    const handleSubmit = () => {
+      if (numberEntry.amountInCents === 0) {
+        amountShake.shake();
+        return;
       }
+      if (!formik.values.accountType?.id) {
+        return;
+      }
+      formik.handleSubmit();
     };
 
     return (
@@ -385,114 +347,65 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
             contentStyle: { backgroundColor: theme.background },
           }}
         />
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-        >
-          <ScrollView
-            contentInsetAdjustmentBehavior="automatic"
-            contentContainerStyle={tw`px-4 pt-4 pb-24`}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View style={[tw`p-4 rounded-2xl`, { backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border }]}>
-              <AccountBalanceInput
-                ref={amountInputRef}
-                value={formik.values.balance}
-                onChange={(textValue) => {
-                  const separator = getDecimalSeparator();
-                  const numericValue =
-                    parseFloat(textValue.replace(separator, ".")) || 0;
-                  formik.setFieldValue("balance", numericValue);
-                }}
-                label={translate("accountBalanceScreen:accountBalance")}
+        <View style={[tw`flex-1`, { paddingBottom: insets.bottom }]}>
+          <AmountDisplay
+            entryType={numberEntry.entryType}
+            amountInCents={numberEntry.amountInCents}
+            wholePart={numberEntry.wholePart}
+            decimalSuffix={numberEntry.decimalSuffix}
+            onBackspace={numberEntry.handleBackspace}
+            shakeOffset={amountShake.offset}
+          />
+
+          <View style={tw`px-4`}>
+            <TransactionFieldRow
+              icon="business-outline"
+              label={bankDisplayName}
+              value={bankDisplayName}
+              imageUrl={selectedBank.bank_url}
+              showChevron={false}
+            />
+
+            <TransactionFieldRow
+              icon="create-outline"
+              label={translate("accountBalanceScreen:name")}
+              isNote
+              noteValue={formik.values.description}
+              onNoteChange={formik.handleChange("description")}
+              showChevron={false}
+            />
+
+            {!isCashBank && (
+              <TransactionFieldRow
+                icon="swap-horizontal-outline"
+                label={translate("accountBalanceScreen:typeAccountTitle")}
+                value={formik.values.accountType?.type_name}
+                onPress={() => setModalVisible(true)}
               />
-              <View
-                style={[
-                  tw`flex-row items-center justify-between h-[60px]`,
-                  { borderTopWidth: 1, borderBottomWidth: 1, borderColor: theme.border },
-                ]}
-              >
-                <View style={tw`flex-row items-center gap-[9px]`}>
-                  <Image
-                    source={{
-                      uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}${selectedBank.bank_url}`,
-                    }}
-                    style={[tw`w-[22px] h-[22px] rounded-full`, { borderWidth: 1, borderColor: theme.border, backgroundColor: theme.surface }]}
-                    resizeMode="contain"
-                  />
-                  <Text
-                    style={tw`text-base`}
-                    weight="semibold"
-                    color={theme.textSecondary}
-                  >
-                    {selectedBank.name === "Banco Personalizado"
-                      ? translate("components:bankModal.customBank")
-                      : selectedBank.name === "Efectivo"
-                      ? translate("modalAccount:cash")
-                      : selectedBank.name || "ABN AMRO Bank"}
-                  </Text>
-                </View>
-              </View>
-              <View style={tw`flex-row items-center justify-between h-[60px]`}>
-                <View style={tw`flex-row items-center`}>
-                  <CustomListItemOption
-                    showBorder={false}
-                    icon="note"
-                    label={translate("accountBalanceScreen:name")}
-                    showChevron={false}
-                    onPress={() => true}
-                    inputValue={formik.values.description}
-                    setInputValue={formik.handleChange("description")}
-                    returnKeyType="done"
-                  />
-                </View>
-              </View>
-              {!isCashBank && (
-                <View
-                  style={[
-                    tw`flex-row items-center justify-between h-[60px]`,
-                    { borderTopWidth: 1, borderBottomWidth: 1, borderColor: theme.border },
-                  ]}
-                >
-                  <View style={tw`flex-row items-center`}>
-                    <CustomListItemOption
-                      icon="recurrence"
-                      label={translate("accountBalanceScreen:typeAccountTitle")}
-                      labelText={translate(
-                        "accountBalanceScreen:typeAccountTitle"
-                      )}
-                      showBorder={false}
-                      recurrenceSelected={translateType(
-                        formik.values.accountType?.type_name
-                      )}
-                      onPress={() => setModalVisible(true)}
-                    />
-                  </View>
-                </View>
-              )}
-            </View>
-          </ScrollView>
-          <ModalAccountType
-            visible={modalVisible}
-            onClose={() => setModalVisible(false)}
-            onSelect={(selected) => {
-              formik.setFieldValue("accountType", cloneAccountType(selected));
-              setModalVisible(false);
-            }}
-            selectedValue={formik.values.accountType as any}
-            data={filteredAccountTypes}
-            title={translate("accountBalanceScreen:typeAccountTitle")}
+            )}
+          </View>
+
+          <NumberPad
+            entryType={numberEntry.entryType}
+            decimalSeparator={decimalSeparator}
+            onDigit={numberEntry.handleDigit}
+            onBackspace={numberEntry.handleBackspace}
+            onDecimal={numberEntry.handleDecimal}
+            onSubmit={handleSubmit}
           />
-          <CustomButton
-            variant="primary"
-            isEnabled={!!(formik.isValid && formik.values.accountType.id)}
-            onPress={formik.handleSubmit}
-            title={translate("accountBalanceScreen:continue")}
-            adaptToKeyboard={true}
-          />
-        </KeyboardAvoidingView>
+        </View>
+
+        <ModalAccountType
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onSelect={(selected) => {
+            formik.setFieldValue("accountType", cloneAccountType(selected));
+            setModalVisible(false);
+          }}
+          selectedValue={formik.values.accountType as any}
+          data={filteredAccountTypes}
+          title={translate("accountBalanceScreen:typeAccountTitle")}
+        />
       </>
     );
   }

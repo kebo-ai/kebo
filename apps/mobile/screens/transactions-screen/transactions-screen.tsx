@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import Animated, { Easing, Keyframe } from "react-native-reanimated";
 
@@ -59,7 +60,6 @@ import { useTheme } from "@/hooks/use-theme";
 import { BackIconSvg } from "@/components/icons/back-svg";
 import { ArrowUpIconSvg } from "@/components/icons/arrow-up-icon";
 import { MaterialIcons } from "@expo/vector-icons";
-import CustomAlert from "@/components/common/custom-alert";
 import { translate } from "@/i18n";
 import { SwipeableListWrapper } from "@/components/swipeable-list-wrapper/swipeable-list-wrapper";
 import { RowMap } from "react-native-swipe-list-view";
@@ -77,7 +77,6 @@ import { MultiCategoryModal } from "@/components/common/multi-category-modal";
 import FilterButton from "@/components/common/filter-button";
 import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import i18n from "@/i18n/i18n";
-import { showToast } from "@/components/ui/custom-toast";
 import { TransactionList } from "@/components/common/transactions-list";
 import { CustomMonthModal } from "@/components/common/custom-month-modal";
 import { CustomTypeModal } from "@/components/common/custom-type-modal";
@@ -176,10 +175,6 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     const animatedIdsRef = useRef(new Set<string>());
     const animCooldownRef = useRef(false);
     const ITEMS_PER_PAGE = 15;
-    const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
-    const [transactionToDelete, setTransactionToDelete] = useState<
-      string | null
-    >(null);
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
     const [selectedBanks, setSelectedBanks] = useState<string[]>([]);
     const [selectedBankNames, setSelectedBankNames] = useState<string[]>([]);
@@ -197,8 +192,6 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     >(null);
     const { data: categories = [] } = useCategories();
     const currentLocale = i18n.language.split("-")[0];
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [isUpdating, setIsUpdating] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [tempSelectedBanks, setTempSelectedBanks] = useState<string[]>([]);
     const [tempSelectedBankNames, setTempSelectedBankNames] = useState<
@@ -331,33 +324,21 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
 
     const handleDelete = useCallback((transactionId: string) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      setTransactionToDelete(transactionId);
-      setIsDeleteAlertVisible(true);
-    }, []);
-
-    const handleConfirmDelete = useCallback(async () => {
-      if (!transactionToDelete) return;
-
-      setIsDeleting(true);
-      try {
-        await deleteTransactionMutation.mutateAsync(transactionToDelete);
-        showToast("success", translate("transactionScreen:deleteTransaction"));
-        // Reset to refetch
-        setPage(1);
-        setAllTransactions([]);
-      } catch (error) {
-        logger.error("Error deleting transaction:", error);
-        showToast(
-          "error",
-          translate("transactionScreen:errorMessageTransaction")
-        );
-      } finally {
-        setIsDeleting(false);
-        setIsUpdating(false);
-        setIsDeleteAlertVisible(false);
-        setTransactionToDelete(null);
-      }
-    }, [transactionToDelete, deleteTransactionMutation]);
+      Alert.alert(
+        translate("homeScreen:titleAlert"),
+        translate("homeScreen:messageAlert"),
+        [
+          { text: translate("homeScreen:cancel"), style: "cancel" },
+          {
+            text: translate("homeScreen:delete"),
+            style: "destructive",
+            onPress: () => {
+              deleteTransactionMutation.mutate(transactionId);
+            },
+          },
+        ]
+      );
+    }, [deleteTransactionMutation]);
 
     const onRowClose = useCallback(() => setOpenRow(null), []);
 
@@ -829,21 +810,7 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
           </TouchableOpacity>
         )}
 
-        <CustomAlert
-          visible={isDeleteAlertVisible}
-          title={translate("transactionScreen:deleteTransaction")}
-          message={translate("transactionScreen:confirmDeleteTransaction")}
-          onConfirm={handleConfirmDelete}
-          onCancel={() => {
-            setIsDeleteAlertVisible(false);
-            setTransactionToDelete(null);
-          }}
-          type="danger"
-          confirmText={translate("transactionScreen:delete")}
-          cancelText={translate("transactionScreen:cancel")}
-        />
-
-        <CustomFilterModal
+<CustomFilterModal
           visible={isFilterModalVisible}
           onClose={() => setFilterModalVisible(false)}
           onApplyFilter={(type) => {

@@ -34,8 +34,8 @@ type Action =
   | { type: "reset" }
   | { type: "setFromCents"; cents: number; mode: NumberEntryType };
 
-const MAX_CENTS = 99999999; // $999,999.99
-const MAX_WHOLE = 9999999; // $9,999,999
+const MAX_CENTS = 99999999999; // $999,999,999.99
+const MAX_WHOLE = 999999999; // $999,999,999
 
 function reducer(state: EntryState, action: Action): EntryState {
   switch (action.type) {

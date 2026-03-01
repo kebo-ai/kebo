@@ -147,11 +147,14 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
           let formattedDate;
 
           if (selectedDateMoment.isValid()) {
-            const datePart = selectedDateMoment.format("YYYY-MM-DD");
-            const timePart = originalDate.format("HH:mm:ss.SSS Z");
-            formattedDate = `${datePart} ${timePart}`;
+            formattedDate = originalDate
+              .clone()
+              .year(selectedDateMoment.year())
+              .month(selectedDateMoment.month())
+              .date(selectedDateMoment.date())
+              .toISOString();
           } else {
-            formattedDate = originalDate.format("YYYY-MM-DD HH:mm:ss.SSS Z");
+            formattedDate = originalDate.toISOString();
           }
 
           await updateTransactionMutation.mutateAsync({
@@ -410,7 +413,7 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
           .locale(currentLocale)
           .format("dddd, D MMMM")
           .replace(/^\w/, (c) => c.toUpperCase());
-        const backendDate = moment(date).format("YYYY-MM-DD HH:mm:ss.SSS Z");
+        const backendDate = moment(date).toISOString();
         formik.setFieldValue("recurrence_end_date", backendDate);
         formik.setFieldValue("displayEndDate", displayDate);
         setEndDatePickerVisibility(false);

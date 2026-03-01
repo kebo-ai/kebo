@@ -1,6 +1,4 @@
 import { TouchableOpacity, Text, View } from "react-native";
-import { Category } from "@/models/category/category";
-import { Icon } from "@/models/icon/icon";
 import tw from "@/hooks/use-tailwind";
 import { SvgUri } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,8 +7,15 @@ import { useState, useEffect } from "react";
 import { translateCategoryName } from "@/utils/category-translations";
 import * as Haptics from "expo-haptics";
 
+interface CategoryItemData {
+  id: string;
+  name?: string | null;
+  icon_url?: string | null;
+  url?: string;
+}
+
 export const CategoryItem: React.FC<{
-  item: Category | Icon;
+  item: CategoryItemData;
   onSelect: () => void;
   showLabel?: boolean;
   onEdit?: () => void;

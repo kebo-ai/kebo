@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useFocusEffect, useRouter, Stack } from "expo-router";
+import { useRouter, Stack } from "expo-router";
 import {
   View,
   TouchableOpacity,
@@ -12,18 +12,17 @@ import {
 } from "react-native";
 import tw from "twrnc";
 import { observer } from "mobx-react-lite";
+import { useQueryClient } from "@tanstack/react-query";
 import { colors } from "@/theme/colors";
 import { largeTitleHeader } from "@/theme/header-options";
 import { useTheme } from "@/hooks/use-theme";
 import { supabase } from "@/config/supabase";
-import { getUserInfo } from "@/utils/auth-utils";
 import { showToast } from "@/components/ui/custom-toast";
 import { Text, Button, Icon } from "@/components/ui";
 import DeleteAccountModal from "@/components/common/delete-account-modal";
 import CustomCategoryModal from "@/components/common/custom-category-modal";
 import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
-import { updateUserProfile } from "@/services/user-service";
 import logger from "@/utils/logger";
 import { EXTERNAL_URLS } from "@/config/urls";
 import { APP_VERSION } from "@/config/config.base";
@@ -39,6 +38,8 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { PencilSvg } from "@/components/icons/pencil-svg";
 import { LanguageService } from "@/services/language-service";
 import * as StoreReview from "expo-store-review";
+import { useProfile, useUpdateProfile, useExpenseCategories, useIncomeCategories } from "@/lib/api/hooks";
+import { queryKeys } from "@/lib/api/keys";
 
 let DeviceInfo: any = null;
 if (__DEV__) {
@@ -55,7 +56,9 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
   function ProfileScreen() {
     const router = useRouter();
     const { theme } = useTheme();
-    const [user, setUser] = useState<any>(null);
+    const queryClient = useQueryClient();
+    const { data: profile } = useProfile();
+    const updateProfileMutation = useUpdateProfile();
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
@@ -65,9 +68,9 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
     const nameInputRef = useRef<TextInput>(null);
     const {
       uiStoreModel: { showLoader, hideLoader },
-      categoryStoreModel: { expenseCategories, incomeCategories },
     } = useStores();
-    const rootStore = useStores();
+    const { data: expenseCategories = [] } = useExpenseCategories();
+    const { data: incomeCategories = [] } = useIncomeCategories();
     const analytics = useAnalytics();
     const { permissionsGranted } = useNotifications();
 
@@ -87,48 +90,29 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
       analytics.trackScreen("Profile");
     }, [analytics]);
 
-    const loadUserInfo = useCallback(async () => {
-      const userInfo = await getUserInfo(rootStore);
-      setUser(userInfo);
-      const name =
-        userInfo?.profile?.full_name ||
-        userInfo?.user?.user_metadata?.full_name ||
-        "";
-      setTempName(name);
-      setDisplayName(name);
-    }, [rootStore]);
+    useEffect(() => {
+      if (profile) {
+        const name = profile.full_name || "";
+        setTempName(name);
+        setDisplayName(name);
+      }
+    }, [profile]);
 
     useEffect(() => {
-      loadUserInfo();
-    }, [loadUserInfo]);
-
-    useFocusEffect(
-      useCallback(() => {
-        loadUserInfo();
-      }, [loadUserInfo])
-    );
-
-    useEffect(() => {
-      if (user?.user?.id) {
+      if (profile?.user_id) {
         try {
           trackProfileEvent(PROFILE_EVENTS.PROFILE_SCREEN_VIEWED, {
             [EVENT_PROPERTIES.ACTION_TYPE]: "view",
             [EVENT_PROPERTIES.PROFILE_SECTION]: "notifications",
             [EVENT_PROPERTIES.PUSH_NOTIFICATIONS_ENABLED]: permissionsGranted,
             [EVENT_PROPERTIES.EMAIL_NOTIFICATIONS_ENABLED]:
-              user?.profile?.email_notifications || false,
-          });
-
-          logger.debug("Notification status captured:", {
-            push_notifications_enabled: permissionsGranted,
-            email_notifications_enabled:
-              user?.profile?.email_notifications || false,
+              profile?.email_notifications || false,
           });
         } catch (error) {
           logger.debug("Error capturing notification status:", error);
         }
       }
-    }, [user, permissionsGranted, analytics, trackProfileEvent]);
+    }, [profile, permissionsGranted, analytics, trackProfileEvent]);
 
     const handleLogout = useCallback(async () => {
       try {
@@ -173,8 +157,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
         return;
       }
 
-      const oldName =
-        user?.profile?.full_name || user?.user?.user_metadata?.full_name || "";
+      const oldName = profile?.full_name || "";
       const newName = tempName.trim();
 
       try {
@@ -182,27 +165,16 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
         setDisplayName(newName);
         setIsEditingName(false);
 
-        const response = await updateUserProfile({
-          full_name: newName,
-        });
+        await updateProfileMutation.mutateAsync({ full_name: newName });
+        showToast("success", translate("profileScreen:nameUpdated"));
 
-        if (response.success) {
-          const userInfo = await getUserInfo(rootStore);
-          setUser(userInfo);
-          showToast("success", translate("profileScreen:nameUpdated"));
-
-          try {
-            updateUserAnalyticsProperties(analytics, {
-              full_name: newName,
-              email: userInfo?.user?.email,
-            });
-          } catch (error) {
-            logger.debug("Analytics error in handleSaveName success:", error);
-          }
-        } else {
-          setDisplayName(oldName);
-          setTempName(oldName);
-          showToast("error", translate("profileScreen:errorUpdatingName"));
+        try {
+          updateUserAnalyticsProperties(analytics, {
+            full_name: newName,
+            email: profile?.email,
+          });
+        } catch (error) {
+          logger.debug("Analytics error in handleSaveName success:", error);
         }
       } catch (error) {
         setDisplayName(oldName);
@@ -211,13 +183,13 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
       } finally {
         hideLoader();
       }
-    }, [tempName, user, analytics, rootStore, showLoader, hideLoader]);
+    }, [tempName, profile, analytics, showLoader, hideLoader, updateProfileMutation]);
 
     const onRefresh = useCallback(async () => {
       setRefreshing(true);
-      await loadUserInfo();
+      await queryClient.refetchQueries({ queryKey: queryKeys.profile.all });
       setRefreshing(false);
-    }, [loadUserInfo]);
+    }, [queryClient]);
 
     const handleDeleteModalClose = useCallback(() => {
       setIsDeleteModalVisible(false);
@@ -330,13 +302,8 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
             >
               <Image
                 source={
-                  user?.profile?.avatar_url ||
-                  user?.user?.user_metadata?.avatar_url
-                    ? {
-                        uri:
-                          user?.profile?.avatar_url ||
-                          user?.user?.user_metadata?.avatar_url,
-                      }
+                  profile?.avatar_url
+                    ? { uri: profile.avatar_url }
                     : require("@/assets/icons/kebo-profile.png")
                 }
                 style={tw`w-full h-full`}
@@ -347,9 +314,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
                 {displayName || translate("profileScreen:noName")}
               </Text>
               <Text type="xs" color={theme.textTertiary}>
-                {user?.profile?.email ||
-                  user?.user?.email ||
-                  translate("profileScreen:noMail")}
+                {profile?.email || translate("profileScreen:noMail")}
               </Text>
             </View>
             <TouchableOpacity

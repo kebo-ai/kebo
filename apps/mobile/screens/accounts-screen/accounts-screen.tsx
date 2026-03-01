@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import logger from "@/utils/logger";
-import React, { FC, useCallback, useState } from "react";
+import React, { FC, useState } from "react";
 import {
   View,
   TouchableOpacity,
@@ -20,15 +20,12 @@ import { colors } from "@/theme";
 import { largeTitleHeader } from "@/theme/header-options";
 import tw from "@/hooks/use-tailwind";
 import { useTheme } from "@/hooks/use-theme";
-import {
-  deleteAccountService,
-  getAccountsWithBalance,
-} from "@/services/account-service";
+import { useAccounts, useAccountsWithBalance, useDeleteAccount } from "@/lib/api/hooks";
 import { useStores } from "@/models/helpers/use-stores";
 import { showToast } from "@/components/ui/custom-toast";
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
-import { Stack, useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";
+import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 
 interface BankOption {
   id: string;
@@ -71,78 +68,16 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
     const { theme } = useTheme();
 
     const {
-      accountStoreModel: {
-        getListAccount,
-        accounts,
-        deleteAccountById,
-        AccountsWithBalance,
-      },
       transactionModel: { updateField },
     } = useStores();
     const { getSymbol, formatAmount } = useCurrencyFormatter();
     const [openRow, setOpenRow] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
-    const [accountsWithBalance, setAccountsWithBalance] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const ITEMS_PER_PAGE = 10;
 
-    const fetchData = useCallback(
-      async (pageNumber: number = 1, append: boolean = false) => {
-        if (visible) {
-          try {
-            const accountsResult = await getListAccount();
-            const balanceResult = await getAccountsWithBalance();
-
-            if (balanceResult) {
-              const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE;
-              const endIndex = startIndex + ITEMS_PER_PAGE;
-              const paginatedResults = balanceResult.slice(
-                startIndex,
-                endIndex
-              );
-              if (append) {
-                setAccountsWithBalance((prev) => [
-                  ...prev,
-                  ...paginatedResults,
-                ]);
-              } else {
-                setAccountsWithBalance(paginatedResults);
-              }
-              setHasMore(endIndex < balanceResult.length);
-            }
-          } catch (error) {
-            logger.error("Error fetching accounts:", error);
-          } finally {
-            setLoading(false);
-          }
-        }
-      },
-      [visible, getListAccount]
-    );
-
-    const loadMore = useCallback(() => {
-      if (loading || !hasMore) return;
-
-      const nextPage = page + 1;
-      setPage(nextPage);
-      fetchData(nextPage, true);
-    }, [loading, hasMore, page, fetchData]);
-
-    useFocusEffect(
-      useCallback(() => {
-        logger.debug("Screen focused - refreshing accounts");
-        setPage(1);
-        setHasMore(true);
-        fetchData(1, false);
-
-        return () => {
-          logger.debug("Screen unfocused - cleanup");
-        };
-      }, [fetchData])
-    );
+    const { data: accounts = [], isLoading: accountsLoading } = useAccounts();
+    const { data: accountsWithBalanceData = [] } = useAccountsWithBalance();
+    const deleteAccountMutation = useDeleteAccount();
 
     const bankOptions = [
       ...accounts
@@ -150,11 +85,11 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
         .map((account) => ({
           id: account.id,
           name: account.name,
-          icon_url: account.icon_url,
-          description: account.customized_name,
-          balance: account.balance,
+          icon_url: account.icon_url || null,
+          description: account.customized_name || "",
+          balance: Number(account.balance),
           account_type_id: account.account_type_id,
-          account_type: account.account_type,
+          account_type: account.account_type || "",
         })),
     ];
 
@@ -179,76 +114,71 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
     const confirmDelete = async (bankId: string) => {
       setIsDeleting(true);
       try {
-        const result = await deleteAccountService(bankId);
-        if (result.kind === "ok") {
-          setIsUpdating(true);
-          await getListAccount();
+        await deleteAccountMutation.mutateAsync(bankId);
+        setIsUpdating(true);
 
-          const remainingAccounts = bankOptions.filter(
-            (account) => account.id !== bankToDelete
-          );
-          if (remainingAccounts.length > 0) {
-            const nextAccount = remainingAccounts[0];
-            if (isTransfer) {
-              if (transferType === "from") {
-                updateField("from_account_id", nextAccount.id);
-                updateField(
-                  "from_account_name",
-                  nextAccount.name === "Efectivo"
-                    ? translate("modalAccount:cash")
-                    : nextAccount.name === "Banco Personalizado"
-                    ? translate("components:bankModal.customBank")
-                    : nextAccount.name
-                );
-                updateField("from_account_url", nextAccount.icon_url ?? "");
-              } else {
-                updateField("to_account_id", nextAccount.id);
-                updateField(
-                  "to_account_name",
-                  nextAccount.name === "Efectivo"
-                    ? translate("modalAccount:cash")
-                    : nextAccount.name === "Banco Personalizado"
-                    ? translate("components:bankModal.customBank")
-                    : nextAccount.name
-                );
-                updateField("to_account_url", nextAccount.icon_url ?? "");
-              }
-            } else {
-              updateField("account_id", nextAccount.id);
+        const remainingAccounts = bankOptions.filter(
+          (account) => account.id !== bankId
+        );
+        if (remainingAccounts.length > 0) {
+          const nextAccount = remainingAccounts[0];
+          if (isTransfer) {
+            if (transferType === "from") {
+              updateField("from_account_id", nextAccount.id);
               updateField(
-                "account_name",
+                "from_account_name",
                 nextAccount.name === "Efectivo"
                   ? translate("modalAccount:cash")
                   : nextAccount.name === "Banco Personalizado"
                   ? translate("components:bankModal.customBank")
                   : nextAccount.name
               );
-              updateField("account_url", nextAccount.icon_url ?? "");
+              updateField("from_account_url", nextAccount.icon_url ?? "");
+            } else {
+              updateField("to_account_id", nextAccount.id);
+              updateField(
+                "to_account_name",
+                nextAccount.name === "Efectivo"
+                  ? translate("modalAccount:cash")
+                  : nextAccount.name === "Banco Personalizado"
+                  ? translate("components:bankModal.customBank")
+                  : nextAccount.name
+              );
+              updateField("to_account_url", nextAccount.icon_url ?? "");
             }
           } else {
-            if (isTransfer) {
-              if (transferType === "from") {
-                updateField("from_account_id", "");
-                updateField("from_account_name", "");
-                updateField("from_account_url", "");
-              } else {
-                updateField("to_account_id", "");
-                updateField("to_account_name", "");
-                updateField("to_account_url", "");
-              }
-            } else {
-              updateField("account_id", "");
-              updateField("account_name", "");
-              updateField("account_url", "");
-            }
+            updateField("account_id", nextAccount.id);
+            updateField(
+              "account_name",
+              nextAccount.name === "Efectivo"
+                ? translate("modalAccount:cash")
+                : nextAccount.name === "Banco Personalizado"
+                ? translate("components:bankModal.customBank")
+                : nextAccount.name
+            );
+            updateField("account_url", nextAccount.icon_url ?? "");
           }
-          showToast(
-            "success",
-            translate("components:bankModal.deleteAccountSuccess")
-          );
         } else {
-          showToast("error", translate("components:bankModal.errorAccount"));
+          if (isTransfer) {
+            if (transferType === "from") {
+              updateField("from_account_id", "");
+              updateField("from_account_name", "");
+              updateField("from_account_url", "");
+            } else {
+              updateField("to_account_id", "");
+              updateField("to_account_name", "");
+              updateField("to_account_url", "");
+            }
+          } else {
+            updateField("account_id", "");
+            updateField("account_name", "");
+            updateField("account_url", "");
+          }
         }
+        showToast(
+          "success",
+          translate("components:bankModal.deleteAccountSuccess")
+        );
       } catch (error) {
         showToast("error", translate("components:bankModal.errorAccount"));
       } finally {
@@ -258,15 +188,15 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
     };
 
     const getTotalBalance = (accountId: string) => {
-      const found = accountsWithBalance.find(
-        (acc) => acc.account_id === accountId
+      const found = accountsWithBalanceData.find(
+        (acc) => acc.id === accountId
       );
       return found ? Number(found.sum__total_balance) : 0;
     };
 
     const getAccountType = (accountId: string) => {
-      const found = accountsWithBalance.find(
-        (acc) => acc.account_id === accountId
+      const found = accountsWithBalanceData.find(
+        (acc) => acc.id === accountId
       );
       const accountType = found?.account_type ?? "-";
 
@@ -482,7 +412,7 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
             ),
           }}
         />
-        {loading ? (
+        {accountsLoading ? (
           <View style={tw`flex-1 items-center justify-center`}>
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
@@ -523,8 +453,6 @@ export const AccountsScreen: FC<AccountsScreenProps> = observer(
                       recalculateHiddenLayout={true}
                       disableHiddenLayoutCalculation={false}
                       directionalDistanceChangeThreshold={5}
-                      onEndReached={loadMore}
-                      onEndReachedThreshold={0.5}
                       scrollEnabled={false}
                     />
                   )}

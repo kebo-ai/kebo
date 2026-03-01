@@ -7,11 +7,10 @@ import { observer } from "mobx-react-lite";
 import { colors } from "@/theme/colors";
 import { BackBlackSvg } from "@/components/icons/back-black-svg";
 import { EditIconSvg } from "@/components/icons/edit-icon-svg";
-import { getUserInfo } from "@/utils/auth-utils";
 import { showToast } from "@/components/ui/custom-toast";
 import { useStores } from "@/models/helpers/use-stores";
 import { translate } from "@/i18n";
-import { updateUserProfile } from "@/services/user-service";
+import { useProfile, useUpdateProfile } from "@/lib/api/hooks";
 import { useAnalytics } from "@/hooks/use-analytics";
 import CustomButton from "@/components/common/custom-button";
 import CustomHeader from "@/components/common/custom-header";
@@ -22,7 +21,8 @@ interface EditProfileScreenProps {}
 export const EditProfileScreen: FC<EditProfileScreenProps> = observer(
   function EditProfileScreen() {
     const router = useRouter();
-    const [user, setUser] = useState<any>(null);
+    const { data: profile } = useProfile();
+    const updateProfileMutation = useUpdateProfile();
     const [isEditingName, setIsEditingName] = useState(false);
     const [tempName, setTempName] = useState("");
     const [displayName, setDisplayName] = useState("");
@@ -30,25 +30,20 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = observer(
     const {
       uiStoreModel: { showLoader, hideLoader },
     } = useStores();
-    const rootStore = useStores();
     const analytics = useAnalytics();
 
     useEffect(() => {
       analytics.trackProfileScreenView();
       analytics.trackScreen("Profile");
+    }, [analytics]);
 
-      const loadUserInfo = async () => {
-        const userInfo = await getUserInfo(rootStore);
-        setUser(userInfo);
-        const name =
-          userInfo?.profile?.full_name ||
-          userInfo?.user?.user_metadata?.full_name ||
-          "";
+    useEffect(() => {
+      if (profile) {
+        const name = profile.full_name || "";
         setTempName(name);
         setDisplayName(name);
-      };
-      loadUserInfo();
-    }, [analytics]);
+      }
+    }, [profile]);
 
     const handleSaveName = useCallback(async () => {
       if (!tempName.trim()) {
@@ -56,8 +51,7 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = observer(
         return;
       }
 
-      const oldName =
-        user?.profile?.full_name || user?.user?.user_metadata?.full_name || "";
+      const oldName = profile?.full_name || "";
       const newName = tempName.trim();
 
       try {
@@ -65,21 +59,10 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = observer(
         setDisplayName(newName);
         setIsEditingName(false);
 
-        const response = await updateUserProfile({
-          full_name: newName,
-        });
+        await updateProfileMutation.mutateAsync({ full_name: newName });
 
-        if (response.success) {
-          const userInfo = await getUserInfo(rootStore);
-          setUser(userInfo);
-
-          showToast("success", translate("profileScreen:nameUpdated"));
-          router.back();
-        } else {
-          setDisplayName(oldName);
-          setTempName(oldName);
-          showToast("error", translate("profileScreen:errorUpdatingName"));
-        }
+        showToast("success", translate("profileScreen:nameUpdated"));
+        router.back();
       } catch (error) {
         setDisplayName(oldName);
         setTempName(oldName);
@@ -87,15 +70,7 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = observer(
       } finally {
         hideLoader();
       }
-    }, [
-      tempName,
-      user,
-      analytics,
-      rootStore,
-      showLoader,
-      hideLoader,
-      router,
-    ]);
+    }, [tempName, profile, showLoader, hideLoader, updateProfileMutation, router]);
 
     const renderInput = () => {
       return (
@@ -124,9 +99,7 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = observer(
             <TextInput
               style={tw`border border-[#606A84]/15 rounded-lg p-4 text-[#606A84]/50 text-base font-medium bg-[#F0F0F0]/50`}
               value={
-                user?.profile?.email ||
-                user?.user?.email ||
-                translate("profileScreen:noMail")
+                profile?.email || translate("profileScreen:noMail")
               }
               editable={false}
             />
@@ -162,13 +135,8 @@ export const EditProfileScreen: FC<EditProfileScreenProps> = observer(
               >
                 <Image
                   source={
-                    user?.profile?.avatar_url ||
-                    user?.user?.user_metadata?.avatar_url
-                      ? {
-                          uri:
-                            user?.profile?.avatar_url ||
-                            user?.user?.user_metadata?.avatar_url,
-                        }
+                    profile?.avatar_url
+                      ? { uri: profile.avatar_url }
                       : require("../../assets/icons/kebo-profile.png")
                   }
                   style={tw`w-full h-full rounded-full`}

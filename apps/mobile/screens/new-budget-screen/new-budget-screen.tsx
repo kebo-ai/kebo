@@ -31,7 +31,7 @@ const ensureValidMomentLocale = () => {
   }
 };
 
-import { budgetService } from "@/services/budget-service";
+import { useCreateBudget, useUpdateBudget } from "@/lib/api/hooks";
 import { showToast } from "@/components/ui/custom-toast";
 import { CalendarRangePicker } from "@/components/common/calendar-range-picker";
 import { ArrowDownSimpleIcon } from "@/components/icons/arrow-down-simple-icon";
@@ -50,6 +50,9 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
   useEffect(() => {
     ensureValidMomentLocale();
   }, []);
+
+  const createBudgetMutation = useCreateBudget();
+  const updateBudgetMutation = useUpdateBudget();
 
   const isEditing = params.isEditing === "true";
   const budgetId = params.budgetId;
@@ -98,25 +101,23 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
         const endDateStr = moment(values.endDate).format("YYYY-MM-DD");
 
         if (isEditing && budgetId) {
-          const success = await budgetService.updateBudget(
-            budgetId,
-            values.name,
-            startDateStr,
-            endDateStr
-          );
-
-          if (success) {
-            showToast("success", translate("newBudgetScreen:successMessage"));
-            router.back();
-          } else {
-            showToast("error", translate("newBudgetScreen:errorMessage"));
-          }
+          await updateBudgetMutation.mutateAsync({
+            id: budgetId,
+            data: {
+              custom_name: values.name,
+              start_date: startDateStr,
+              end_date: endDateStr,
+            },
+          });
+          showToast("success", translate("newBudgetScreen:successMessage"));
+          router.back();
         } else {
-          const result = await budgetService.createBudget(
-            values.name,
-            startDateStr,
-            endDateStr
-          );
+          const result = await createBudgetMutation.mutateAsync({
+            custom_name: values.name,
+            budget_amount: 0,
+            start_date: startDateStr,
+            end_date: endDateStr,
+          });
 
           if (result?.id) {
             router.replace({
@@ -134,7 +135,7 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
         setIsLoading(false);
       }
     },
-    [router, isEditing, budgetId]
+    [router, isEditing, budgetId, createBudgetMutation, updateBudgetMutation]
   );
 
   const formik = useFormik({

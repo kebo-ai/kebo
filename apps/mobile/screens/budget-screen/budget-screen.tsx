@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite";
 import React, { FC, useCallback, useEffect, useRef, useState } from "react";
 import { Stack, useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import {
@@ -20,8 +19,8 @@ import CustomBudgetCard from "@/components/common/custom-budget-card";
 import { budgetService } from "@/services/budget-service";
 import { CategoryItem } from "@/components/common/category-item";
 import { BudgetResponse } from "@/types/transaction";
-import { Category } from "@/models/category/category";
-import { useStores } from "@/models/helpers/use-stores";
+import type { Category } from "@/lib/api/types";
+import { useCategories } from "@/lib/api/hooks";
 import { showToast } from "@/components/ui/custom-toast";
 import CustomAlert from "@/components/common/custom-alert";
 import * as Haptics from "expo-haptics";
@@ -47,7 +46,7 @@ const ensureValidMomentLocale = () => {
 
 interface BudgetScreenProps {}
 
-export const BudgetScreen: FC<BudgetScreenProps> = observer(
+export const BudgetScreen: FC<BudgetScreenProps> =
   function BudgetScreen() {
     const router = useRouter();
     const { theme } = useTheme();
@@ -60,7 +59,7 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
     const [budgetData, setBudgetData] = useState<BudgetResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const { categoryStoreModel } = useStores();
+    const { data: categories = [] } = useCategories();
     const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState<string | null>(
       null
@@ -106,13 +105,8 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
       }
     };
 
-    useEffect(() => {
-      categoryStoreModel.getCategories();
-    }, []);
-
     useFocusEffect(
       useCallback(() => {
-        categoryStoreModel.getCategories();
         if (hasLoadedRef.current) {
           loadBudget(false);
         }
@@ -256,7 +250,7 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
     };
 
     const availableCategories = budgetData
-      ? categoryStoreModel.categories.filter(
+      ? categories.filter(
           (category) =>
             category.type === "Expense" &&
             !budgetData.budget_lines.some(
@@ -391,5 +385,4 @@ export const BudgetScreen: FC<BudgetScreenProps> = observer(
         />
       </View>
     );
-  }
-);
+  };

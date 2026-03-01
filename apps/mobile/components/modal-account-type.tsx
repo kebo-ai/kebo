@@ -11,16 +11,16 @@ import { Text } from "@/components/ui";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
-import { AccountTypeSnapshotIn } from "@/models/account-type-store/account-type";
+import type { AccountType } from "@/lib/api/types";
 import { translate } from "@/i18n";
 import { useTheme } from "@/hooks/use-theme";
 
 interface ModalAccountTypeProps {
   visible: boolean;
   onClose: () => void;
-  onSelect: (value: AccountTypeSnapshotIn) => void;
-  selectedValue: AccountTypeSnapshotIn;
-  data: AccountTypeSnapshotIn[];
+  onSelect: (value: AccountType) => void;
+  selectedValue: AccountType;
+  data: AccountType[];
   title: string;
 }
 

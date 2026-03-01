@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import logger from "@/utils/logger";
-import React, { FC, useEffect, useState, useCallback, memo } from "react";
+import React, { FC, useEffect, useState, useCallback, useRef, memo } from "react";
 import {
   View,
   ScrollView,
@@ -20,7 +20,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { Text, Icon } from "@/components/ui";
-import { TransactionService } from "@/services/transaction-service";
 import tw from "twrnc";
 import moment from "moment";
 import "moment/locale/es";
@@ -29,7 +28,10 @@ import { useTheme } from "@/hooks/use-theme";
 import { Stack, useRouter } from "expo-router";
 import { useFocusEffect } from "expo-router";
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
-import { getUserInfo } from "@/utils/auth-utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { useBalance, useRecentTransactions, useDeleteTransaction, useProfile } from "@/lib/api/hooks";
+import { queryKeys } from "@/lib/api/keys";
+import type { Transaction } from "@/lib/api/types";
 import { SpentSvg } from "@/components/icons/spent-svg";
 import { TranferSvg } from "@/components/icons/tranfer-svg";
 import { IncomeSvg } from "@/components/icons/income-svg";
@@ -57,23 +59,6 @@ import { useAnalytics } from "@/hooks/use-analytics";
 import { initializeUserAnalytics } from "@/utils/analytics-utils";
 
 interface HomeScreenProps {}
-
-// Define a type for transactions
-interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  date: string;
-  transaction_type: string;
-  category_icon_url?: string;
-  bank_url?: string;
-  category_name?: string;
-  category_id?: string;
-  is_recurring?: boolean;
-  metadata?: {
-    auto_generated?: boolean;
-  };
-}
 
 // Extracted Transaction Item Component for Memoization
 const TransactionItem = memo(
@@ -198,7 +183,7 @@ const TransactionItem = memo(
                   <Text weight="medium" color={theme.textPrimary}>
                     {categoryText}
                   </Text>
-                  {transaction.metadata?.auto_generated && (
+                  {!!transaction.metadata?.auto_generated && (
                     <View style={tw`ml-1 w-5 h-5 items-center justify-center`}>
                       <RecurrenceIconHomeSvg width={20} height={20} />
                     </View>
@@ -268,6 +253,41 @@ const insecureExiting = new Keyframe({
   0: { opacity: 1, transform: TRANSFORM_ZERO },
   100: { opacity: 0, transform: TRANSFORM_INSECURE, easing: BALANCE_EASING },
 });
+
+// Transaction list entering — depth rise with subtle overshoot
+const transactionEntering = new Keyframe({
+  0: {
+    opacity: 0,
+    transform: [
+      { perspective: 600 },
+      { translateY: 25 },
+      { scale: 0.88 },
+      { rotateX: "-8deg" },
+    ],
+  },
+  65: {
+    opacity: 1,
+    transform: [
+      { perspective: 600 },
+      { translateY: -2 },
+      { scale: 1.02 },
+      { rotateX: "0.5deg" },
+    ],
+    easing: Easing.out(Easing.cubic),
+  },
+  100: {
+    opacity: 1,
+    transform: [
+      { perspective: 600 },
+      { translateY: 0 },
+      { scale: 1 },
+      { rotateX: "0deg" },
+    ],
+    easing: Easing.out(Easing.ease),
+  },
+});
+const TRANSACTION_ANIM_DURATION = 420;
+const TRANSACTION_ANIM_COOLDOWN = 2000;
 
 const BalanceDisplay = memo(
   ({
@@ -376,15 +396,26 @@ const keboWiseOptions = [
 export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
   const router = useRouter();
   const { theme } = useTheme();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [user, setUser] = useState<any>(null);
-  const [userBalance, setUserBalance] = useState<any>(null);
   const [openRow, setOpenRow] = useState<string | null>(null);
   const { formatAmount } = useCurrencyFormatter();
   const rootStore = useStores();
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const analytics = useAnalytics();
+  const animatedIdsRef = useRef(new Set<string>());
+  const animCooldownRef = useRef(false);
+  const animKeySetRef = useRef(new Set<string>());
+  const snapshotIdsRef = useRef(new Set<string>());
+  const hasInitialLoadRef = useRef(false);
+  const [focusTick, setFocusTick] = useState(0);
+
+  const queryClient = useQueryClient();
+  const { data: balance } = useBalance();
+  const { data: txResponse } = useRecentTransactions(5);
+  const { data: profile } = useProfile();
+  const deleteTransaction = useDeleteTransaction();
+
+  const transactions = txResponse?.data ?? [];
 
   const {
     isVisible: isReviewModalVisible,
@@ -395,11 +426,6 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     getModalTexts,
   } = useReviewModal();
 
-  const {
-    categoryStoreModel: { getCategories },
-    accountStoreModel: { getListAccount },
-    profileModel: { full_name },
-  } = useStores();
 
   useEffect(() => {
     const loadBalanceVisibility = async () => {
@@ -427,53 +453,58 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     }, [checkEligibility])
   );
 
-  const fetchUserBalance = useCallback(async () => {
-    try {
-      const balance = await TransactionService.getUserBalance();
-      setUserBalance(balance);
-    } catch (error) {
-      logger.error("Error fetching user balance:", error);
-    }
-  }, []);
-
-  const fetchTransactions = useCallback(async () => {
-    try {
-      const userInfo = await getUserInfo(rootStore);
-      setUser(userInfo);
-
-      await initializeUserAnalytics(analytics, rootStore);
-
-      const data = await TransactionService.getTransactions();
-      const sortedTransactions =
-        data?.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        ) || [];
-      setTransactions(sortedTransactions);
-      await fetchUserBalance();
-    } catch (error) {
-      logger.error("Error fetching transactions:", error);
-    }
-  }, [rootStore, fetchUserBalance]);
-
+  // Seed animated set with initial data so existing items skip animation
   useEffect(() => {
-    getCategories();
-    fetchTransactions();
-    getListAccount();
-  }, [getCategories, fetchTransactions, getListAccount]);
+    if (!hasInitialLoadRef.current && transactions.length > 0) {
+      hasInitialLoadRef.current = true;
+      snapshotIdsRef.current = new Set(transactions.map(t => t.id));
+    }
+  }, [transactions]);
 
+  // When returning to Home, detect new transactions and animate them
   useFocusEffect(
     useCallback(() => {
-      fetchTransactions();
-    }, [fetchTransactions])
+      if (!hasInitialLoadRef.current) return;
+
+      const currentIds = (txResponse?.data ?? []).map((t: Transaction) => t.id);
+      const newSinceFocus = currentIds.filter(
+        (id: string) => !snapshotIdsRef.current.has(id) && snapshotIdsRef.current.size > 0
+      );
+
+      if (newSinceFocus.length > 0) {
+        // Remove from animated set so they'll be "new" on next render
+        newSinceFocus.forEach((id: string) => animatedIdsRef.current.delete(id));
+        // Delay for the navigation transition to settle, then trigger animation
+        const timeout = setTimeout(() => setFocusTick(c => c + 1), 350);
+        return () => {
+          clearTimeout(timeout);
+          snapshotIdsRef.current = new Set((txResponse?.data ?? []).map((t: Transaction) => t.id));
+        };
+      }
+
+      return () => {
+        snapshotIdsRef.current = new Set((txResponse?.data ?? []).map((t: Transaction) => t.id));
+      };
+    }, [txResponse])
   );
+
+  useEffect(() => {
+    if (profile) {
+      initializeUserAnalytics(analytics, rootStore);
+    }
+  }, [profile, analytics, rootStore]);
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
-    await fetchTransactions();
+    await Promise.all([
+      queryClient.refetchQueries({ queryKey: queryKeys.balance.all }),
+      queryClient.refetchQueries({ queryKey: queryKeys.transactions.all }),
+      queryClient.refetchQueries({ queryKey: queryKeys.profile.all }),
+    ]);
     setIsRefreshing(false);
-  }, [fetchTransactions]);
+  }, [queryClient]);
 
-  const firstName = (full_name || "").split(" ")[0];
+  const firstName = (profile?.full_name || "").split(" ")[0];
 
   const handleDelete = useCallback((transactionId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -485,18 +516,13 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
         {
           text: translate("homeScreen:delete"),
           style: "destructive",
-          onPress: async () => {
-            try {
-              await TransactionService.deleteTransaction(transactionId);
-              fetchTransactions();
-            } catch (error) {
-              logger.error("Error deleting transaction:", error);
-            }
+          onPress: () => {
+            deleteTransaction.mutate(transactionId);
           },
         },
       ]
     );
-  }, [fetchTransactions]);
+  }, [deleteTransaction]);
 
   const handleTransactionPress = useCallback(
     (transaction: Transaction) => {
@@ -519,15 +545,44 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
 
   const renderTransactionItemWrapper = useCallback(
     (item: Transaction) => {
+      // Initial load — track items silently, page FadeIn handles the entrance
+      if (!hasInitialLoadRef.current) {
+        animatedIdsRef.current.add(item.id);
+        return (
+          <Animated.View>
+            <TransactionItem
+              transaction={item}
+              onPress={handleTransactionPress}
+              formatAmount={formatAmount}
+            />
+          </Animated.View>
+        );
+      }
+
+      const isNew = !animatedIdsRef.current.has(item.id);
+      animatedIdsRef.current.add(item.id);
+
+      const shouldAnimate = isNew && !animCooldownRef.current;
+      if (shouldAnimate) {
+        animCooldownRef.current = true;
+        animKeySetRef.current.add(item.id);
+        setTimeout(() => { animCooldownRef.current = false; }, TRANSACTION_ANIM_COOLDOWN);
+      }
+
       return (
-        <TransactionItem
-          transaction={item}
-          onPress={handleTransactionPress}
-          formatAmount={formatAmount}
-        />
+        <Animated.View
+          key={animKeySetRef.current.has(item.id) ? `${item.id}-e` : item.id}
+          entering={shouldAnimate ? transactionEntering.duration(TRANSACTION_ANIM_DURATION) : undefined}
+        >
+          <TransactionItem
+            transaction={item}
+            onPress={handleTransactionPress}
+            formatAmount={formatAmount}
+          />
+        </Animated.View>
       );
     },
-    [handleTransactionPress, formatAmount]
+    [handleTransactionPress, formatAmount, focusTick]
   );
 
   const renderHiddenItem = useCallback(
@@ -641,8 +696,8 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
             isVisible={isBalanceVisible}
             onToggle={handleBalanceVisibilityToggle}
             formattedBalance={
-              userBalance
-                ? formatAmount(userBalance.total_balance)
+              balance
+                ? formatAmount(balance.total_balance)
                 : formatAmount(0)
             }
           />
@@ -698,7 +753,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
       </View>
     );
   }, [
-    userBalance,
+    balance,
     formatAmount,
     navigateToTransaction,
     navigateToSelectBank,
@@ -750,10 +805,9 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
 
   const onRowClose = useCallback(() => setOpenRow(null), []);
 
-  const avatarSource =
-    user?.profile?.avatar_url || user?.user?.user_metadata?.avatar_url
-      ? { uri: user?.profile?.avatar_url || user?.user?.user_metadata?.avatar_url }
-      : require("@/assets/icons/kebo-profile.png");
+  const avatarSource = profile?.avatar_url
+    ? { uri: profile.avatar_url }
+    : require("@/assets/icons/kebo-profile.png");
 
   return (
     <>

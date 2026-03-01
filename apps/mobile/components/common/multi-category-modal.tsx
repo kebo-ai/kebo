@@ -8,7 +8,6 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import { useStores } from "@/models/helpers/use-stores";
 import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
 import { colors } from "@/theme";
@@ -17,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { translateCategoryName } from "@/utils/category-translations";
 import { useTheme } from "@/hooks/use-theme";
+import { useCategories } from "@/lib/api/hooks";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = (width - 50) / 3;
@@ -37,7 +37,7 @@ export const MultiCategoryModal = observer(
     selectedCategories,
     onApply,
   }: MultiCategoryModalProps) => {
-    const { categoryStoreModel } = useStores();
+    const { data: categories = [] } = useCategories();
     const { t: translate } = useTranslation();
     const { theme } = useTheme();
     const [tempSelectedCategories, setTempSelectedCategories] =
@@ -141,7 +141,7 @@ export const MultiCategoryModal = observer(
               showsVerticalScrollIndicator={false}
             >
               <FlatList
-                data={categoryStoreModel.categories}
+                data={categories}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
                 showsVerticalScrollIndicator={false}

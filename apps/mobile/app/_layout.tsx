@@ -38,6 +38,7 @@ import * as Haptics from "expo-haptics";
 import { PressablesConfig } from "pressto";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { QueryProvider } from "@/lib/api/providers/QueryProvider";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -107,22 +108,24 @@ export default function RootLayout() {
                 }}
                 config={{ minScale: 0.97 }}
               >
-                <StatusBar style={colorScheme === "dark" ? "light" : "dark"} backgroundColor="transparent" translucent />
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    navigationBarColor: colorScheme === "dark" ? colors.dark.navigationBar : colors.white,
-                    contentStyle: {
-                      backgroundColor: colorScheme === "dark" ? colors.dark.background : colors.white,
-                    },
-                    animation: "slide_from_right",
-                    gestureEnabled: true,
-                    gestureDirection: "horizontal",
-                    animationDuration: 200,
-                  }}
-                />
-                <CustomToast />
-                <Loader />
+                <QueryProvider>
+                  <StatusBar style={colorScheme === "dark" ? "light" : "dark"} backgroundColor="transparent" translucent />
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      navigationBarColor: colorScheme === "dark" ? colors.dark.navigationBar : colors.white,
+                      contentStyle: {
+                        backgroundColor: colorScheme === "dark" ? colors.dark.background : colors.white,
+                      },
+                      animation: "slide_from_right",
+                      gestureEnabled: true,
+                      gestureDirection: "horizontal",
+                      animationDuration: 200,
+                    }}
+                  />
+                  <CustomToast />
+                  <Loader />
+                </QueryProvider>
               </PressablesConfig>
             </KeyboardProvider>
           </ErrorBoundary>

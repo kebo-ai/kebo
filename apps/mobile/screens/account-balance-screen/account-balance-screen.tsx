@@ -20,14 +20,9 @@ import CustomListItemOption from "@/components/common/custom-list-item-option";
 import { useStores } from "@/models/helpers/use-stores";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { getUserInfo } from "@/utils/auth-utils";
 import ModalAccountType from "@/components/modal-account-type";
-import { AccountTypeSnapshotIn } from "@/models/account-type-store/account-type";
+import { useAccountTypes, useCreateAccount, useUpdateAccount, useAccount } from "@/lib/api/hooks";
 import { showToast } from "@/components/ui/custom-toast";
-import {
-  getAccountDetailService,
-  updateAccountService,
-} from "@/services/account-service";
 import {
   currencyMap,
   useCurrencyFormatter,
@@ -126,13 +121,15 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
 
     const [modalVisible, setModalVisible] = useState(false);
     const {
-      accountStoreModel: { getListAccountType, accountTypes, createAccount },
       uiStoreModel: { showLoader, hideLoader },
       transactionModel: { updateField },
     } = useStores();
-    const rootStore = useStores();
-    const [isLoading, setIsLoading] = useState(false);
-    const [accountDetail, setAccountDetail] = useState<any>(null);
+    const { data: accountTypes = [] } = useAccountTypes();
+    const createAccountMutation = useCreateAccount();
+    const updateAccountMutation = useUpdateAccount();
+    const { data: accountDetailData, isLoading: isLoadingDetail } = useAccount(
+      isEditing && accountId ? accountId : ""
+    );
     const amountInputRef = useRef<TextInput>(null);
     const hasFocusedRef = useRef(false);
 
@@ -146,15 +143,19 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
           (type) => type.type_name?.toLowerCase() !== "efectivo"
         );
 
+    // Populate formik from fetched account detail (editing mode)
     useEffect(() => {
-      getListAccountType();
-    }, []);
-
-    useEffect(() => {
-      if (isEditing && accountId) {
-        fetchAccountDetail();
+      if (isEditing && accountDetailData && accountTypes.length > 0) {
+        const foundType = accountTypes.find(
+          (t) => t.id === accountDetailData.account_type_id
+        );
+        formik.setValues({
+          balance: Number(accountDetailData.balance ?? 0),
+          accountType: foundType ? cloneAccountType(foundType) : { id: "" },
+          description: accountDetailData.customized_name ?? "",
+        });
       }
-    }, [accountId]);
+    }, [accountDetailData, accountTypes]);
 
     useEffect(() => {
       if (isCashBank) {
@@ -207,30 +208,6 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
       };
     }, []);
 
-    const fetchAccountDetail = async () => {
-      setIsLoading(true);
-      try {
-        const result = await getAccountDetailService(accountId || "");
-        if (result.kind === "ok" && result.data) {
-          setAccountDetail(result.data);
-          formik.setValues({
-            balance: Number(result.data.balance ?? 0),
-            accountType: result.data.account_types
-              ? cloneAccountType(result.data.account_types)
-              : { id: "" },
-            description: result.data.customized_name ?? "",
-          });
-        } else {
-          showToast("error", translate("accountBalanceScreen:accountError"));
-        }
-      } catch (error) {
-        logger.error("Error fetching account detail:", error);
-        showToast("error", translate("accountBalanceScreen:accountError"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     const validationSchema = useMemo(() => {
       const isCustomBank =
         selectedBank.name?.toLowerCase() === "banco personalizado";
@@ -278,46 +255,40 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
       onSubmit: async (values, { resetForm }) => {
         showLoader();
         try {
-          const { user } = await getUserInfo(rootStore);
-
           if (isEditing && accountId) {
-            const result = await updateAccountService(accountId, {
-              customized_name:
-                values.description ||
-                translate("accountBalanceScreen:myAccount"),
-              account_type_id: values.accountType.id,
-              balance: values.balance,
+            await updateAccountMutation.mutateAsync({
+              id: accountId,
+              data: {
+                customized_name:
+                  values.description ||
+                  translate("accountBalanceScreen:myAccount"),
+                account_type_id: values.accountType.id,
+                balance: values.balance,
+              },
             });
 
-            if (result.kind === "ok") {
-              showToast(
-                "success",
-                translate("accountBalanceScreen:accountSuccess")
-              );
-              Keyboard.dismiss();
-              setTimeout(() => {
-                if (fromScreen === "Transaction") {
-                  router.push({ pathname: "/(authenticated)/transaction" });
-                } else {
-                  router.push({ pathname: "/(authenticated)/accounts" });
-                }
-              }, 100);
-            } else {
-              showToast(
-                "error",
-                translate("accountBalanceScreen:accountError")
-              );
-            }
+            showToast(
+              "success",
+              translate("accountBalanceScreen:accountSuccess")
+            );
+            Keyboard.dismiss();
+            setTimeout(() => {
+              if (fromScreen === "Transaction") {
+                router.push({ pathname: "/(authenticated)/transaction" });
+              } else {
+                router.push({ pathname: "/(authenticated)/accounts" });
+              }
+            }, 100);
           } else {
-            const result = await createAccount({
-              id: "",
-              user_id: user.id,
-              name:
-                selectedBank.name === "Banco Personalizado"
-                  ? translate("components:bankModal.customBank")
-                  : selectedBank.name === "Efectivo"
-                  ? translate("modalAccount:cash")
-                  : selectedBank.name,
+            const bankName =
+              selectedBank.name === "Banco Personalizado"
+                ? translate("components:bankModal.customBank")
+                : selectedBank.name === "Efectivo"
+                ? translate("modalAccount:cash")
+                : selectedBank.name;
+
+            const result = await createAccountMutation.mutateAsync({
+              name: bankName,
               customized_name:
                 values.description ||
                 translate("accountBalanceScreen:myAccount"),
@@ -326,76 +297,49 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
               account_type_id: values.accountType.id,
               balance: values.balance,
             });
-            if (result) {
-              showToast(
-                "success",
-                translate("accountBalanceScreen:accountAddSuccess")
-              );
-              updateField("account_id", result.id);
-              updateField(
-                "account_name",
-                selectedBank.name === "Banco Personalizado"
-                  ? translate("components:bankModal.customBank")
-                  : selectedBank.name === "Efectivo"
-                  ? translate("modalAccount:cash")
-                  : selectedBank.name
-              );
-              updateField("account_url", selectedBank.bank_url);
 
-              if (isTransfer) {
-                if (transferType === "from") {
-                  updateField("from_account_id", result.id);
-                  updateField(
-                    "from_account_name",
-                    selectedBank.name === "Banco Personalizado"
-                      ? translate("components:bankModal.customBank")
-                      : selectedBank.name === "Efectivo"
-                      ? translate("modalAccount:cash")
-                      : selectedBank.name
-                  );
-                  updateField("from_account_url", selectedBank.bank_url);
-                } else {
-                  updateField("to_account_id", result.id);
-                  updateField(
-                    "to_account_name",
-                    selectedBank.name === "Banco Personalizado"
-                      ? translate("components:bankModal.customBank")
-                      : selectedBank.name === "Efectivo"
-                      ? translate("modalAccount:cash")
-                      : selectedBank.name
-                  );
-                  updateField("to_account_url", selectedBank.bank_url);
-                }
-              }
+            showToast(
+              "success",
+              translate("accountBalanceScreen:accountAddSuccess")
+            );
+            updateField("account_id", result.id);
+            updateField("account_name", bankName);
+            updateField("account_url", selectedBank.bank_url);
 
-              if (fromScreen === "EditTransaction") {
-                Keyboard.dismiss();
-                setTimeout(() => {
-                  router.back();
-                  router.back();
-                }, 100);
-              } else if (fromScreen === "BankModal") {
-                Keyboard.dismiss();
-                setTimeout(() => {
-                  router.back();
-                  router.back();
-                }, 100);
+            if (isTransfer) {
+              if (transferType === "from") {
+                updateField("from_account_id", result.id);
+                updateField("from_account_name", bankName);
+                updateField("from_account_url", selectedBank.bank_url);
               } else {
-                Keyboard.dismiss();
-                setTimeout(() => {
-                  router.push({
-                    pathname: "/(authenticated)/transaction",
-                    params: {
-                      transactionType: isTransfer ? "Transfer" : undefined,
-                    },
-                  });
-                }, 100);
+                updateField("to_account_id", result.id);
+                updateField("to_account_name", bankName);
+                updateField("to_account_url", selectedBank.bank_url);
               }
+            }
+
+            if (fromScreen === "EditTransaction") {
+              Keyboard.dismiss();
+              setTimeout(() => {
+                router.back();
+                router.back();
+              }, 100);
+            } else if (fromScreen === "BankModal") {
+              Keyboard.dismiss();
+              setTimeout(() => {
+                router.back();
+                router.back();
+              }, 100);
             } else {
-              showToast(
-                "error",
-                translate("accountBalanceScreen:accountErrorAdd")
-              );
+              Keyboard.dismiss();
+              setTimeout(() => {
+                router.push({
+                  pathname: "/(authenticated)/transaction",
+                  params: {
+                    transactionType: isTransfer ? "Transfer" : undefined,
+                  },
+                });
+              }, 100);
             }
           }
         } catch (error) {

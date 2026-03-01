@@ -24,6 +24,8 @@ import {
 } from "@react-native-google-signin/google-signin";
 import { useStores } from "@/models/helpers/use-stores";
 import { useAnalytics } from "@/hooks/use-analytics";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/api/keys";
 import { AUTH_EVENTS, EVENT_PROPERTIES } from "@/services/analytics-service";
 import logger from "@/utils/logger";
 
@@ -104,8 +106,9 @@ const AuthButtons: React.FC<AuthButtonsProps> = () => {
     });
   }
   const { t } = useTranslation();
-  const { uiStoreModel, accountStoreModel } = useStores();
+  const { uiStoreModel } = useStores();
   const analytics = useAnalytics();
+  const queryClient = useQueryClient();
   const url = Linking.useURL();
   if (url) createSessionFromUrl(url);
 
@@ -153,7 +156,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = () => {
                   [EVENT_PROPERTIES.REGISTRATION_DATE]: data.user.created_at,
                 });
 
-                await accountStoreModel.getListAccount();
+                await queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
               }
             } else {
               const noTokenError = new Error("No ID token present!");
@@ -244,7 +247,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = () => {
                     [EVENT_PROPERTIES.REGISTRATION_DATE]: user.created_at,
                   });
 
-                  await accountStoreModel.getListAccount();
+                  await queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
                 }
               } else {
                 const noTokenError = new Error("No identityToken.");

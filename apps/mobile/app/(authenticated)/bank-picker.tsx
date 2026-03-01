@@ -10,21 +10,19 @@ import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { Text } from "@/components/ui";
 import { useStores } from "@/models/helpers/use-stores";
-import { observer } from "mobx-react-lite";
 import { translate } from "@/i18n";
 import { Ionicons } from "@expo/vector-icons";
+import { useBanks } from "@/lib/api/hooks";
 
-export default observer(function BankPicker() {
+export default function BankPicker() {
   const router = useRouter();
   const params = useLocalSearchParams<{
     storeKey: string;
     hideBankActions?: string;
   }>();
 
-  const {
-    bankStoreModel: { banks },
-    uiStoreModel,
-  } = useStores();
+  const { uiStoreModel } = useStores();
+  const { data: banks = [] } = useBanks();
 
   const handleSelect = useCallback(
     (bank: any) => {
@@ -114,4 +112,4 @@ export default observer(function BankPicker() {
       />
     </View>
   );
-});
+}

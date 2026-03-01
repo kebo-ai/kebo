@@ -9,7 +9,7 @@ This document provides essential information for AI coding agents working in the
 - **API**: `apps/api/AGENTS.md` — Hono REST API with Drizzle ORM, deployed to Vercel
 - **Dashboard**: `apps/dashboard/AGENTS.md` — Next.js financial dashboard with TanStack Query + Supabase realtime
 - **Marketing**: `apps/marketing/AGENTS.md` — Next.js marketing site with i18n (es/en/pt)
-- **Mobile**: `apps/mobile/AGENTS.md` — Expo/React Native app with MobX-State-Tree
+- **Mobile**: `apps/mobile/AGENTS.md` — Expo/React Native app with React Query + Hono RPC
 - **Shared**: `packages/shared/AGENTS.md` — Shared TypeScript types and constants
 
 ### Global Invariants
@@ -28,7 +28,7 @@ Kebo is a personal finance app with a mobile app, web dashboard, API, and market
 | API | `apps/api` | Hono + Drizzle ORM | REST API (Vercel serverless) |
 | Dashboard | `apps/dashboard` | Next.js 16 + React 19 | Authenticated financial dashboard |
 | Marketing | `apps/marketing` | Next.js 16 + React 19 | Public marketing/landing website |
-| Mobile | `apps/mobile` | Expo SDK 54 + React Native | Main mobile application |
+| Mobile | `apps/mobile` | Expo SDK 54 + React Native | Main mobile application (React Query + Hono RPC) |
 | Shared | `packages/shared` | TypeScript | Shared types and constants |
 
 ## Build/Lint/Test Commands
@@ -176,41 +176,43 @@ static async fetchData() {
 
 ### Mobile App (React Native/Expo)
 
-- **State Management**: MobX-State-Tree
+- **Server State**: TanStack Query v5 + Hono RPC typed client (same pattern as Dashboard)
+- **UI State**: MobX-State-Tree (form state, UI selections — NOT server data)
 - **Navigation**: expo-router (file-based) with native tabs and sheets
 - **Styling**: twrnc (Tailwind for React Native)
 - **i18n**: i18next with `translate()` function
 
 ```typescript
-// Screen component pattern
+// Screen component pattern — React Query hooks for data, observer for UI state
 import { observer } from "mobx-react-lite"
-import { useStores } from "@/models"
+import { useTransactions, useDeleteTransaction } from "@/lib/api/hooks"
+import { useQueryClient } from "@tanstack/react-query"
 
 export const HomeScreen = observer(() => {
-  const { transactionStore } = useStores()
+  const { data: txResponse } = useRecentTransactions(5)
+  const { data: balance } = useBalance()
+  const deleteTransaction = useDeleteTransaction()
   // ...
 })
 ```
 
-### Services Pattern (Mobile)
+### API Layer (Mobile — `lib/api/`)
 
-```typescript
-// Static methods, Supabase client, centralized error handling
-export class TransactionService {
-  static async getAll(userId: string) {
-    try {
-      const { data, error } = await supabase
-        .from("transactions")
-        .select("*")
-        .eq("user_id", userId)
-      if (error) throw error
-      return data
-    } catch (error) {
-      logger.error("TransactionService.getAll error:", error)
-      throw error
-    }
-  }
-}
+Same architecture as Dashboard — Hono RPC typed client with TanStack Query:
+
+```
+lib/api/
+  rpc.ts              — Hono typed client singleton + unwrap<T>() helper
+  client.ts           — Auth token management (getAccessToken, ApiError)
+  types.ts            — TypeScript interfaces matching API response shapes
+  keys.ts             — Query key factory (queryKeys.transactions.list(), etc.)
+  query-config.ts     — Per-resource staleTime / gcTime
+  hooks/              — useTransactions, useAccounts, useBudgets, etc.
+  providers/          — QueryProvider (wraps app in QueryClientProvider)
+lib/realtime/
+  realtime-provider.tsx    — Supabase realtime subscriptions
+  invalidation-tracker.ts  — markMutationSettled() deduplication
+```
 ```
 
 ## Project Structure
@@ -231,12 +233,14 @@ kebo/
 │   │   ├── i18n/             # Translations
 │   │   └── lib/              # Utilities (cn, etc.)
 │   │
-│   └── mobile/src/
+│   └── mobile/
+│       ├── app/              # expo-router file-based routes
 │       ├── components/       # UI components
 │       ├── screens/          # Screen components
-│       ├── navigators/       # React Navigation config
-│       ├── models/           # MobX-State-Tree stores
-│       ├── services/         # API service classes
+│       ├── lib/api/          # React Query hooks + Hono RPC client
+│       ├── lib/realtime/     # Supabase realtime sync
+│       ├── models/           # MobX-State-Tree (UI state only)
+│       ├── services/         # Legacy service classes (being phased out)
 │       ├── hooks/            # Custom React hooks
 │       ├── i18n/             # i18next translations
 │       ├── theme/            # Colors, typography
@@ -259,7 +263,7 @@ kebo/
 | Backend | Supabase | Supabase (waitlist) | Supabase |
 | Styling | Tailwind CSS | Tailwind CSS | twrnc |
 | UI | Radix UI, shadcn/ui | Minimal shadcn/ui | Custom components |
-| State | React Query | React state | MobX-State-Tree |
+| State | React Query | React state | React Query + MST (UI) |
 | Analytics | Vercel Analytics | Vercel Analytics | PostHog |
 | i18n | — | Custom dictionary | i18next |
 | Animation | — | Framer Motion | — |

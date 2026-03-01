@@ -27,6 +27,7 @@ import { showToast } from "@/components/ui/custom-toast";
 import { InputAmount } from "@/components/input-amount";
 import { budgetService } from "@/services/budget-service";
 import { useStores } from "@/models/helpers/use-stores";
+import { useCategories } from "@/lib/api/hooks";
 import CustomButton from "@/components/common/custom-button";
 import { colors } from "@/theme/colors";
 import CustomBudgetCategoryModal from "@/components/common/custom-budget-category-modal";
@@ -69,7 +70,7 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
     const [currentSelectedCategory, setCurrentSelectedCategory] =
       useState(selectedCategory);
     const [existingCategories, setExistingCategories] = useState<string[]>([]);
-    const { categoryStoreModel } = useStores();
+    const { data: allCategories = [] } = useCategories();
     const inputRef = useRef<any>(null);
     const { region } = useCurrencyFormatter();
 
@@ -169,15 +170,15 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
 
     const filteredCategories = useMemo(() => {
       if (isEditing) {
-        return categoryStoreModel.categories.filter(
+        return allCategories.filter(
           (cat) => !existingCategories.includes(cat.id) || cat.id === categoryId
         );
       }
-      return categoryStoreModel.categories.filter(
+      return allCategories.filter(
         (cat) => !existingCategories.includes(cat.id)
       );
     }, [
-      categoryStoreModel.categories,
+      allCategories,
       existingCategories,
       isEditing,
       categoryId,

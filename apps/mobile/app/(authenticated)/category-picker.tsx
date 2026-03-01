@@ -10,14 +10,14 @@ import tw from "twrnc";
 import { colors } from "@/theme/colors";
 import { Text } from "@/components/ui";
 import { useStores } from "@/models/helpers/use-stores";
-import { observer } from "mobx-react-lite";
 import { SvgUri } from "react-native-svg";
 import { translate } from "@/i18n";
 import { translateCategoryName } from "@/utils/category-translations";
 import { Ionicons } from "@expo/vector-icons";
+import { useExpenseCategories, useIncomeCategories } from "@/lib/api/hooks";
 const ICON_SIZE = 50;
 
-export default observer(function CategoryPicker() {
+export default function CategoryPicker() {
   const router = useRouter();
   const params = useLocalSearchParams<{
     type: string;
@@ -26,10 +26,9 @@ export default observer(function CategoryPicker() {
     storeKey: string;
   }>();
 
-  const {
-    categoryStoreModel: { expenseCategories, incomeCategories },
-    uiStoreModel,
-  } = useStores();
+  const { uiStoreModel } = useStores();
+  const { data: expenseCategories = [] } = useExpenseCategories();
+  const { data: incomeCategories = [] } = useIncomeCategories();
 
   const categories =
     params.type === "income" ? incomeCategories : expenseCategories;
@@ -143,4 +142,4 @@ export default observer(function CategoryPicker() {
       />
     </View>
   );
-});
+}

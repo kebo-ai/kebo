@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import logger from "@/utils/logger";
 import React, { FC, useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
   RefreshControl,
@@ -9,9 +9,49 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import Animated, { Easing, Keyframe } from "react-native-reanimated";
+
+// Transaction list entering — depth rise with subtle overshoot
+const transactionEntering = new Keyframe({
+  0: {
+    opacity: 0,
+    transform: [
+      { perspective: 600 },
+      { translateY: 25 },
+      { scale: 0.88 },
+      { rotateX: "-8deg" },
+    ],
+  },
+  65: {
+    opacity: 1,
+    transform: [
+      { perspective: 600 },
+      { translateY: -2 },
+      { scale: 1.02 },
+      { rotateX: "0.5deg" },
+    ],
+    easing: Easing.out(Easing.cubic),
+  },
+  100: {
+    opacity: 1,
+    transform: [
+      { perspective: 600 },
+      { translateY: 0 },
+      { scale: 1 },
+      { rotateX: "0deg" },
+    ],
+    easing: Easing.out(Easing.ease),
+  },
+});
+const TRANSACTION_ANIM_DURATION = 420;
+const TRANSACTION_ANIM_COOLDOWN = 2000;
 import { Text } from "@/components/ui";
 import { Screen } from "@/components/screen";
-import { TransactionService } from "@/services/transaction-service";
+import { useTransactions, useDeleteTransaction } from "@/lib/api/hooks";
+import type { TransactionsResponse } from "@/lib/api/hooks/use-transactions";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/api/keys";
+import type { Transaction as ApiTransaction } from "@/lib/api/types";
 import tw from "twrnc";
 import moment from "moment";
 import { colors } from "@/theme/colors";
@@ -30,6 +70,7 @@ import * as Haptics from "expo-haptics";
 import { InteractionManager } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useStores } from "@/models/helpers/use-stores";
+import { useCategories } from "@/lib/api/hooks";
 import { AccountIconSvg } from "@/components/icons/account-svg";
 import { CalendarIconSvg } from "@/components/icons/calendar-svg";
 import { MultiCategoryModal } from "@/components/common/multi-category-modal";
@@ -91,10 +132,34 @@ const parseArrayParam = (param?: string): string[] | undefined => {
   }
 };
 
+function groupTransactionsByMonth(transactions: ApiTransaction[]): GroupedTransaction[] {
+  const groups: Record<string, GroupedTransaction> = {};
+
+  for (const tx of transactions) {
+    const monthKey = moment(tx.date).format("YYYY-MM");
+    const monthLabel = moment(tx.date)
+      .format("MMMM YYYY")
+      .replace(/^\w/, (c) => c.toUpperCase());
+
+    if (!groups[monthKey]) {
+      groups[monthKey] = {
+        name: monthLabel,
+        date: monthKey,
+        transactions: [],
+      };
+    }
+    groups[monthKey].transactions.push(tx as unknown as Transaction);
+  }
+
+  return Object.values(groups).sort((a, b) => b.date.localeCompare(a.date));
+}
+
 export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
   function TransactionsScreen() {
     const router = useRouter();
     const params = useLocalSearchParams<RouteParams>();
+    const queryClient = useQueryClient();
+    const deleteTransactionMutation = useDeleteTransaction();
 
     const initialFilters = useMemo(() => ({
       accountIds: parseArrayParam(params.accountIds),
@@ -104,13 +169,12 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     }), [params.accountIds, params.months, params.categoryIds, params.transactionType]);
     const origin = (params.origin as "Home" | "Accounts") ?? "Home";
     const { theme, isDark } = useTheme();
-    const [transactions, setTransactions] = useState<GroupedTransaction[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
     const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+    const [allTransactions, setAllTransactions] = useState<ApiTransaction[]>([]);
     const [showScrollToTop, setShowScrollToTop] = useState(false);
     const scrollViewRef = useRef<ScrollView>(null);
+    const animatedIdsRef = useRef(new Set<string>());
+    const animCooldownRef = useRef(false);
     const ITEMS_PER_PAGE = 15;
     const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
     const [transactionToDelete, setTransactionToDelete] = useState<
@@ -131,11 +195,11 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     const [selectedType, setSelectedType] = useState<
       "Ingreso" | "Gasto" | null
     >(null);
-    const { categoryStoreModel } = useStores();
-    const categories = categoryStoreModel.categories;
+    const { data: categories = [] } = useCategories();
     const currentLocale = i18n.language.split("-")[0];
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const [tempSelectedBanks, setTempSelectedBanks] = useState<string[]>([]);
     const [tempSelectedBankNames, setTempSelectedBankNames] = useState<
       string[]
@@ -144,7 +208,6 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     const [tempSelectedCategories, setTempSelectedCategories] = useState<
       { id: string; name: string }[]
     >([]);
-    const [readyToFetch, setReadyToFetch] = useState(false);
 
     const hasInitialFilters = !!(
       initialFilters?.accountIds?.length ||
@@ -185,237 +248,86 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
       });
     });
 
-    const fetchTransactions = useCallback(
-      async (pageNumber = 1, isLoadMore = false) => {
-        try {
-          if (!isLoadMore) {
-            setLoading(true);
-          }
+    // Compute date range from selected months
+    const monthDateRange = useMemo(() => {
+      if (selectedMonths.length === 0) return {};
+      const sorted = [...selectedMonths].sort();
+      const startDate = moment(sorted[0], "YYYY-MM").startOf("month").format("YYYY-MM-DD");
+      const endDate = moment(sorted[sorted.length - 1], "YYYY-MM").endOf("month").format("YYYY-MM-DD");
+      return { start_date: startDate, end_date: endDate };
+    }, [selectedMonths]);
 
-          const filters = {
-            accountIds: selectedBanks.length > 0 ? selectedBanks : undefined,
-            months: selectedMonths.length > 0 ? selectedMonths : undefined,
-            categoryIds:
-              selectedCategories.length > 0
-                ? selectedCategories.map((cat) => cat.id)
-                : undefined,
-            transactionType:
-              selectedType === "Ingreso"
-                ? ("Income" as const)
-                : selectedType === "Gasto"
-                ? ("Expense" as const)
-                : undefined,
-          };
+    // Build API filters from component state
+    const apiFilters = useMemo(() => ({
+      account_ids: selectedBanks.length > 0 ? selectedBanks : undefined,
+      category_ids: selectedCategories.length > 0 ? selectedCategories.map(c => c.id) : undefined,
+      transaction_type: selectedType === "Ingreso" ? "Income" : selectedType === "Gasto" ? "Expense" : undefined,
+      limit: ITEMS_PER_PAGE,
+      page,
+      ...monthDateRange,
+    }), [selectedBanks, selectedCategories, selectedType, page, monthDateRange]);
 
-          const data = await TransactionService.getTransactionsByMonth(
-            pageNumber,
-            ITEMS_PER_PAGE,
-            filters
-          );
+    const { data: txResponse, isLoading: queryLoading, isFetching } = useTransactions(apiFilters);
 
-          if (!data || (Array.isArray(data) && data.length === 0)) {
-            setHasMore(false);
-            if (!isLoadMore) {
-              setTransactions([]);
-            }
-          } else {
-            const totalTransactions = countTotalTransactions(data);
-            setHasMore(totalTransactions === ITEMS_PER_PAGE);
-
-            setTransactions((prev) => {
-              if (!Array.isArray(data)) return prev;
-
-              if (isLoadMore) {
-                const combinedTransactions = [...prev];
-
-                data.forEach((newGroup) => {
-                  const existingGroupIndex = combinedTransactions.findIndex(
-                    (group) => group.name === newGroup.name
-                  );
-
-                  if (existingGroupIndex !== -1) {
-                    const existingIds = new Set(
-                      combinedTransactions[existingGroupIndex].transactions.map((t: { id: string }) => t.id)
-                    );
-                    const uniqueNewTransactions = newGroup.transactions.filter(
-                      (t: { id: string }) => !existingIds.has(t.id)
-                    );
-                    combinedTransactions[existingGroupIndex].transactions = [
-                      ...combinedTransactions[existingGroupIndex].transactions,
-                      ...uniqueNewTransactions,
-                    ];
-                  } else {
-                    combinedTransactions.push(newGroup);
-                  }
-                });
-
-                return combinedTransactions;
-              }
-
-              return data;
-            });
-          }
-        } catch (error) {
-          logger.error("Error fetching transactions:", error);
-          setTransactions([]);
-        } finally {
-          setLoading(false);
-          setRefreshing(false);
+    // Accumulate transaction pages for infinite scroll
+    useEffect(() => {
+      if (txResponse?.data) {
+        if (page === 1) {
+          setAllTransactions(txResponse.data);
+        } else {
+          setAllTransactions(prev => {
+            const existingIds = new Set(prev.map(t => t.id));
+            const newTxs = txResponse.data.filter(t => !existingIds.has(t.id));
+            return [...prev, ...newTxs];
+          });
         }
-      },
-      [selectedBanks, selectedMonths, selectedCategories, selectedType]
-    );
+      }
+    }, [txResponse, page]);
 
-    const countTotalTransactions = (
-      groups: GroupedTransaction[] | undefined
-    ): number => {
-      if (!groups) return 0;
-      return groups.reduce((total: number, group: GroupedTransaction) => {
-        return total + (group.transactions ? group.transactions.length : 0);
-      }, 0);
-    };
+    const hasMore = txResponse ? txResponse.total > allTransactions.length : false;
+
+    const groupedTransactions = useMemo(() => {
+      return groupTransactionsByMonth(allTransactions);
+    }, [allTransactions]);
 
     const loadMore = useCallback(() => {
-      if (loading || !hasMore) return;
+      if (queryLoading || isFetching || !hasMore) return;
+      setPage(prev => prev + 1);
+    }, [queryLoading, isFetching, hasMore]);
 
-      setLoading(true);
-      const nextPage = page + 1;
-      setPage(nextPage);
-
-      const filters = {
-        accountIds: selectedBanks.length > 0 ? selectedBanks : undefined,
-        months: selectedMonths.length > 0 ? selectedMonths : undefined,
-        categoryIds:
-          selectedCategories.length > 0
-            ? selectedCategories.map((cat) => cat.id)
-            : undefined,
-        transactionType:
-          selectedType === "Ingreso"
-            ? ("Income" as const)
-            : selectedType === "Gasto"
-            ? ("Expense" as const)
-            : undefined,
-      };
-
-      TransactionService.getTransactionsByMonth(
-        nextPage,
-        ITEMS_PER_PAGE,
-        filters
-      )
-        .then((data) => {
-          if (!data || data.length === 0) {
-            setHasMore(false);
-          } else {
-            setTransactions((prev) => {
-              if (!Array.isArray(data)) return prev;
-
-              const combinedTransactions = [...prev];
-              data.forEach((newGroup) => {
-                const existingGroupIndex = combinedTransactions.findIndex(
-                  (group) => group.name === newGroup.name
-                );
-
-                if (existingGroupIndex !== -1) {
-                  const existingIds = new Set(
-                    combinedTransactions[existingGroupIndex].transactions.map((t: { id: string }) => t.id)
-                  );
-                  const uniqueNewTransactions = newGroup.transactions.filter(
-                    (t: { id: string }) => !existingIds.has(t.id)
-                  );
-                  combinedTransactions[existingGroupIndex].transactions = [
-                    ...combinedTransactions[existingGroupIndex].transactions,
-                    ...uniqueNewTransactions,
-                  ];
-                } else {
-                  combinedTransactions.push(newGroup);
-                }
-              });
-
-              return combinedTransactions;
-            });
-
-            const totalTransactions = countTotalTransactions(data);
-            setHasMore(totalTransactions === ITEMS_PER_PAGE);
-          }
-        })
-        .catch((error) => {
-          logger.error("Error loading more transactions:", error);
-          setHasMore(false);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }, [
-      loading,
-      hasMore,
-      page,
-      selectedBanks,
-      selectedMonths,
-      selectedCategories,
-      selectedType,
-      countTotalTransactions,
-    ]);
-
+    // Apply initial filters on mount
     useEffect(() => {
-      const applyInitialFilters = async () => {
-        if (initialFilters) {
-          if (initialFilters.accountIds) {
-            setSelectedBanks(initialFilters.accountIds);
-            setTempSelectedBanks(initialFilters.accountIds);
-          }
-          if (initialFilters.months) {
-            setSelectedMonths(initialFilters.months);
-            setTempSelectedMonths(initialFilters.months);
-          }
-          if (initialFilters.categoryIds) {
-            const categoriesToSet = initialFilters.categoryIds.map(
-              (id: any) => {
-                const category = categories.find(
-                  (cat) => cat.id === id || cat.category_id === id
-                );
-                return {
-                  id: category?.id || id,
-                  name: category?.name || "Categoría",
-                };
-              }
-            );
-            setSelectedCategories(categoriesToSet);
-            setTempSelectedCategories(categoriesToSet);
-          }
-          if (initialFilters.transactionType) {
-            const type =
-              initialFilters.transactionType === "Income" ? "Ingreso" : "Gasto";
-            setSelectedType(type);
-          }
+      if (initialFilters) {
+        if (initialFilters.accountIds) {
+          setSelectedBanks(initialFilters.accountIds);
+          setTempSelectedBanks(initialFilters.accountIds);
         }
-
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        setReadyToFetch(true);
-      };
-      applyInitialFilters();
-    }, [initialFilters, categories]);
-
-    useEffect(() => {
-      if (readyToFetch) {
-        setLoading(true);
-        fetchTransactions(1, false);
-        setReadyToFetch(false);
+        if (initialFilters.months) {
+          setSelectedMonths(initialFilters.months);
+          setTempSelectedMonths(initialFilters.months);
+        }
+        if (initialFilters.categoryIds) {
+          const categoriesToSet = initialFilters.categoryIds.map(
+            (id: any) => {
+              const category = categories.find(
+                (cat) => cat.id === id || cat.category_id === id
+              );
+              return {
+                id: category?.id || id,
+                name: category?.name || "Categoria",
+              };
+            }
+          );
+          setSelectedCategories(categoriesToSet);
+          setTempSelectedCategories(categoriesToSet);
+        }
+        if (initialFilters.transactionType) {
+          const type =
+            initialFilters.transactionType === "Income" ? "Ingreso" : "Gasto";
+          setSelectedType(type);
+        }
       }
-    }, [readyToFetch]);
-
-    const fetchRef = useRef(fetchTransactions);
-    fetchRef.current = fetchTransactions;
-
-    useFocusEffect(
-      useCallback(() => {
-        if (!hasInitialFilters) {
-          setPage(1);
-          setHasMore(true);
-          setLoading(true);
-          fetchRef.current(1, false);
-        }
-      }, [hasInitialFilters])
-    );
+    }, [initialFilters, categories]);
 
     const handleDelete = useCallback((transactionId: string) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -428,10 +340,11 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
 
       setIsDeleting(true);
       try {
-        await TransactionService.deleteTransaction(transactionToDelete);
-        setIsUpdating(true);
-        await fetchTransactions();
+        await deleteTransactionMutation.mutateAsync(transactionToDelete);
         showToast("success", translate("transactionScreen:deleteTransaction"));
+        // Reset to refetch
+        setPage(1);
+        setAllTransactions([]);
       } catch (error) {
         logger.error("Error deleting transaction:", error);
         showToast(
@@ -444,7 +357,7 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
         setIsDeleteAlertVisible(false);
         setTransactionToDelete(null);
       }
-    }, [transactionToDelete, fetchTransactions]);
+    }, [transactionToDelete, deleteTransactionMutation]);
 
     const onRowClose = useCallback(() => setOpenRow(null), []);
 
@@ -517,7 +430,7 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
             const category = categories.find((cat) => cat.id === id);
             return {
               id,
-              name: category?.name || "Categoría",
+              name: category?.name || "Categoria",
             };
           });
           setSelectedCategories(categoriesToSet);
@@ -529,54 +442,12 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
         }
 
         setPage(1);
-        setHasMore(true);
-        setLoading(true);
-        setTransactions([]);
-
-        const apiFilters = {
-          accountIds: filters.accountIds || selectedBanks,
-          months: filters.months || selectedMonths,
-          categoryIds:
-            filters.categoryIds || selectedCategories.map((cat) => cat.id),
-          transactionType:
-            filters.transactionType ||
-            (selectedType === "Ingreso"
-              ? "Income"
-              : selectedType === "Gasto"
-              ? "Expense"
-              : undefined),
-        };
-
-        TransactionService.getTransactionsByMonth(1, ITEMS_PER_PAGE, apiFilters)
-          .then((data) => {
-            if (!data || data.length === 0) {
-              setTransactions([]);
-              setHasMore(false);
-            } else {
-              setTransactions(data);
-              const totalTransactions = countTotalTransactions(data);
-              setHasMore(totalTransactions === ITEMS_PER_PAGE);
-            }
-            setLoading(false);
-          })
-          .catch((error) => {
-            logger.error("Error al aplicar filtros:", error);
-            setTransactions([]);
-            setLoading(false);
-          });
+        setAllTransactions([]);
       },
-      [
-        categories,
-        selectedBanks,
-        selectedMonths,
-        selectedCategories,
-        selectedType,
-        countTotalTransactions,
-      ]
+      [categories]
     );
 
-    const clearAllFilters = useCallback(async () => {
-      setLoading(true);
+    const clearAllFilters = useCallback(() => {
       setTempSelectedBanks([]);
       setTempSelectedBankNames([]);
       setTempSelectedMonths([]);
@@ -586,11 +457,8 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
       setSelectedMonths([]);
       setSelectedCategories([]);
       setSelectedType(null);
-
       setPage(1);
-      setHasMore(true);
-
-      setReadyToFetch(true);
+      setAllTransactions([]);
     }, []);
 
     const openBankModal = useCallback(() => {
@@ -615,13 +483,24 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
         index: number,
         transactions: Transaction[]
       ) => {
+        const isNew = !animatedIdsRef.current.has(transaction.id);
+        animatedIdsRef.current.add(transaction.id);
+
+        const shouldAnimate = isNew && !animCooldownRef.current;
+        if (shouldAnimate) {
+          animCooldownRef.current = true;
+          setTimeout(() => { animCooldownRef.current = false; }, TRANSACTION_ANIM_COOLDOWN);
+        }
+
         return (
-          <TransactionList
-            transaction={transaction}
-            index={index}
-            transactions={transactions}
-            handleEditTransaction={handleEditTransaction}
-          />
+          <Animated.View entering={shouldAnimate ? transactionEntering.duration(TRANSACTION_ANIM_DURATION) : undefined}>
+            <TransactionList
+              transaction={transaction}
+              index={index}
+              transactions={transactions}
+              handleEditTransaction={handleEditTransaction}
+            />
+          </Animated.View>
         );
       },
       [handleEditTransaction]
@@ -746,14 +625,13 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
       });
     }, [tempSelectedBanks, applyFilters]);
 
-    const onRefresh = useCallback(() => {
+    const onRefresh = useCallback(async () => {
       setRefreshing(true);
       setPage(1);
-      setHasMore(true);
-      setTimeout(() => {
-        fetchTransactions(1, false);
-      }, 50);
-    }, [fetchTransactions]);
+      setAllTransactions([]);
+      await queryClient.refetchQueries({ queryKey: queryKeys.transactions.all });
+      setRefreshing(false);
+    }, [queryClient]);
 
     return (
       <Screen
@@ -807,14 +685,14 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
 
             setShowScrollToTop(contentOffset.y > 100);
 
-            if (isCloseToBottom && !loading && hasMore) {
+            if (isCloseToBottom && !queryLoading && !isFetching && hasMore) {
               logger.debug("Reached near bottom, triggering loadMore");
               loadMore();
             }
           }}
           scrollEventThrottle={200}
           onMomentumScrollEnd={() => {
-            if (!loading && hasMore) {
+            if (!queryLoading && !isFetching && hasMore) {
               loadMore();
             }
           }}
@@ -901,14 +779,14 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
           </View>
 
           <View style={[tw`px-4 mt-4`, { backgroundColor: theme.background }]}>
-            {loading && page === 1 ? (
+            {queryLoading && page === 1 ? (
               <View style={tw`flex-1 items-center justify-center py-8`}>
                 <ActivityIndicator size="large" color={colors.primary} />
                 <Text style={tw`mt-4 text-base`} color={theme.textSecondary}>
                   {translate("transactionScreen:chargingTransaction")}
                 </Text>
               </View>
-            ) : transactions.length === 0 ? (
+            ) : groupedTransactions.length === 0 ? (
               <View style={tw`flex-1 items-center justify-center py-12`}>
                 <KeboSadIconSvg width={60} height={60} />
                 <Text style={tw`text-base mt-4`} color={theme.textSecondary}>
@@ -919,17 +797,17 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
               <View
                 style={[tw`rounded-[18px] overflow-hidden`, { borderWidth: 1, borderColor: theme.border, backgroundColor: theme.surface }]}
               >
-                {transactions.map((group) => (
+                {groupedTransactions.map((group) => (
                   <View key={group.name}>
                     {renderMonthGroup({
                       item: group,
-                      index: transactions.indexOf(group),
+                      index: groupedTransactions.indexOf(group),
                     })}
                   </View>
                 ))}
               </View>
             )}
-            {loading && page > 1 && (
+            {isFetching && page > 1 && (
               <View style={tw`py-4 items-center`}>
                 <ActivityIndicator size="small" color={colors.primary} />
                 <Text style={tw`mt-2 text-sm`} color={theme.textSecondary}>

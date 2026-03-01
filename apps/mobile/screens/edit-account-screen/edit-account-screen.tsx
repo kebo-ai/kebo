@@ -13,10 +13,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import ModalAccountType from "@/components/modal-account-type";
 import { showToast } from "@/components/ui/custom-toast";
-import {
-  getAccountDetailService,
-  updateAccountService,
-} from "@/services/account-service";
+import { useAccountTypes, useUpdateAccount, useAccount } from "@/lib/api/hooks";
 import { translate } from "@/i18n";
 import { useNumberEntry } from "@/hooks/use-number-entry";
 import { useShakeAnimation } from "@/hooks/use-shake-animation";
@@ -105,12 +102,11 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
 
     const [modalVisible, setModalVisible] = useState(false);
     const {
-      accountStoreModel: { getListAccountType, accountTypes, getListAccount },
       uiStoreModel: { showLoader, hideLoader },
     } = useStores();
-
-    const [isLoading, setIsLoading] = useState(true);
-    const [accountDetail, setAccountDetail] = useState<any>(null);
+    const { data: accountTypes = [] } = useAccountTypes();
+    const updateAccountMutation = useUpdateAccount();
+    const { data: accountDetailData, isLoading } = useAccount(accountId || "");
 
     const insets = useSafeAreaInsets();
     const numberEntry = useNumberEntry(2);
@@ -142,23 +138,21 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
       onSubmit: async (values) => {
         showLoader();
         try {
-          const result = await updateAccountService(accountId, {
-            customized_name:
-              values.description || translate("accountBalanceScreen:myAccount"),
-            account_type_id: values.accountType.id,
-            balance: values.balance,
+          await updateAccountMutation.mutateAsync({
+            id: accountId,
+            data: {
+              customized_name:
+                values.description || translate("accountBalanceScreen:myAccount"),
+              account_type_id: values.accountType.id,
+              balance: values.balance,
+            },
           });
 
-          if (result.kind === "ok") {
-            await getListAccount();
-            showToast(
-              "success",
-              translate("accountBalanceScreen:accountSuccess")
-            );
-            router.back();
-          } else {
-            showToast("error", translate("accountBalanceScreen:accountError"));
-          }
+          showToast(
+            "success",
+            translate("accountBalanceScreen:accountSuccess")
+          );
+          router.back();
         } catch (error) {
           logger.error("Error updating account:", error);
           showToast(
@@ -171,47 +165,29 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
       },
     });
 
+    // Populate formik from fetched account detail
     useEffect(() => {
-      getListAccountType();
-      if (accountId) {
-        fetchAccountDetail();
+      if (accountDetailData && accountTypes.length > 0) {
+        const balance = Number(accountDetailData.balance ?? 0);
+        const cents = Math.round(balance * 100);
+        numberEntry.setFromCents(cents);
+
+        const foundType = accountTypes.find(
+          (t) => t.id === accountDetailData.account_type_id
+        );
+        formik.setValues({
+          balance,
+          accountType: foundType ? cloneAccountType(foundType) : { id: "" },
+          description: accountDetailData.customized_name ?? "",
+        });
       }
-    }, [accountId]);
+    }, [accountDetailData, accountTypes]);
 
     // Sync number entry → formik balance
     useEffect(() => {
       const balance = numberEntry.amountInCents / 100;
       formik.setFieldValue("balance", balance);
     }, [numberEntry.amountInCents]);
-
-    const fetchAccountDetail = async () => {
-      setIsLoading(true);
-      try {
-        const result = await getAccountDetailService(accountId || "");
-        if (result.kind === "ok" && result.data) {
-          setAccountDetail(result.data);
-
-          const balance = Number(result.data.balance ?? 0);
-          const cents = Math.round(balance * 100);
-          numberEntry.setFromCents(cents);
-
-          formik.setValues({
-            balance,
-            accountType: result.data.account_types
-              ? cloneAccountType(result.data.account_types)
-              : { id: "" },
-            description: result.data.customized_name ?? "",
-          });
-        } else {
-          showToast("error", translate("accountBalanceScreen:accountError"));
-        }
-      } catch (error) {
-        logger.error("Error fetching account detail:", error);
-        showToast("error", translate("accountBalanceScreen:accountError"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
     const handleSubmit = () => {
       if (numberEntry.amountInCents === 0) {

@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useCallback } from "react";
+import React, { FC, useState, useEffect, useCallback, useMemo } from "react";
 import logger from "@/utils/logger";
 import {
   Platform,
@@ -16,17 +16,13 @@ import moment from "moment";
 import IncomeExpenseBarChart from "@/components/common/custom-bar-income";
 import { ArrowDownSimpleIcon } from "@/components/icons/arrow-down-simple-icon";
 import CustomModal from "@/components/common/custom-modal";
-import {
-  ChartService,
-  IncomeExpenseReportResponse,
-} from "@/services/chart-service";
+import { useIncomeExpenseReport, useDeleteCategory } from "@/lib/api/hooks";
+import type { IncomeExpenseReport, ReportGranularity } from "@/lib/api/types";
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 import { CategoriesList } from "@/components/common/categories-list";
 import * as Haptics from "expo-haptics";
 import CustomAlert from "@/components/common/custom-alert";
-import { deleteCategoryService } from "@/services/category-service";
 import { showToast } from "@/components/ui/custom-toast";
-import { useStores } from "@/models/helpers/use-stores";
 import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { load, save } from "@/utils/storage";
 import { REPORTS_INCOME_PERIOD } from "@/utils/storage/storage-keys";
@@ -77,17 +73,12 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
   function ReportsIncomeScreen() {
     const router = useRouter();
     const { theme } = useTheme();
-    const { categoryStoreModel } = useStores();
     const [period, setPeriod] = useState<PeriodType>(periodOptions[1]);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedYearIndex, setSelectedYearIndex] = useState(
       years.length - 1
     );
     const [currentDate, setCurrentDate] = useState(moment());
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [reportData, setReportData] =
-      useState<IncomeExpenseReportResponse | null>(null);
     const { formatAmount } = useCurrencyFormatter();
     const [renderHiddenItem, setRenderHiddenItem] = useState<any>(null);
     const [openRow, setOpenRow] = useState<string | null>(null);
@@ -96,7 +87,6 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
     );
     const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
     const [tooltipVisible, setTooltipVisible] = useState(false);
-    const [availablePeriods, setAvailablePeriods] = useState<string[]>([]);
 
     // Create a navigation-compatible object for CategoriesList
     const navigation = {
@@ -184,38 +174,20 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
       [getCurrentPeriod]
     );
 
-    const fetchReport = useCallback(async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const periodData = getPeriodData(period);
-        if (!periodData) {
-          throw new Error("Could not retrieve period data");
-        }
-        const data = await ChartService.getIncomeExpenseReport(
-          periodData.period_start,
-          periodData.granularity
-        );
+    const periodData = getPeriodData(period);
+    const { data: reportData, isLoading: loading } = useIncomeExpenseReport({
+      periodDate: periodData.period_start,
+      granularity: periodData.granularity as ReportGranularity,
+    });
 
-        if (data?.time_series) {
-          const periods = data.time_series
-            .filter((item) => item.income > 0 || item.expense > 0)
-            .map((item) => item.period);
-          setAvailablePeriods(periods);
-        }
+    const deleteCategoryMutation = useDeleteCategory();
 
-        setReportData(data ?? null);
-      } catch (e: any) {
-        logger.error("Error en fetchReport:", e);
-        setError(e.message || "Error al cargar el reporte");
-      } finally {
-        setLoading(false);
-      }
-    }, [period, getPeriodData]);
-
-    useEffect(() => {
-      fetchReport();
-    }, [fetchReport, currentDate, selectedYearIndex]);
+    const availablePeriods = useMemo(() => {
+      if (!reportData?.time_series) return [];
+      return reportData.time_series
+        .filter((item) => item.income > 0 || item.expense > 0)
+        .map((item) => item.period);
+    }, [reportData]);
 
     // Load saved period when component mounts
     useEffect(() => {
@@ -325,20 +297,11 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
       if (!categoryToDelete) return;
 
       try {
-        const result = await deleteCategoryService(categoryToDelete);
-        if (result.kind === "ok") {
-          showToast(
-            "success",
-            translate("components:categoryModal.deleteCategorySuccess")
-          );
-          await categoryStoreModel.getCategories();
-          await fetchReport();
-        } else {
-          showToast(
-            "error",
-            translate("components:categoryModal.errorCategory")
-          );
-        }
+        await deleteCategoryMutation.mutateAsync(categoryToDelete);
+        showToast(
+          "success",
+          translate("components:categoryModal.deleteCategorySuccess")
+        );
       } catch (error) {
         logger.error("Error deleting category:", error);
         showToast("error", translate("components:categoryModal.errorCategory"));
@@ -346,7 +309,7 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
         setIsDeleteAlertVisible(false);
         setCategoryToDelete(null);
       }
-    }, [categoryToDelete, categoryStoreModel, fetchReport]);
+    }, [categoryToDelete, deleteCategoryMutation]);
 
     const handleCloseDeleteAlert = () => {
       setIsDeleteAlertVisible(false);
@@ -381,7 +344,7 @@ export const ReportsIncomeScreen: FC<ReportsIncomeScreenProps> = observer(
       const allTransactions = [
         ...incomeTransactions,
         ...expenseTransactions,
-      ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      ].sort((a, b) => b.amount - a.amount);
 
       return (
         <View

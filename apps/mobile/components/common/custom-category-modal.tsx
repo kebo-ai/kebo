@@ -21,7 +21,7 @@ import { observer } from "mobx-react-lite";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { showToast } from "@/components/ui/custom-toast";
 import CustomAlert from "./custom-alert";
-import { deleteCategoryService } from "@/services/category-service";
+import { useDeleteCategory } from "@/lib/api/hooks";
 import { translate } from "@/i18n";
 import { translateCategoryName } from "@/utils/category-translations";
 import { useTheme } from "@/hooks/use-theme";
@@ -131,9 +131,9 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
   }) => {
     const {
       transactionModel,
-      categoryStoreModel: { getCategories },
     } = useStores();
     const { theme } = useTheme();
+    const deleteCategoryMutation = useDeleteCategory();
 
     const [showActions, setShowActions] = useState(false);
     const [editMode, setEditMode] = useState(false);
@@ -169,38 +169,29 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
 
       setIsDeleting(true);
       try {
-        const result = await deleteCategoryService(categoryToDelete);
-        if (result.kind === "ok") {
-          setIsUpdating(true);
-          await getCategories();
+        await deleteCategoryMutation.mutateAsync(categoryToDelete);
 
-          const remainingCategories = categories.filter(
-            (cat) => cat.id !== categoryToDelete
-          );
-          if (remainingCategories.length > 0) {
-            const nextCategory = remainingCategories[0];
-            transactionModel.setSelectedCategory({
-              id: nextCategory.id,
-              name: nextCategory.name || "",
-              icon_url: nextCategory.icon_url || "",
-            });
-          } else {
-            transactionModel.setSelectedCategory({
-              id: "",
-              name: "",
-              icon_url: "",
-            });
-          }
-          showToast(
-            "success",
-            translate("components:categoryModal.deleteCategorySuccess")
-          );
+        const remainingCategories = categories.filter(
+          (cat) => cat.id !== categoryToDelete
+        );
+        if (remainingCategories.length > 0) {
+          const nextCategory = remainingCategories[0];
+          transactionModel.setSelectedCategory({
+            id: nextCategory.id,
+            name: nextCategory.name || "",
+            icon_url: nextCategory.icon_url || "",
+          });
         } else {
-          showToast(
-            "error",
-            translate("components:categoryModal.errorCategory")
-          );
+          transactionModel.setSelectedCategory({
+            id: "",
+            name: "",
+            icon_url: "",
+          });
         }
+        showToast(
+          "success",
+          translate("components:categoryModal.deleteCategorySuccess")
+        );
       } catch (error) {
         showToast("error", translate("components:categoryModal.errorCategory"));
       } finally {
@@ -209,7 +200,7 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
         setIsDeleteAlertVisible(false);
         setCategoryToDelete(null);
       }
-    }, [categoryToDelete, categories, transactionModel, getCategories]);
+    }, [categoryToDelete, categories, transactionModel, deleteCategoryMutation]);
 
     const editCategory = useCallback(
       (categoryId: string) => {

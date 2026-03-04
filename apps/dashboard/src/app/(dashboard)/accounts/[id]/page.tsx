@@ -13,6 +13,7 @@ import {
   Star,
 } from "lucide-react"
 import { toast } from "sonner"
+import { resolveStorageUrl } from "@/lib/utils"
 
 import {
   useAccount,
@@ -257,17 +258,17 @@ export default function AccountDetailPage() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center gap-4 mb-6">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-              {account.icon_url ? (
-                <img
-                  src={account.icon_url}
-                  alt=""
-                  className="h-7 w-7 object-contain"
-                />
-              ) : (
+            {account.icon_url ? (
+              <img
+                src={resolveStorageUrl(account.icon_url)}
+                alt=""
+                className="h-14 w-14 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
                 <Wallet className="h-7 w-7" />
-              )}
-            </div>
+              </div>
+            )}
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <p className="text-lg font-semibold">

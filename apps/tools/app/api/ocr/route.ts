@@ -26,7 +26,8 @@ const PROMPT = `You are an expert receipt parser. Given the OCR text from a rece
 IMPORTANT:
 - The receipt may have been rotated, sideways, or upside down — the OCR text may be messy. Do your best to interpret it.
 - Carefully distinguish between ITEMS and NON-ITEMS. Subtotals, totals, tax lines, tip lines, discounts, payment info, change, and balance are NOT items.
-- If an item has a quantity multiplier (e.g. "2 x Burger" or "Qty: 3"), set quantity accordingly and use the UNIT price.
+- If an item has a quantity multiplier (e.g. "2 x Burger" or "Qty: 3"), you MUST expand it into separate rows — one row per unit, each with quantity 1 and the UNIT price. For example, "3 x Burger $10" becomes three separate items each named "Burger" at $10 with quantity 1. This is critical for bill splitting.
+- If the receipt shows a line total instead of a unit price (e.g. "3 x Burger $30"), divide the total by the quantity to get the unit price, then emit one row per unit.
 - If a price has been voided or crossed out, skip it.
 - For combo/meal deals, list the combo as one item at its total price.
 - Clean up item names: capitalize properly, remove codes/numbers/SKUs.

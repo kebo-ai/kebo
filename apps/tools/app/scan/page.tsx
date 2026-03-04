@@ -45,16 +45,15 @@ export default function ScanPage() {
       const res = await fetch("/api/ocr", { method: "POST", body: formData });
       if (!res.ok) throw new Error("OCR failed");
       const data = await res.json();
-      setItems(
-        (data.items || []).map(
-          (i: { name: string; price: number; quantity?: number }) => ({
-            id: nanoid(),
-            name: i.name,
-            price: i.price,
-            quantity: i.quantity ?? 1,
-          })
-        )
-      );
+      // Expand items with quantity > 1 into individual rows for bill splitting
+      const expanded: ReviewItem[] = [];
+      for (const i of data.items || []) {
+        const qty = i.quantity ?? 1;
+        for (let n = 0; n < qty; n++) {
+          expanded.push({ id: nanoid(), name: i.name, price: i.price, quantity: 1 });
+        }
+      }
+      setItems(expanded);
       if (data.currency) setCurrency(data.currency);
       if (data.tax) setTax(data.tax);
       if (data.title) setTitle(data.title);

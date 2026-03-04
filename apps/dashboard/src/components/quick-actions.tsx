@@ -34,7 +34,7 @@ export function QuickActions() {
       {actions.map((action) => (
         <Button
           key={action.label}
-          variant={action.primary ? "default" : "outline"}
+          variant={action.primary ? "default" : "ghost"}
           className="rounded-full"
           asChild
         >

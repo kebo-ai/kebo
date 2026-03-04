@@ -11,8 +11,6 @@ import {
   EyeOff,
   TrendingUp,
   TrendingDown,
-  BarChart3,
-  CheckCircle,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -53,45 +51,37 @@ export function BalanceCard() {
 
   return (
     <Card>
-      <CardContent className="p-6">
+      <CardContent className="p-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-foreground">
-              Kebo balance
-            </span>
-            <CheckCircle className="h-4 w-4 text-success" />
-          </div>
-          <div className="flex gap-1">
-            <button className="p-2 rounded-lg bg-muted hover:bg-border transition-colors">
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            </button>
-            <button
-              className="p-2 rounded-lg hover:bg-muted transition-colors"
-              onClick={() => setShowBalance(!showBalance)}
-            >
-              {showBalance ? (
-                <EyeOff className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <Eye className="h-4 w-4 text-muted-foreground" />
-              )}
-            </button>
-          </div>
+        <div className="flex items-center justify-between mb-6">
+          <span className="text-sm font-medium text-muted-foreground">
+            Kebo balance
+          </span>
+          <button
+            className="p-2 rounded-lg hover:bg-muted transition-colors"
+            onClick={() => setShowBalance(!showBalance)}
+          >
+            {showBalance ? (
+              <EyeOff className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Eye className="h-4 w-4 text-muted-foreground" />
+            )}
+          </button>
         </div>
 
         {/* Balance Amount */}
-        <div className="mb-4">
+        <div className="mb-6">
           {showBalance ? (
             <div className="flex items-baseline">
-              <span className="text-4xl font-bold text-foreground">
+              <span className="text-5xl font-bold text-foreground">
                 ${dollars}
               </span>
-              <span className="text-xl font-bold text-muted-foreground">
+              <span className="text-2xl font-bold text-muted-foreground">
                 .{cents}
               </span>
             </div>
           ) : (
-            <div className="text-4xl font-bold text-foreground">$****.**</div>
+            <div className="text-5xl font-bold text-foreground">$****.**</div>
           )}
         </div>
 

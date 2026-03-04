@@ -18,7 +18,7 @@ export function KeboWiseCard() {
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-kebo-500/20 to-kebo-600/20 flex items-center justify-center">
+          <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
             <span className="text-xl">🧠</span>
           </div>
           <div>
@@ -45,7 +45,7 @@ export function KeboWiseCard() {
         {/* CTA */}
         <Link
           href={`${basePath}/chat`}
-          className="mt-4 flex items-center justify-center gap-2 w-full p-3 rounded-lg bg-gradient-to-r from-kebo-500/10 to-kebo-600/10 border border-kebo-500/20 text-kebo-400 hover:from-kebo-500/20 hover:to-kebo-600/20 transition-all text-sm font-medium"
+          className="mt-4 flex items-center justify-center gap-2 w-full p-3 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all text-sm font-medium"
         >
           Start a conversation
           <ChevronRight className="h-4 w-4" />

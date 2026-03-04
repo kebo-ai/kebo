@@ -6,19 +6,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
+import { resolveStorageUrl } from "@/lib/utils"
 
 const basePath = ""
 
-const avatarColors = [
-  "bg-blue-500/20 text-blue-400",
-  "bg-emerald-500/20 text-emerald-400",
-  "bg-purple-500/20 text-purple-400",
-  "bg-orange-500/20 text-orange-400",
-  "bg-pink-500/20 text-pink-400",
-]
-
-function getAvatarColor(index: number) {
-  return avatarColors[index % avatarColors.length]
+function getAvatarColor(_index: number) {
+  return "bg-muted text-muted-foreground"
 }
 
 function formatCurrency(amount: number | string) {
@@ -86,20 +79,20 @@ export function AccountsPanel() {
                   href={`${basePath}/accounts/${account.id}`}
                   className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted transition-colors cursor-pointer"
                 >
-                  <div
-                    className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium ${getAvatarColor(index)}`}
-                  >
-                    {account.icon_url ? (
-                      <img
-                        src={account.icon_url}
-                        alt=""
-                        className="h-6 w-6 object-contain"
-                      />
-                    ) : (
-                      account.name.charAt(0).toUpperCase()
-                    )}
-                  </div>
-                  <span className="flex-1 text-foreground text-sm">
+                  {account.icon_url ? (
+                    <img
+                      src={resolveStorageUrl(account.icon_url)}
+                      alt=""
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium ${getAvatarColor(index)}`}
+                    >
+                      {account.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <span className="flex-1 min-w-0 truncate text-foreground text-sm">
                     {account.name}
                   </span>
                   <div className="text-right">

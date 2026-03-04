@@ -12,6 +12,7 @@ import {
 
 import { useAccounts } from "@/lib/api/hooks/use-accounts"
 import type { Account } from "@/lib/api/types"
+import { resolveStorageUrl } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -64,28 +65,28 @@ function AccountItem({
       href={`/accounts/${account.id}`}
       className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted transition-colors cursor-pointer"
     >
-      <div
-        className={`h-12 w-12 rounded-full flex items-center justify-center ${getAvatarColor(index)}`}
-      >
-        {account.icon_url ? (
-          <img
-            src={account.icon_url}
-            alt=""
-            className="h-6 w-6 object-contain"
-          />
-        ) : (
-          getAccountIcon(account.account_type)
-        )}
-      </div>
+      {account.icon_url ? (
+        <img
+          src={resolveStorageUrl(account.icon_url)}
+          alt=""
+          className="h-12 w-12 rounded-full object-cover"
+        />
+      ) : (
+        <div
+          className={`h-12 w-12 rounded-full flex items-center justify-center ${getAvatarColor(index)}`}
+        >
+          {getAccountIcon(account.account_type)}
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         <p className="text-foreground font-medium truncate">
           {account.customized_name || account.name}
         </p>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground/70">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground/70 min-w-0">
           {account.bank_name && (
             <>
-              <Building2 className="h-3 w-3" />
-              <span>{account.bank_name}</span>
+              <Building2 className="h-3 w-3 shrink-0" />
+              <span className="truncate">{account.bank_name}</span>
               <span>-</span>
             </>
           )}

@@ -94,31 +94,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   const {
     uiStoreModel: { showLoader, hideLoader },
   } = useStores();
-  const [partialContent, setPartialContent] = useState("");
-  const [typingFinished, setTypingFinished] = useState(isLoading);
-
-  useEffect(() => {
-    if (!isUser && content && !typingFinished) {
-      let i = 0;
-      const interval = setInterval(() => {
-        i++;
-        setPartialContent(content.slice(0, i));
-        if (i >= content.length) {
-          clearInterval(interval);
-          setTypingFinished(true);
-        }
-      }, 2);
-
-      return () => clearInterval(interval);
-    }
-  }, [content, typingFinished]);
-
-  useEffect(() => {
-    if (!isUser && !content) {
-      setTypingFinished(false);
-      setPartialContent("");
-    }
-  }, [isLoading]);
 
   const formik = useFormik({
     initialValues: {
@@ -191,23 +166,17 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             <Text style={tw`text-white`}>{content}</Text>
           ) : (
             <>
-              {!typingFinished ? (
-                <Markdown style={markdownStyles}>{partialContent}</Markdown>
-              ) : (
-                <>
-                  <Markdown style={markdownStyles}>{content}</Markdown>
-                  <TouchableOpacity
-                    onPress={handleReport}
-                    style={tw`mt-2 flex-row items-center justify-end`}
-                  >
-                    <Ionicons
-                      name="flag-outline"
-                      size={12}
-                      color={theme.textTertiary}
-                    />
-                  </TouchableOpacity>
-                </>
-              )}
+              <Markdown style={markdownStyles}>{content}</Markdown>
+              <TouchableOpacity
+                onPress={handleReport}
+                style={tw`mt-2 flex-row items-center justify-end`}
+              >
+                <Ionicons
+                  name="flag-outline"
+                  size={12}
+                  color={theme.textTertiary}
+                />
+              </TouchableOpacity>
             </>
           )}
         </View>

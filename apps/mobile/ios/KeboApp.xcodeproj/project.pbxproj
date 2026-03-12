@@ -8,25 +8,25 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		2DD2D10594E2CC44CCDA6A3F /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33657E60D6C4D426BD23E98E /* ExpoModulesProvider.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		94F0DAC6139C524903874D0F /* libPods-KeboApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 23F132D494AAE85E8199347A /* libPods-KeboApp.a */; };
+		8642B0E981BD2B0FA004B812 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 11C4E8DBA05D545C2A3A89BF /* PrivacyInfo.xcprivacy */; };
+		AE960B47F68AB90D2FFBE6A0 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B3E865CC7E404D5450F911 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		BB46E3C2B48DADC3860379CE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9A3058FCA226D7EFDB61E5E0 /* PrivacyInfo.xcprivacy */; };
+		C5186C67F534FC4791E7B55E /* libPods-KeboApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 12381D7E060342D2390FBE13 /* libPods-KeboApp.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		11C4E8DBA05D545C2A3A89BF /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = KeboApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		12381D7E060342D2390FBE13 /* libPods-KeboApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KeboApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* KeboApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeboApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = KeboApp/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = KeboApp/Info.plist; sourceTree = "<group>"; };
-		23F132D494AAE85E8199347A /* libPods-KeboApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KeboApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		33657E60D6C4D426BD23E98E /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-KeboApp/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		645DF26FB90E2DA36B5F82B8 /* Pods-KeboApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KeboApp.release.xcconfig"; path = "Target Support Files/Pods-KeboApp/Pods-KeboApp.release.xcconfig"; sourceTree = "<group>"; };
-		9A3058FCA226D7EFDB61E5E0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = KeboApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		9326B5CC874A5418AFEA7D38 /* Pods-KeboApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KeboApp.release.xcconfig"; path = "Target Support Files/Pods-KeboApp/Pods-KeboApp.release.xcconfig"; sourceTree = "<group>"; };
+		94B3E865CC7E404D5450F911 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-KeboApp/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = KeboApp/SplashScreen.storyboard; sourceTree = "<group>"; };
-		B27A6577612F3188EE816CC9 /* Pods-KeboApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KeboApp.debug.xcconfig"; path = "Target Support Files/Pods-KeboApp/Pods-KeboApp.debug.xcconfig"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		D15FC6ACD2903C820ACC52E9 /* Pods-KeboApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KeboApp.debug.xcconfig"; path = "Target Support Files/Pods-KeboApp/Pods-KeboApp.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = KeboApp/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* KeboApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "KeboApp-Bridging-Header.h"; path = "KeboApp/KeboApp-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -37,23 +37,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				94F0DAC6139C524903874D0F /* libPods-KeboApp.a in Frameworks */,
+				C5186C67F534FC4791E7B55E /* libPods-KeboApp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		103292859244C4A23E35B494 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				B27A6577612F3188EE816CC9 /* Pods-KeboApp.debug.xcconfig */,
-				645DF26FB90E2DA36B5F82B8 /* Pods-KeboApp.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		13B07FAE1A68108700A75B9A /* KeboApp */ = {
 			isa = PBXGroup;
 			children = (
@@ -63,18 +53,44 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				9A3058FCA226D7EFDB61E5E0 /* PrivacyInfo.xcprivacy */,
+				11C4E8DBA05D545C2A3A89BF /* PrivacyInfo.xcprivacy */,
 			);
 			name = KeboApp;
+			sourceTree = "<group>";
+		};
+		171C9CD3C8AA8B38D174915A /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				3828B8F603897A7EE5E5E40D /* KeboApp */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				23F132D494AAE85E8199347A /* libPods-KeboApp.a */,
+				12381D7E060342D2390FBE13 /* libPods-KeboApp.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		36E2D47ACFC12946F6BB4ABD /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D15FC6ACD2903C820ACC52E9 /* Pods-KeboApp.debug.xcconfig */,
+				9326B5CC874A5418AFEA7D38 /* Pods-KeboApp.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		3828B8F603897A7EE5E5E40D /* KeboApp */ = {
+			isa = PBXGroup;
+			children = (
+				94B3E865CC7E404D5450F911 /* ExpoModulesProvider.swift */,
+			);
+			name = KeboApp;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -91,8 +107,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				103292859244C4A23E35B494 /* Pods */,
-				BB35046639990F2F5CA0BA9C /* ExpoModulesProviders */,
+				36E2D47ACFC12946F6BB4ABD /* Pods */,
+				171C9CD3C8AA8B38D174915A /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -116,22 +132,6 @@
 			path = KeboApp/Supporting;
 			sourceTree = "<group>";
 		};
-		BB35046639990F2F5CA0BA9C /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				F44B66A2DF850151A3E8646F /* KeboApp */,
-			);
-			name = ExpoModulesProviders;
-			sourceTree = "<group>";
-		};
-		F44B66A2DF850151A3E8646F /* KeboApp */ = {
-			isa = PBXGroup;
-			children = (
-				33657E60D6C4D426BD23E98E /* ExpoModulesProvider.swift */,
-			);
-			name = KeboApp;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -140,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "KeboApp" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				696F2D5324085C9B5951781E /* [Expo] Configure project */,
+				60B68671280B5024128A0D48 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				C36A0C4FD26C75AB88CD93CC /* [CP] Embed Pods Frameworks */,
+				D8995A7421D4ECA9110192E1 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -196,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				BB46E3C2B48DADC3860379CE /* PrivacyInfo.xcprivacy in Resources */,
+				8642B0E981BD2B0FA004B812 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,7 +242,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		696F2D5324085C9B5951781E /* [Expo] Configure project */ = {
+		60B68671280B5024128A0D48 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -330,7 +330,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KeboApp/Pods-KeboApp-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C36A0C4FD26C75AB88CD93CC /* [CP] Embed Pods Frameworks */ = {
+		D8995A7421D4ECA9110192E1 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -360,7 +360,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				2DD2D10594E2CC44CCDA6A3F /* ExpoModulesProvider.swift in Sources */,
+				AE960B47F68AB90D2FFBE6A0 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,7 +369,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B27A6577612F3188EE816CC9 /* Pods-KeboApp.debug.xcconfig */;
+			baseConfigurationReference = D15FC6ACD2903C820ACC52E9 /* Pods-KeboApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -406,7 +406,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 645DF26FB90E2DA36B5F82B8 /* Pods-KeboApp.release.xcconfig */;
+			baseConfigurationReference = 9326B5CC874A5418AFEA7D38 /* Pods-KeboApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

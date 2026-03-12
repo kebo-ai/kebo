@@ -32,7 +32,7 @@ export const updateUserProfile = async (updates: {
       .update(updates)
       .eq('user_id', user.id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       logger.error('Error updating profile:', error);

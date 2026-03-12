@@ -76,7 +76,7 @@ export const WebViewScreen: FC<WebViewScreenProps> = observer(
             ...standardHeader(theme),
             headerShown: true,
             title,
-            headerBackTitle: translate("navigator:reports"),
+            headerBackTitle: translate("common:back"),
           }}
         />
         {isLoading && (

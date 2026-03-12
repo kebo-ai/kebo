@@ -68,7 +68,21 @@ const app = base
   })
   .openapi(deleteAccountRoute, async (c) => {
     const userId = c.get("userId")
+
+    // 1. Delete all user data from our tables
     await UserService.hardDelete(c.get("db"), userId)
+
+    // 2. Delete the user from Supabase Auth
+    const supabaseUrl = c.env.SUPABASE_URL
+    const serviceRoleKey = c.env.SUPABASE_SERVICE_ROLE_KEY
+    await fetch(`${supabaseUrl}/auth/v1/admin/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${serviceRoleKey}`,
+        apikey: serviceRoleKey,
+      },
+    })
+
     return c.json({ success: true, message: "Account deleted" }, 200)
   })
 

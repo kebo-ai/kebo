@@ -4,12 +4,15 @@ import type { NewProfile } from "@/db/schema"
 import {
   accounts,
   accountsUsers,
+  accountTypes,
   aiReports,
+  banks,
   banksUsers,
   budgetLines,
   budgets,
   categories,
   chatConversations,
+  globalCategories,
   profiles,
   transactions,
 } from "@/db/schema"
@@ -40,7 +43,61 @@ export class UserService {
       .onConflictDoNothing({ target: profiles.user_id })
       .returning()
 
+    // If we actually created a new profile, set up defaults
+    if (created) {
+      await this.setupDefaults(db, userId)
+    }
+
     return created ?? (await this.getProfile(db, userId))
+  }
+
+  /** Create default account and categories for a new user */
+  private static async setupDefaults(db: DrizzleClient, userId: string) {
+    // 1. Create default "Efectivo" (Cash) account
+    const [cashBank] = await db
+      .select({ id: banks.id })
+      .from(banks)
+      .where(eq(banks.name, "Efectivo"))
+      .limit(1)
+
+    const [cashType] = await db
+      .select({ id: accountTypes.id })
+      .from(accountTypes)
+      .where(eq(accountTypes.type_name, "Efectivo"))
+      .limit(1)
+
+    if (cashBank && cashType) {
+      await db.insert(accounts).values({
+        user_id: userId,
+        name: "Efectivo",
+        customized_name: "Efectivo",
+        bank_id: cashBank.id,
+        account_type_id: cashType.id,
+        balance: "0",
+        is_default: true,
+        icon_url:
+          "/storage/v1/object/public/banks/GLOBAL/category__default_cash.svg",
+      })
+    }
+
+    // 2. Copy all active global categories to user's categories_users
+    const globals = await db
+      .select()
+      .from(globalCategories)
+      .where(eq(globalCategories.is_deleted, false))
+
+    if (globals.length > 0) {
+      await db.insert(categories).values(
+        globals.map((g) => ({
+          user_id: userId,
+          category_id: g.id,
+          type: g.type,
+          name: g.name,
+          icon_url: g.icon_url,
+          color_id: g.color_id,
+        })),
+      )
+    }
   }
 
   static async updateProfile(

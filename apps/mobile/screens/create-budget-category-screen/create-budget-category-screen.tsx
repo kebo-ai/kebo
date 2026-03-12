@@ -5,37 +5,32 @@ import React, {
   useState,
   useEffect,
   useMemo,
-  useRef,
   useCallback,
 } from "react";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { useFocusEffect } from "expo-router";
-import { Screen } from "@/components/screen";
+import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import {
   View,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
 } from "react-native";
 import { Text } from "@/components/ui";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
-import CustomHeaderSecondary from "@/components/common/custom-header-secondary";
-import { CategoryItem } from "@/components/common/category-item";
 import { showToast } from "@/components/ui/custom-toast";
-import { InputAmount } from "@/components/input-amount";
+import { standardHeader } from "@/theme/header-options";
 import { budgetService } from "@/services/budget-service";
-import { useStores } from "@/models/helpers/use-stores";
 import { useCategories } from "@/lib/api/hooks";
-import CustomButton from "@/components/common/custom-button";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/use-theme";
+import { useNumberEntry } from "@/hooks/use-number-entry";
+import { useShakeAnimation } from "@/hooks/use-shake-animation";
+import { AmountDisplay } from "@/components/transaction/amount-display";
+import { NumberPad } from "@/components/transaction/number-pad";
+import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 import CustomBudgetCategoryModal from "@/components/common/custom-budget-category-modal";
-import {
-  currencyMap,
-  useCurrencyFormatter,
-} from "@/components/common/currency-formatter";
 import { EditIconSvg } from "@/components/icons/edit-icon-svg";
+import { translateCategoryName } from "@/utils/category-translations";
+import { SvgUri } from "react-native-svg";
 import { useAnalytics } from "@/hooks/use-analytics";
 
 interface CreateBudgetCategoryScreenProps {}
@@ -65,14 +60,16 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
     const initialAmount = params.amount ? parseFloat(params.amount) : undefined;
 
     const analytics = useAnalytics();
-    const [amount, setAmount] = useState("");
+    const { theme } = useTheme();
+    const { decimalSeparator } = useCurrencyFormatter();
+    const insets = useSafeAreaInsets();
+    const numberEntry = useNumberEntry(2);
+    const amountShake = useShakeAnimation();
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [currentSelectedCategory, setCurrentSelectedCategory] =
       useState(selectedCategory);
     const [existingCategories, setExistingCategories] = useState<string[]>([]);
     const { data: allCategories = [] } = useCategories();
-    const inputRef = useRef<any>(null);
-    const { region } = useCurrencyFormatter();
 
     // Navigation adapter for components that still expect navigation prop
     const navigationAdapter = useMemo(
@@ -99,44 +96,13 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
       [router]
     );
 
+    // Load existing amount when editing
     useEffect(() => {
-      const hideKeyboard = () => {
-        Keyboard.dismiss();
-      };
-
-      hideKeyboard();
-
-      return () => {
-        hideKeyboard();
-      };
-    }, []);
-
-    useEffect(() => {
-      if (isEditing && initialAmount !== undefined && initialAmount !== null) {
-        const amountStr = initialAmount.toString();
-        setAmount(amountStr === "0" ? "" : amountStr);
-      } else {
-        setAmount("");
+      if (isEditing && initialAmount !== undefined && initialAmount > 0) {
+        const cents = Math.round(initialAmount * 100);
+        numberEntry.setFromCents(cents);
       }
     }, [isEditing, initialAmount]);
-
-    useEffect(() => {
-      if (showCategoryModal) {
-        Keyboard.dismiss();
-      }
-    }, [showCategoryModal]);
-
-    useFocusEffect(
-      useCallback(() => {
-        const timeout = setTimeout(() => {
-          if (inputRef.current) {
-            inputRef.current.focus();
-          }
-        }, 800); // Adjust if still failing
-
-        return () => clearTimeout(timeout);
-      }, [])
-    );
 
     useEffect(() => {
       const getExistingCategories = async () => {
@@ -150,7 +116,7 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
               setExistingCategories(categoryIds);
             }
           } catch (error) {
-            logger.error("Error getting exirsting categories:", error);
+            logger.error("Error getting existing categories:", error);
           }
         }
       };
@@ -158,14 +124,9 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
       getExistingCategories();
     }, [budgetId]);
 
-    const handleAmountChange = (value: string) => {
-      setAmount(value);
-    };
-
     const handleCategorySelect = (category: any) => {
       setCurrentSelectedCategory(category);
       setShowCategoryModal(false);
-      Keyboard.dismiss();
     };
 
     const filteredCategories = useMemo(() => {
@@ -185,14 +146,12 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
     ]);
 
     const handleSave = async () => {
-      const numericAmount = parseFloat(amount);
-      if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
-        showToast(
-          "error",
-          translate("createBudgetCategoryScreen:amountRequired")
-        );
+      if (numberEntry.amountInCents < 1) {
+        amountShake.shake();
         return;
       }
+
+      const numericAmount = numberEntry.amountInCents / 100;
 
       try {
         let success;
@@ -248,107 +207,91 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
     };
 
     return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1, backgroundColor: "#FAFAFA" }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-      >
-        <Screen
-          safeAreaEdges={["top"]}
-          preset="scroll"
-          backgroundColor="#FAFAFA"
-          statusBarBackgroundColor="#FAFAFA"
-          header={
-            <CustomHeaderSecondary
-              title={
-                isEditing
-                  ? translate("newBudgetScreen:editBudget")
-                  : translate("createBudgetCategoryScreen:title")
-              }
-              onPress={() => router.back()}
-            />
-          }
-        >
-          <View style={tw`px-6 flex-1`}>
-            <View style={tw`mt-4`}>
-              <InputAmount
-                ref={inputRef}
-                value={amount}
-                onChange={handleAmountChange}
-                showSymbol={true}
-                currency={currencyMap[region] || "USD"}
-                inputAccessoryViewID="inputAccessoryViewID"
-              />
-            </View>
-            <View style={tw`mt-6`}>
-              <View style={tw`flex-row justify-between items-center mb-4`}>
-                <Text
-                  style={tw`text-black text-base`}
-                  weight="medium"
-                >
-                  {translate("createBudgetCategoryScreen:selectedCategory")}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    setShowCategoryModal(true);
-                    Keyboard.dismiss();
-                  }}
-                  style={tw`flex-row items-center`}
-                >
-                  <EditIconSvg width={16} height={16} color={colors.primary} />
-                  <Text
-                    style={tw`ml-1 text-sm`}
-                    weight="medium"
-                    color={colors.primary}
-                  >
-                    {translate("components:categoryModal.edit")}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={tw`bg-white p-4 rounded-[20px] border border-[#E3E3E5]`}
-              >
-                <CategoryItem
-                  item={currentSelectedCategory}
-                  onSelect={() => {}}
-                  showActions={false}
-                  setShowActions={() => {}}
-                  screenName="CreateBudgetCategory"
-                />
-              </View>
-            </View>
-          </View>
-        </Screen>
-        <CustomButton
-          title={
-            isEditing
-              ? translate("budgetScreen:save")
-              : translate("createBudgetCategoryScreen:title")
-          }
-          onPress={handleSave}
-          isEnabled={!!amount && !!currentSelectedCategory}
-          variant="primary"
-          adaptToKeyboard={true}
-          enableAnalytics={true}
-          analyticsEvent="create_budget_category_save_button_clicked"
-          analyticsProperties={{
-            screen_name: "CreateBudgetCategoryScreen",
-            action_type: "click",
-            interaction_type: "button",
+      <View style={[tw`flex-1`, { backgroundColor: theme.background, paddingBottom: insets.bottom }]}>
+        <Stack.Screen
+          options={{
+            ...standardHeader(theme),
+            headerShown: true,
+            headerBackTitle: translate("common:back"),
+            title: isEditing
+              ? translate("newBudgetScreen:editBudget")
+              : translate("createBudgetCategoryScreen:title"),
+            contentStyle: { backgroundColor: theme.background },
           }}
         />
+
+        <AmountDisplay
+          entryType={numberEntry.entryType}
+          amountInCents={numberEntry.amountInCents}
+          wholePart={numberEntry.wholePart}
+          decimalSuffix={numberEntry.decimalSuffix}
+          onBackspace={numberEntry.handleBackspace}
+          shakeOffset={amountShake.offset}
+        />
+
+        <View style={tw`px-4`}>
+          <TouchableOpacity
+            onPress={() => setShowCategoryModal(true)}
+            activeOpacity={0.7}
+            style={[
+              tw`flex-row items-center px-4 py-3 rounded-2xl`,
+              { backgroundColor: theme.surface, borderColor: theme.border, borderWidth: 1 },
+            ]}
+          >
+            {(() => {
+              const iconUrl = currentSelectedCategory?.icon_url;
+              const isEmoji = iconUrl && !iconUrl.startsWith("/storage/");
+              return (
+                <View style={tw`w-8 h-8 items-center justify-center`}>
+                  {iconUrl ? (
+                    isEmoji ? (
+                      <Text style={{ fontSize: 22 }}>{iconUrl}</Text>
+                    ) : (
+                      <SvgUri
+                        width={28}
+                        height={28}
+                        uri={`${process.env.EXPO_PUBLIC_SUPABASE_URL}${iconUrl}`}
+                      />
+                    )
+                  ) : null}
+                </View>
+              );
+            })()}
+            <Text
+              style={[tw`flex-1 ml-3`, { color: theme.textPrimary, fontSize: 15 }]}
+              weight="medium"
+              numberOfLines={1}
+            >
+              {currentSelectedCategory?.name
+                ? translateCategoryName(
+                    currentSelectedCategory.name,
+                    currentSelectedCategory.id,
+                    currentSelectedCategory.icon_url || ""
+                  )
+                : ""}
+            </Text>
+            <EditIconSvg width={16} height={16} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
+
+        <NumberPad
+          entryType={numberEntry.entryType}
+          decimalSeparator={decimalSeparator}
+          onDigit={numberEntry.handleDigit}
+          onBackspace={numberEntry.handleBackspace}
+          onDecimal={numberEntry.handleDecimal}
+          onSubmit={handleSave}
+        />
+
         <CustomBudgetCategoryModal
           visible={showCategoryModal}
-          onClose={() => {
-            setShowCategoryModal(false);
-            Keyboard.dismiss();
-          }}
+          onClose={() => setShowCategoryModal(false)}
           onSelect={handleCategorySelect}
           navigation={navigationAdapter}
           categories={filteredCategories}
           screenName="CreateBudgetCategory"
           hideActions={false}
         />
-      </KeyboardAvoidingView>
+      </View>
     );
   });

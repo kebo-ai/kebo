@@ -77,6 +77,7 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
             animation: "slide_from_bottom",
             animationDuration: 80,
             gestureEnabled: false,
+            headerBackTitle: translate("common:back"),
             contentStyle: { backgroundColor: theme.background },
           }}
         />
@@ -87,6 +88,7 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
             animation: "slide_from_bottom",
             animationDuration: 80,
             gestureEnabled: false,
+            headerBackTitle: translate("common:back"),
             contentStyle: { backgroundColor: theme.background },
           }}
         />
@@ -122,6 +124,15 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
             presentation: "formSheet",
             sheetGrabberVisible: true,
             sheetAllowedDetents: [1.0],
+          }}
+        />
+        <Stack.Screen
+          name="delete-account"
+          options={{
+            presentation: "formSheet",
+            sheetGrabberVisible: true,
+            sheetAllowedDetents: [0.5, 0.75],
+            contentStyle: { backgroundColor: theme.background },
           }}
         />
 

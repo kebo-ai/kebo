@@ -1,0 +1,10 @@
+ios/build/
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+.expo/
+dist/
+web-build/
+.DS_Store
+*.log

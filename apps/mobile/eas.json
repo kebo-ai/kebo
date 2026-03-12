@@ -4,18 +4,37 @@
     "appVersionSource": "remote"
   },
   "build": {
+    "base": {
+      "node": "22.12.0",
+      "bun": "1.1.38"
+    },
     "development": {
+      "extends": "base",
       "developmentClient": true,
       "distribution": "internal"
     },
+    "development:simulator": {
+      "extends": "development",
+      "ios": { "simulator": true }
+    },
     "preview": {
+      "extends": "base",
       "distribution": "internal"
     },
     "production": {
+      "extends": "base",
       "autoIncrement": true
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleTeamId": "477PL8P3CL"
+      },
+      "android": {
+        "track": "internal",
+        "releaseStatus": "draft"
+      }
+    }
   }
 }

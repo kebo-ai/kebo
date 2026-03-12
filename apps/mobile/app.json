@@ -3,7 +3,7 @@
   "displayName": "kebo",
   "expo": {
     "name": "Kebo App",
-    "slug": "kebo",
+    "slug": "mobile",
     "scheme": "kebo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -50,8 +50,10 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "9fc2288c-b9a7-497a-b0b3-c32d98cf825d"
-      }
-    }
+        "projectId": "7650e73f-04f2-4f0d-a48b-87f9cda0e56e"
+      },
+      "router": {}
+    },
+    "owner": "kebo-app"
   }
 }

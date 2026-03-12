@@ -29,6 +29,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="kebo"/>
+        <data android:scheme="exp+mobile"/>
       </intent-filter>
     </activity>
   </application>

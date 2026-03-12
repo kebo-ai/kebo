@@ -1,34 +1,25 @@
 import logger from "@/utils/logger";
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   Modal,
   FlatList,
-  Image,
-  TouchableWithoutFeedback,
   StyleSheet,
-  Dimensions,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import tw from "twrnc";
 import { colors } from "@/theme/colors";
+import { useTheme } from "@/hooks/use-theme";
 import { useStores } from "@/models/helpers/use-stores";
 import type { Category } from "@/lib/api/types";
 import { SvgUri } from "react-native-svg";
 import { CategoryItem } from "./category-item";
 import { observer } from "mobx-react-lite";
-import { MotiView } from "moti";
 import {
   GestureHandlerRootView,
-  PanGestureHandler,
-  State,
 } from "react-native-gesture-handler";
-import { showToast } from "@/components/ui/custom-toast";
 import CustomAlert from "./custom-alert";
 import { useDeleteCategory } from "@/lib/api/hooks";
 import { translate } from "@/i18n";
@@ -120,6 +111,7 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
     const {
       transactionModel,
     } = useStores();
+    const { theme } = useTheme();
     const deleteCategoryMutation = useDeleteCategory();
 
     const [editMode, setEditMode] = useState(false);
@@ -214,7 +206,7 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
         return (
           <View style={tw`items-center p-2 mb-4`}>
             <TouchableOpacity
-              style={tw`items-center bg-white p-3  w-full`}
+              style={[tw`items-center p-3 w-full`, { backgroundColor: theme.surface }]}
               onPress={() => handleSelectCategory(item)}
             >
               <View
@@ -230,7 +222,7 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
                   />
                 )}
               </View>
-              <Text style={tw`text-xs text-black text-center`}>
+              <Text style={[tw`text-xs text-center`, { color: theme.textPrimary }]}>
                 {translateCategoryName(item.name, item.id, item.icon_url)}
               </Text>
             </TouchableOpacity>
@@ -262,10 +254,10 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
     return (
       <Modal visible={visible} transparent animationType="fade">
         <View style={tw`flex-1 justify-end bg-black/50`}>
-          <View style={tw`bg-white p-4 rounded-t-3xl h-[60%]`}>
+          <View style={[tw`p-4 rounded-t-3xl h-[60%]`, { backgroundColor: theme.surface }]}>
             <View style={tw`relative items-center mb-4`}>
               <Text
-                style={tw`text-lg font-medium text-center absolute left-0 right-0`}
+                style={[tw`text-lg font-medium text-center absolute left-0 right-0`, { color: theme.textPrimary }]}
               >
                 {translate("components:categoryModal.category")}
               </Text>
@@ -294,7 +286,7 @@ const CustomCategoryModal: React.FC<CustomCategoryModalProps> = observer(
             </GestureHandlerRootView>
             {multipleSelection && (
               <TouchableOpacity
-                style={tw`bg-[${colors.primary}] py-3 rounded-lg mt-4`}
+                style={[tw`py-3 rounded-lg mt-4`, { backgroundColor: colors.primary }]}
                 onPress={handleClose}
               >
                 <Text style={tw`text-white text-center font-medium`}>

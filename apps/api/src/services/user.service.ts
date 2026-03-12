@@ -3,8 +3,13 @@ import type { DrizzleClient } from "@/db"
 import type { NewProfile } from "@/db/schema"
 import {
   accounts,
+  accountsUsers,
+  aiReports,
+  banksUsers,
+  budgetLines,
   budgets,
   categories,
+  chatConversations,
   profiles,
   transactions,
 } from "@/db/schema"
@@ -38,19 +43,37 @@ export class UserService {
   static async hardDelete(db: DrizzleClient, userId: string) {
     return await db.transaction(async (tx) => {
       // Delete in order respecting foreign key constraints
-      // Budget lines will be cascade deleted with budgets
+
+      // 1. budget_lines → references budgets + categories
+      await tx.delete(budgetLines).where(eq(budgetLines.user_id, userId))
+
+      // 2. budgets
       await tx.delete(budgets).where(eq(budgets.user_id, userId))
 
-      // Delete transactions
+      // 3. transactions → references accounts + categories
       await tx.delete(transactions).where(eq(transactions.user_id, userId))
 
-      // Delete accounts
+      // 4. accounts_users → references accounts
+      await tx.delete(accountsUsers).where(eq(accountsUsers.user_id, userId))
+
+      // 5. banks_users → references accounts
+      await tx.delete(banksUsers).where(eq(banksUsers.user_id, userId))
+
+      // 6. accounts
       await tx.delete(accounts).where(eq(accounts.user_id, userId))
 
-      // Delete categories
+      // 7. categories
       await tx.delete(categories).where(eq(categories.user_id, userId))
 
-      // Finally, delete the profile
+      // 8. chat_conversations (messages cascade-delete)
+      await tx
+        .delete(chatConversations)
+        .where(eq(chatConversations.user_id, userId))
+
+      // 9. ai_reports
+      await tx.delete(aiReports).where(eq(aiReports.user_id, userId))
+
+      // 10. profile
       await tx.delete(profiles).where(eq(profiles.user_id, userId))
 
       // Note: The actual Supabase auth user deletion should be handled

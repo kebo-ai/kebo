@@ -51,8 +51,10 @@ export const CustomMonthModal: React.FC<CustomMonthModalProps> = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={tw`flex-1 justify-end bg-black/50`}>
+      <View style={tw`flex-1 justify-end bg-black/50`}>
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={tw`flex-1`} />
+        </TouchableWithoutFeedback>
           <View style={[tw`p-4 rounded-t-3xl max-h-[50%]`, { backgroundColor: theme.surface }]}>
             <View style={tw`flex-row justify-between items-center mb-4`}>
               <TouchableOpacity onPress={onClear} style={tw`flex-1`}>
@@ -110,8 +112,7 @@ export const CustomMonthModal: React.FC<CustomMonthModalProps> = ({
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+      </View>
     </Modal>
   );
 };

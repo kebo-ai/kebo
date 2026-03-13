@@ -15,7 +15,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { KeyboardStickyView } from "react-native-keyboard-controller";
+import {
+  KeyboardStickyView,
+  KeyboardController,
+  AndroidSoftInputModes,
+} from "react-native-keyboard-controller";
 import tw from "twrnc";
 import moment from "moment";
 import * as Haptics from "expo-haptics";
@@ -79,6 +83,21 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
 
     // iOS tab bar ~49px, Android Material bottom nav ~64px
     const tabBarOffset = Platform.OS === "ios" ? 50 : 80;
+
+    // Android: use adjustNothing so keyboard covers the tab bar
+    // and KeyboardStickyView can properly position the input above the keyboard
+    useEffect(() => {
+      if (Platform.OS === "android") {
+        KeyboardController.setInputMode(
+          AndroidSoftInputModes.SOFT_INPUT_ADJUST_NOTHING,
+        );
+        return () => {
+          KeyboardController.setInputMode(
+            AndroidSoftInputModes.SOFT_INPUT_ADJUST_RESIZE,
+          );
+        };
+      }
+    }, []);
 
     // Track keyboard height for dynamic content padding
     // iOS fires keyboardWillShow/Hide, Android fires keyboardDidShow/Hide
@@ -225,8 +244,8 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
     // Dynamic bottom padding: ensures last message is always above the input
     const inputAreaHeight = 70;
     const bottomPadding = keyboardHeight > 0
-      ? keyboardHeight + inputAreaHeight // keyboard open: content clears keyboard + input
-      : inputAreaHeight + insets.bottom + tabBarOffset; // keyboard closed: content clears tab bar + input
+      ? keyboardHeight + inputAreaHeight
+      : inputAreaHeight + insets.bottom + tabBarOffset;
 
     return (
       <Pressable style={[tw`flex-1`, { backgroundColor: theme.background }]} onPress={Keyboard.dismiss}>

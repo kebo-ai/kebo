@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { createClient } from "@/lib/auth/client"
 import { KeboLogo } from "@/components/logos/kebo"
+import { GlassShader } from "@/components/glass-shader"
 import { toast } from "sonner"
 
 export default function LoginPage() {
@@ -34,42 +35,18 @@ export default function LoginPage() {
     process.env.NEXT_PUBLIC_MARKETING_URL || "https://kebo.app"
 
   return (
-    <div className="flex min-h-svh bg-black">
-      {/* Full-screen shell */}
-      <div className="flex w-full min-h-svh">
-        {/* Left panel — gradient mesh with dot grid */}
-        <div className="relative hidden lg:flex lg:flex-1 overflow-hidden rounded-3xl m-3 mr-0">
-          {/* Gradient mesh layer */}
-          <div className="absolute inset-0">
-            {/* Deep violet glow — top-left */}
-            <div className="absolute -top-1/4 -left-1/4 h-[80%] w-[80%] rounded-full bg-violet-800/50 blur-[120px]" />
-            {/* Purple glow — center */}
-            <div className="absolute top-1/4 left-1/4 h-[60%] w-[60%] rounded-full bg-purple-500/50 blur-[100px]" />
-            {/* Fuchsia glow — top-right */}
-            <div className="absolute -top-1/4 -right-1/4 h-[70%] w-[70%] rounded-full bg-fuchsia-600/40 blur-[120px]" />
-            {/* Dark fade — bottom half */}
-            <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black via-black/80 to-transparent" />
-          </div>
+    <div className="relative flex min-h-svh bg-black">
+      {/* Mobile: shader as full background */}
+      <div className="absolute inset-0 lg:hidden">
+        <GlassShader />
+        <div className="absolute inset-0 bg-black/60" />
+      </div>
 
-          {/* Dot grid overlay */}
-          <svg
-            className="absolute inset-0 h-full w-full opacity-[0.15]"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <pattern
-                id="dot-grid"
-                x="0"
-                y="0"
-                width="8"
-                height="8"
-                patternUnits="userSpaceOnUse"
-              >
-                <circle cx="1" cy="1" r="0.8" fill="white" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#dot-grid)" />
-          </svg>
+      {/* Full-screen shell */}
+      <div className="relative flex w-full min-h-svh flex-col lg:flex-row">
+        {/* Left panel — glass shader (desktop only) */}
+        <div className="relative hidden lg:flex lg:w-[60%] overflow-hidden rounded-3xl m-3 mr-0">
+          <GlassShader />
 
           {/* Left panel text overlay */}
           <div className="relative z-10 flex flex-col justify-end p-10">
@@ -86,7 +63,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right panel — login form */}
-        <div className="flex flex-1 flex-col items-center justify-center px-8 py-12 sm:px-12 lg:max-w-md">
+        <div className="flex w-full lg:w-[40%] flex-1 flex-col items-center justify-center px-6 py-12 sm:px-12">
           <div className="w-full max-w-sm">
             {/* Logo */}
             <div className="flex justify-center mb-8">
@@ -106,7 +83,7 @@ export default function LoginPage() {
             {/* OAuth Buttons */}
             <div className="flex w-full gap-3 mb-8">
               <button
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 backdrop-blur-sm px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-50"
                 onClick={() => handleOAuthLogin("google")}
                 disabled={isLoading}
               >
@@ -131,7 +108,7 @@ export default function LoginPage() {
                 Google
               </button>
               <button
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800/80 backdrop-blur-sm px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-50"
                 onClick={() => handleOAuthLogin("apple")}
                 disabled={isLoading}
               >

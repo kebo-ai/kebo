@@ -14,7 +14,8 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.kebo.app.mobile",
       "appleTeamId": "477PL8P3CL",
-      "icon": "./assets/icon-ios.png"
+      "icon": "./assets/icon-ios.png",
+      "runtimeVersion": "1.0.0"
     },
     "android": {
       "package": "com.kebo.app.mobile",
@@ -54,6 +55,9 @@
       },
       "router": {}
     },
-    "owner": "kebo-app"
+    "owner": "kebo-app",
+    "updates": {
+      "url": "https://u.expo.dev/7650e73f-04f2-4f0d-a48b-87f9cda0e56e"
+    }
   }
 }

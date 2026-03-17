@@ -5,7 +5,7 @@
     "name": "Kebo App",
     "slug": "mobile",
     "scheme": "kebo",
-    "version": "1.2.7",
+    "version": "0.0.28",
     "orientation": "portrait",
     "icon": "./assets/icon-ios.png",
     "userInterfaceStyle": "automatic",

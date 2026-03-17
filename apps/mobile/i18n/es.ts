@@ -231,6 +231,10 @@ const es = {
     typeAccountTitle: "Tipo de cuenta",
     continue: "Continuar",
     saveChanges: "Guardar cambios",
+    initialBalance: "Balance inicial",
+    initialBalanceInfo: "Este es el balance inicial de tu cuenta. Tu balance actual se calcula automáticamente sumando tus transacciones a este valor.",
+    currentBalance: "Balance actual",
+    currentBalanceDescription: "Balance inicial + transacciones",
   },
   alertMessage: {
     comminSoon: "¡Próximamente! 🚀",

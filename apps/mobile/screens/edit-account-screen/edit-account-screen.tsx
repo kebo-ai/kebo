@@ -1,11 +1,11 @@
 import logger from "@/utils/logger";
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState, useEffect, useRef } from "react";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
 import tw from "@/hooks/use-tailwind";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Text } from "@/components/ui";
+import { Text, InfoBadge } from "@/components/ui";
 import { colors } from "@/theme/colors";
 import { useTheme } from "@/hooks/use-theme";
 import { useStores } from "@/models/helpers/use-stores";
@@ -49,7 +49,6 @@ interface EditAccountScreenProps {}
 const validationSchema = Yup.object().shape({
   balance: Yup.number()
     .required(translate("accountBalanceScreen:requiredBalance"))
-    .min(0.01, translate("accountBalanceScreen:higherBalance"))
     .typeError(translate("accountBalanceScreen:numberBalance")),
   accountType: Yup.object()
     .shape({
@@ -77,7 +76,7 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
   function EditAccountScreen() {
     const router = useRouter();
     const { theme } = useTheme();
-    const { decimalSeparator } = useCurrencyFormatter();
+    const { decimalSeparator, formatAmount } = useCurrencyFormatter();
     const params = useLocalSearchParams<{
       accountId: string;
       accountData?: string;
@@ -112,6 +111,18 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
     const numberEntry = useNumberEntry(2);
     const amountShake = useShakeAnimation();
 
+    // Track initial values for dirty checking
+    const initialValuesRef = useRef<{
+      balance: number;
+      accountTypeId: string;
+      description: string;
+    } | null>(null);
+
+    // Computed balance from API (initial + transactions)
+    const computedBalance = accountDetailData
+      ? Number(accountDetailData.balance ?? 0)
+      : 0;
+
     // Check if the bank is "efectivo" (cash)
     const isCashBank = accountData?.name?.toLowerCase() === "efectivo";
 
@@ -136,6 +147,17 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
       },
       validationSchema,
       onSubmit: async (values) => {
+        // Dirty check: skip save if nothing changed
+        if (
+          initialValuesRef.current &&
+          values.balance === initialValuesRef.current.balance &&
+          values.accountType.id === initialValuesRef.current.accountTypeId &&
+          values.description === initialValuesRef.current.description
+        ) {
+          router.back();
+          return;
+        }
+
         showLoader();
         try {
           await updateAccountMutation.mutateAsync({
@@ -165,29 +187,43 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
       },
     });
 
-    // Populate formik from fetched account detail
+    // Populate formik from fetched account detail — use base_balance (raw column)
     useEffect(() => {
       if (accountDetailData && accountTypes.length > 0) {
-        const balance = Number(accountDetailData.balance ?? 0);
-        const cents = Math.round(balance * 100);
+        const baseBalance = Number(
+          (accountDetailData as any).base_balance ?? accountDetailData.balance ?? 0
+        );
+        const cents = Math.round(baseBalance * 100);
         numberEntry.setFromCents(cents);
 
         const foundType = accountTypes.find(
           (t) => t.id === accountDetailData.account_type_id
         );
+        const accountType = foundType
+          ? cloneAccountType(foundType)
+          : { id: "" };
+        const description = accountDetailData.customized_name ?? "";
+
         formik.setValues({
-          balance,
-          accountType: foundType ? cloneAccountType(foundType) : { id: "" },
-          description: accountDetailData.customized_name ?? "",
+          balance: baseBalance,
+          accountType,
+          description,
         });
+
+        // Save initial values for dirty checking
+        initialValuesRef.current = {
+          balance: baseBalance,
+          accountTypeId: accountType.id,
+          description,
+        };
       }
     }, [accountDetailData, accountTypes]);
 
     // Sync number entry → formik balance
     useEffect(() => {
-      const balance = numberEntry.amountInCents / 100;
-      formik.setFieldValue("balance", balance);
-    }, [numberEntry.amountInCents]);
+      const abs = numberEntry.amountInCents / 100;
+      formik.setFieldValue("balance", numberEntry.isNegative ? -abs : abs);
+    }, [numberEntry.amountInCents, numberEntry.isNegative]);
 
     const handleSubmit = () => {
       if (numberEntry.amountInCents === 0) {
@@ -227,11 +263,30 @@ export const EditAccountScreen: FC<EditAccountScreenProps> = observer(
             <AmountDisplay
               entryType={numberEntry.entryType}
               amountInCents={numberEntry.amountInCents}
+              isNegative={numberEntry.isNegative}
               wholePart={numberEntry.wholePart}
               decimalSuffix={numberEntry.decimalSuffix}
               onBackspace={numberEntry.handleBackspace}
               shakeOffset={amountShake.offset}
             />
+
+            {/* Balance info section */}
+            <View style={tw`items-center mb-2 gap-1`}>
+              <InfoBadge
+                label={translate("accountBalanceScreen:initialBalance")}
+                title={translate("accountBalanceScreen:initialBalance")}
+                message={translate("accountBalanceScreen:initialBalanceInfo")}
+              />
+              <Text type="sm" weight="normal" color={theme.textSecondary}>
+                {translate("accountBalanceScreen:currentBalance")}:{" "}
+                <Text type="sm" weight="semibold" color={theme.textSecondary}>
+                  {formatAmount(computedBalance)}
+                </Text>
+              </Text>
+              <Text type="xs" weight="normal" color={theme.textTertiary}>
+                {translate("accountBalanceScreen:currentBalanceDescription")}
+              </Text>
+            </View>
 
             <View style={tw`px-4`}>
               <TransactionFieldRow

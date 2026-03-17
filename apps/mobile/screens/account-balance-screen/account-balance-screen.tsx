@@ -1,12 +1,11 @@
-import React, { FC, useState, useEffect, useMemo } from "react";
+import React, { FC, useState, useEffect, useMemo, useRef } from "react";
 import logger from "@/utils/logger";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { observer } from "mobx-react-lite";
 import tw from "@/hooks/use-tailwind";
 import { View, Keyboard } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Text } from "@/components/ui";
-import { colors } from "@/theme/colors";
+import { Text, InfoBadge } from "@/components/ui";
 import { standardHeader } from "@/theme/header-options";
 import { useStores } from "@/models/helpers/use-stores";
 import { useFormik } from "formik";
@@ -64,7 +63,7 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
   function AccountBalanceScreen() {
     const router = useRouter();
     const { theme } = useTheme();
-    const { decimalSeparator } = useCurrencyFormatter();
+    const { decimalSeparator, formatAmount } = useCurrencyFormatter();
     const insets = useSafeAreaInsets();
     const numberEntry = useNumberEntry(2);
     const amountShake = useShakeAnimation();
@@ -114,6 +113,18 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
       isEditing && accountId ? accountId : ""
     );
 
+    // Track initial values for dirty checking (edit mode)
+    const initialValuesRef = useRef<{
+      balance: number;
+      accountTypeId: string;
+      description: string;
+    } | null>(null);
+
+    // Computed balance from API (initial + transactions) — for display only
+    const computedBalance = accountDetailData
+      ? Number(accountDetailData.balance ?? 0)
+      : 0;
+
     const isCashBank =
       selectedBank.name?.toLowerCase() ===
         translate("modalAccount:cash").toLowerCase() ||
@@ -131,21 +142,35 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
         ? translate("modalAccount:cash")
         : selectedBank.name || "";
 
-    // Populate formik from fetched account detail (editing mode)
+    // Populate formik from fetched account detail (editing mode) — use base_balance
     useEffect(() => {
       if (isEditing && accountDetailData && accountTypes.length > 0) {
-        const balance = Number(accountDetailData.balance ?? 0);
-        const cents = Math.round(balance * 100);
+        const baseBalance = Number(
+          (accountDetailData as any).base_balance ?? accountDetailData.balance ?? 0
+        );
+        const cents = Math.round(baseBalance * 100);
         numberEntry.setFromCents(cents);
 
         const foundType = accountTypes.find(
           (t) => t.id === accountDetailData.account_type_id
         );
+        const accountType = foundType
+          ? cloneAccountType(foundType)
+          : { id: "" };
+        const description = accountDetailData.customized_name ?? "";
+
         formik.setValues({
-          balance,
-          accountType: foundType ? cloneAccountType(foundType) : { id: "" },
-          description: accountDetailData.customized_name ?? "",
+          balance: baseBalance,
+          accountType,
+          description,
         });
+
+        // Save initial values for dirty checking
+        initialValuesRef.current = {
+          balance: baseBalance,
+          accountTypeId: accountType.id,
+          description,
+        };
       }
     }, [accountDetailData, accountTypes]);
 
@@ -172,9 +197,9 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
 
     // Sync number entry -> formik balance
     useEffect(() => {
-      const balance = numberEntry.amountInCents / 100;
-      formik.setFieldValue("balance", balance);
-    }, [numberEntry.amountInCents]);
+      const abs = numberEntry.amountInCents / 100;
+      formik.setFieldValue("balance", numberEntry.isNegative ? -abs : abs);
+    }, [numberEntry.amountInCents, numberEntry.isNegative]);
 
     const validationSchema = useMemo(() => {
       const isCustom =
@@ -224,6 +249,17 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
         showLoader();
         try {
           if (isEditing && accountId) {
+            // Dirty check: skip save if nothing changed
+            if (
+              initialValuesRef.current &&
+              values.balance === initialValuesRef.current.balance &&
+              values.accountType.id === initialValuesRef.current.accountTypeId &&
+              values.description === initialValuesRef.current.description
+            ) {
+              router.back();
+              return;
+            }
+
             await updateAccountMutation.mutateAsync({
               id: accountId,
               data: {
@@ -351,11 +387,32 @@ export const AccountBalanceScreen: FC<AccountBalanceScreenProps> = observer(
           <AmountDisplay
             entryType={numberEntry.entryType}
             amountInCents={numberEntry.amountInCents}
+            isNegative={numberEntry.isNegative}
             wholePart={numberEntry.wholePart}
             decimalSuffix={numberEntry.decimalSuffix}
             onBackspace={numberEntry.handleBackspace}
             shakeOffset={amountShake.offset}
           />
+
+          {/* Balance info section (editing mode) */}
+          {isEditing && (
+            <View style={tw`items-center mb-2 gap-1`}>
+              <InfoBadge
+                label={translate("accountBalanceScreen:initialBalance")}
+                title={translate("accountBalanceScreen:initialBalance")}
+                message={translate("accountBalanceScreen:initialBalanceInfo")}
+              />
+              <Text type="sm" weight="normal" color={theme.textSecondary}>
+                {translate("accountBalanceScreen:currentBalance")}:{" "}
+                <Text type="sm" weight="semibold" color={theme.textSecondary}>
+                  {formatAmount(computedBalance)}
+                </Text>
+              </Text>
+              <Text type="xs" weight="normal" color={theme.textTertiary}>
+                {translate("accountBalanceScreen:currentBalanceDescription")}
+              </Text>
+            </View>
+          )}
 
           <View style={tw`px-4`}>
             <TransactionFieldRow

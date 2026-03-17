@@ -230,6 +230,10 @@ const it: Translations = {
     typeAccountTitle: "Tipo di conto",
     continue: "Continua",
     saveChanges: "Salva modifiche",
+    initialBalance: "Saldo iniziale",
+    initialBalanceInfo: "Questo è il saldo iniziale del tuo conto. Il tuo saldo attuale viene calcolato automaticamente aggiungendo le tue transazioni a questo valore.",
+    currentBalance: "Saldo attuale",
+    currentBalanceDescription: "Saldo iniziale + transazioni",
   },
   alertMessage: {
     comminSoon: "In arrivo 🚀",

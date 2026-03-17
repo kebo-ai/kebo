@@ -223,6 +223,10 @@ const zh: Translations = {
     typeAccountTitle: "账户类型",
     continue: "继续",
     saveChanges: "保存更改",
+    initialBalance: "初始余额",
+    initialBalanceInfo: "这是您账户的初始余额。您的当前余额是通过将交易添加到此值自动计算的。",
+    currentBalance: "当前余额",
+    currentBalanceDescription: "初始余额 + 交易",
   },
   alertMessage: {
     comminSoon: "敬请期待 🚀",

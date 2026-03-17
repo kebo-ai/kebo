@@ -227,6 +227,10 @@ const hi: Translations = {
     typeAccountTitle: "खाते का प्रकार",
     continue: "जारी रखें",
     saveChanges: "परिवर्तनों को सहेजें",
+    initialBalance: "प्रारंभिक बैलेंस",
+    initialBalanceInfo: "यह आपके खाते का प्रारंभिक बैलेंस है। आपका वर्तमान बैलेंस इस मूल्य में आपके लेन-देन जोड़कर स्वचालित रूप से गणना किया जाता है।",
+    currentBalance: "वर्तमान बैलेंस",
+    currentBalanceDescription: "प्रारंभिक बैलेंस + लेन-देन",
   },
 
   alertMessage: {

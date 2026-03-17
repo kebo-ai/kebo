@@ -230,6 +230,10 @@ const en = {
     typeAccountTitle: "Account type",
     continue: "Continue",
     saveChanges: "Save changes",
+    initialBalance: "Initial balance",
+    initialBalanceInfo: "This is the starting balance of your account. Your current balance is calculated automatically by adding your transactions to this value.",
+    currentBalance: "Current balance",
+    currentBalanceDescription: "Initial balance + transactions",
   },
   alertMessage: {
     comminSoon: "Coming soon 🚀",

@@ -1,6 +1,7 @@
 export { Button } from "./button";
 export { Text } from "./text";
 export { Icon } from "./icon";
+export { InfoBadge } from "./info-badge";
 export type { TextType, TextWeight, TextProps } from "./text";
 export type {
   UISize,

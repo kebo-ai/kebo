@@ -14,6 +14,8 @@ interface EntryState {
   firstDecimal: number;
   secondDecimal: number;
   assignedDecimals: 0 | 1 | 2;
+  // Sign tracking (for negative balances)
+  isNegative: boolean;
 }
 
 const initialState: EntryState = {
@@ -23,6 +25,7 @@ const initialState: EntryState = {
   firstDecimal: 0,
   secondDecimal: 0,
   assignedDecimals: 0,
+  isNegative: false,
 };
 
 // --- Actions ---
@@ -64,11 +67,19 @@ function reducer(state: EntryState, action: Action): EntryState {
 
     case "backspace": {
       if (action.mode === 1) {
+        // If at 0 and negative, clear the sign
+        if (state.cents === 0 && state.isNegative) {
+          return { ...state, isNegative: false };
+        }
         return { ...state, cents: Math.floor(state.cents / 10) };
       }
 
       // Mode 2
       if (!state.isEditingDecimal) {
+        // If at 0 and negative, clear the sign
+        if (state.wholePart === 0 && state.isNegative) {
+          return { ...state, isNegative: false };
+        }
         return { ...state, wholePart: Math.floor(state.wholePart / 10) };
       }
       if (state.assignedDecimals === 2) {
@@ -90,17 +101,19 @@ function reducer(state: EntryState, action: Action): EntryState {
 
     case "setFromCents": {
       const { cents, mode } = action;
+      const isNegative = cents < 0;
+      const absCents = Math.abs(cents);
       if (mode === 1) {
-        return { ...initialState, cents };
+        return { ...initialState, cents: absCents, isNegative };
       }
       // Mode 2
-      const whole = Math.floor(cents / 100);
-      const dec = cents % 100;
+      const whole = Math.floor(absCents / 100);
+      const dec = absCents % 100;
       const first = Math.floor(dec / 10);
       const second = dec % 10;
 
       if (dec === 0) {
-        return { ...initialState, wholePart: whole };
+        return { ...initialState, wholePart: whole, isNegative };
       }
       if (second === 0) {
         return {
@@ -109,6 +122,7 @@ function reducer(state: EntryState, action: Action): EntryState {
           isEditingDecimal: true,
           firstDecimal: first,
           assignedDecimals: 1,
+          isNegative,
         };
       }
       return {
@@ -118,6 +132,7 @@ function reducer(state: EntryState, action: Action): EntryState {
         firstDecimal: first,
         secondDecimal: second,
         assignedDecimals: 2,
+        isNegative,
       };
     }
   }
@@ -128,6 +143,7 @@ function reducer(state: EntryState, action: Action): EntryState {
 export interface NumberEntryResult {
   entryType: NumberEntryType;
   amountInCents: number;
+  isNegative: boolean;
   // Mode 2 display info
   wholePart: number;
   decimalSuffix: string; // "" | "." | ".4" | ".45"
@@ -190,6 +206,7 @@ export function useNumberEntry(
   return {
     entryType,
     amountInCents,
+    isNegative: state.isNegative,
     wholePart: state.wholePart,
     decimalSuffix,
     handleDigit,

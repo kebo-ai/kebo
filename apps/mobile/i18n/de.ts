@@ -235,6 +235,10 @@ const de: Translations = {
     typeAccountTitle: "Kontotyp",
     continue: "Weiter",
     saveChanges: "Änderungen speichern",
+    initialBalance: "Anfangssaldo",
+    initialBalanceInfo: "Dies ist der Anfangssaldo Ihres Kontos. Ihr aktueller Kontostand wird automatisch berechnet, indem Ihre Transaktionen zu diesem Wert addiert werden.",
+    currentBalance: "Aktueller Kontostand",
+    currentBalanceDescription: "Anfangssaldo + Transaktionen",
   },
   alertMessage: {
     comminSoon: "Kommt bald 🚀",

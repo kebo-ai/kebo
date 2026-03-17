@@ -14,6 +14,7 @@ import type { NumberEntryType } from "@/hooks/use-number-entry";
 interface AmountDisplayProps {
   entryType: NumberEntryType;
   amountInCents: number;
+  isNegative?: boolean;
   // Mode 2 display info
   wholePart: number;
   decimalSuffix: string;
@@ -24,6 +25,7 @@ interface AmountDisplayProps {
 export function AmountDisplay({
   entryType,
   amountInCents,
+  isNegative = false,
   wholePart,
   decimalSuffix,
   onBackspace,
@@ -37,18 +39,21 @@ export function AmountDisplay({
     const formatWhole = (n: number) =>
       n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator);
 
+    const sign = isNegative ? "-" : "";
+
     if (entryType === 1) {
       const whole = Math.floor(amountInCents / 100);
       const dec = String(amountInCents % 100).padStart(2, "0");
-      return `${getSymbolCurrency} ${formatWhole(whole)}${decimalSeparator}${dec}`;
+      return `${getSymbolCurrency} ${sign}${formatWhole(whole)}${decimalSeparator}${dec}`;
     }
 
     // Mode 2: dynamic decimals — replace "." in suffix with user's separator
     const localSuffix = decimalSuffix.replace(".", decimalSeparator);
-    return `${getSymbolCurrency} ${formatWhole(wholePart)}${localSuffix}`;
+    return `${getSymbolCurrency} ${sign}${formatWhole(wholePart)}${localSuffix}`;
   }, [
     entryType,
     amountInCents,
+    isNegative,
     wholePart,
     decimalSuffix,
     getSymbolCurrency,

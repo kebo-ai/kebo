@@ -232,6 +232,10 @@ const fr: Translations = {
     typeAccountTitle: "Type de compte",
     continue: "Continuer",
     saveChanges: "Enregistrer les modifications",
+    initialBalance: "Solde initial",
+    initialBalanceInfo: "Ceci est le solde initial de votre compte. Votre solde actuel est calculé automatiquement en ajoutant vos transactions à cette valeur.",
+    currentBalance: "Solde actuel",
+    currentBalanceDescription: "Solde initial + transactions",
   },
   alertMessage: {
     comminSoon: "Bientôt disponible 🚀",

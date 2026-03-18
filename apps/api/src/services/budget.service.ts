@@ -37,22 +37,6 @@ export class BudgetService {
           }
         }
 
-        // Sum all expenses for all categories in the budget period
-        const [spentResult] = await db
-          .select({ total: sum(transactions.amount) })
-          .from(transactions)
-          .where(
-            and(
-              eq(transactions.user_id, userId),
-              eq(transactions.transaction_type, "Expense"),
-              eq(transactions.is_deleted, false),
-              between(transactions.date, startDate, endDate),
-              // Filter by categories in budget lines
-              // Using SQL IN clause equivalent
-            ),
-          )
-
-        // Actually need to filter by category_ids - let me do a proper query
         let totalSpent = 0
         for (const line of budget.lines) {
           const [lineSpent] = await db
@@ -70,16 +54,19 @@ export class BudgetService {
           totalSpent += parseFloat(lineSpent?.total ?? "0")
         }
 
-        const budgetAmount = parseFloat(budget.budget_amount ?? "0")
-        const remaining = budgetAmount - totalSpent
+        const sumOfAllocations = budget.lines.reduce(
+          (acc, line) => acc + parseFloat(line.amount),
+          0,
+        )
+        const remaining = sumOfAllocations - totalSpent
 
         return {
           ...budget,
           total_spent: totalSpent.toFixed(2),
           total_remaining: remaining.toFixed(2),
           progress_percentage:
-            budgetAmount > 0
-              ? ((totalSpent / budgetAmount) * 100).toFixed(2)
+            sumOfAllocations > 0
+              ? ((totalSpent / sumOfAllocations) * 100).toFixed(2)
               : "0",
         }
       }),
@@ -145,8 +132,11 @@ export class BudgetService {
       }),
     )
 
-    // Calculate totals
-    const totalBudget = parseFloat(budget.budget_amount ?? "0")
+    // Calculate totals from actual category allocations
+    const totalAllocated = linesWithSpent.reduce(
+      (acc, line) => acc + parseFloat(line.amount),
+      0,
+    )
     const totalSpent = linesWithSpent.reduce(
       (acc, line) => acc + parseFloat(line.spent_amount),
       0,
@@ -156,11 +146,13 @@ export class BudgetService {
       ...budget,
       budget_lines: linesWithSpent,
       total_metrics: {
-        total_budget: budget.budget_amount,
+        total_budget: totalAllocated.toFixed(2),
         total_spent: totalSpent.toFixed(2),
-        total_remaining: (totalBudget - totalSpent).toFixed(2),
+        total_remaining: (totalAllocated - totalSpent).toFixed(2),
         overall_progress_percentage:
-          totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(2) : "0",
+          totalAllocated > 0
+            ? ((totalSpent / totalAllocated) * 100).toFixed(2)
+            : "0",
       },
     }
   }

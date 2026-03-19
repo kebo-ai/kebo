@@ -9,6 +9,7 @@ export class BudgetService {
       where: and(eq(budgets.user_id, userId), eq(budgets.is_deleted, false)),
       with: {
         lines: {
+          where: eq(budgetLines.is_deleted, false),
           with: {
             category: true,
           },
@@ -25,10 +26,7 @@ export class BudgetService {
           : new Date()
         const endDate = budget.end_date ? new Date(budget.end_date) : new Date()
 
-        // Get all expense transactions in budget period for categories in budget lines
-        const categoryIds = budget.lines.map((line) => line.category_id)
-
-        if (categoryIds.length === 0) {
+        if (budget.lines.length === 0) {
           return {
             ...budget,
             total_spent: "0",
@@ -84,6 +82,7 @@ export class BudgetService {
       ),
       with: {
         lines: {
+          where: eq(budgetLines.is_deleted, false),
           with: {
             category: true,
           },
@@ -266,6 +265,7 @@ export class BudgetService {
       where: and(
         eq(budgetLines.budget_id, budgetId),
         eq(budgetLines.category_id, categoryId),
+        eq(budgetLines.is_deleted, false),
       ),
       with: {
         category: true,

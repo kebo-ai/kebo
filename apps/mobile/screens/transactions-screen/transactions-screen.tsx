@@ -175,6 +175,7 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     const scrollViewRef = useRef<ScrollView>(null);
     const animatedIdsRef = useRef(new Set<string>());
     const animCooldownRef = useRef(false);
+    const isLoadingMoreRef = useRef(false);
     const ITEMS_PER_PAGE = 15;
     const [isFilterModalVisible, setFilterModalVisible] = useState(false);
     const [selectedBanks, setSelectedBanks] = useState<string[]>([]);
@@ -275,12 +276,11 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     }), [apiFilters]);
 
     useEffect(() => {
-      // Skip placeholder (stale) data from keepPreviousData to avoid showing
-      // results from a previous filter while the new query fetches
-      if (isPlaceholderData) {
-        setAllTransactions([]);
-        return;
-      }
+      // While keepPreviousData shows stale data, skip — don't clear the list.
+      // When filters change page resets to 1, so the page===1 branch below
+      // will replace the accumulated list once fresh data arrives.
+      if (isPlaceholderData) return;
+
       if (txResponse?.data) {
         if (page === 1) {
           setAllTransactions(txResponse.data);
@@ -294,6 +294,13 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
       }
     }, [txResponse, page, filterKey, isPlaceholderData]);
 
+    // Reset the loadMore gate when fetching completes
+    useEffect(() => {
+      if (!isFetching) {
+        isLoadingMoreRef.current = false;
+      }
+    }, [isFetching]);
+
     const hasMore = txResponse ? txResponse.total > allTransactions.length : false;
 
     const groupedTransactions = useMemo(() => {
@@ -301,7 +308,8 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     }, [allTransactions]);
 
     const loadMore = useCallback(() => {
-      if (queryLoading || isFetching || !hasMore) return;
+      if (queryLoading || isFetching || !hasMore || isLoadingMoreRef.current) return;
+      isLoadingMoreRef.current = true;
       setPage(prev => prev + 1);
     }, [queryLoading, isFetching, hasMore]);
 
@@ -658,19 +666,16 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
               layoutMeasurement.height + contentOffset.y >=
               contentSize.height - paddingToBottom;
 
-            setShowScrollToTop(contentOffset.y > 100);
+            const shouldShow = contentOffset.y > 100;
+            if (shouldShow !== showScrollToTop) {
+              setShowScrollToTop(shouldShow);
+            }
 
-            if (isCloseToBottom && !queryLoading && !isFetching && hasMore) {
-              logger.debug("Reached near bottom, triggering loadMore");
+            if (isCloseToBottom) {
               loadMore();
             }
           }}
-          scrollEventThrottle={200}
-          onMomentumScrollEnd={() => {
-            if (!queryLoading && !isFetching && hasMore) {
-              loadMore();
-            }
-          }}
+          scrollEventThrottle={400}
         >
           <View style={tw`px-4 pt-4 pb-2`}>
             <ScrollView

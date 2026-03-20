@@ -73,6 +73,8 @@ export function AmountDisplay({
           weight="light"
           adjustsFontSizeToFit
           numberOfLines={1}
+          allowFontScaling={false}
+          minimumFontScale={0.5}
         >
           {formatted}
         </Text>

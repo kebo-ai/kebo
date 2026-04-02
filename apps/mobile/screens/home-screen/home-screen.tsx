@@ -419,6 +419,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
 
   const {
     isVisible: isReviewModalVisible,
+    eligibilityData: reviewEligibilityData,
     checkEligibility,
     closeModal: closeReviewModal,
     handleConfirm: handleReviewConfirm,
@@ -932,6 +933,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
         onCancel={handleReviewCancel}
         confirmText={getModalTexts().confirmText}
         cancelText={getModalTexts().cancelText}
+        eligibilityData={reviewEligibilityData}
       />
     </>
   );

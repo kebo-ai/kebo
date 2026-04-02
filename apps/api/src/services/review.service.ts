@@ -18,16 +18,7 @@ export class ReviewService {
       return { eligible: false, reason: "Already rated" }
     }
 
-    // Check account age (minimum 7 days)
-    const createdAt = profile.created_at ?? new Date()
-    const accountAgeMs = Date.now() - new Date(createdAt).getTime()
-    const accountAgeDays = accountAgeMs / (1000 * 60 * 60 * 24)
-
-    if (accountAgeDays < 7) {
-      return { eligible: false, reason: "Account too new" }
-    }
-
-    // Check transaction count (minimum 10 transactions)
+    // Count user transactions
     const [txCount] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(transactions)
@@ -38,26 +29,30 @@ export class ReviewService {
         ),
       )
 
-    if ((txCount?.count ?? 0) < 10) {
-      return { eligible: false, reason: "Not enough transactions" }
+    const count = txCount?.count ?? 0
+
+    if (count < 1) {
+      return { eligible: false, reason: "No transactions yet", transactionCount: count }
     }
 
-    // Check milestone-based eligibility
+    // Milestone-based eligibility: trigger at 1, 10, 20, 30...
     const currentMilestone =
-      txCount?.count && txCount.count >= 5
-        ? txCount.count <= 10
-          ? 10
-          : Math.ceil(txCount.count / 10) * 10
-        : 5
+      count < 10 ? 1 : Math.ceil(count / 10) * 10
 
     if (
       profile.last_shown_rating_milestone &&
       currentMilestone <= profile.last_shown_rating_milestone
     ) {
-      return { eligible: false, reason: "Milestone not reached" }
+      return { eligible: false, reason: "Milestone not reached", transactionCount: count }
     }
 
-    return { eligible: true, currentMilestone }
+    // Calculate account age for analytics
+    const createdAt = profile.created_at ?? new Date()
+    const accountAgeDays = Math.floor(
+      (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24),
+    )
+
+    return { eligible: true, currentMilestone, transactionCount: count, accountAgeDays }
   }
 
   static async recordInteraction(

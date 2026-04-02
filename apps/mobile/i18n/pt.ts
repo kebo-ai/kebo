@@ -62,6 +62,8 @@ const pt = {
     today: "Hoje",
     yesterday: "Ontem",
     noCategory: "Sem categoria",
+    balanceHintTitle: "Saldo total",
+    balanceHintMessage: "Pressione e segure o saldo para ocultá-lo ou mostrá-lo. Seu saldo está sempre seguro — só você pode vê-lo.",
   },
   profileScreen: {
     profile: "Meu Perfil",
@@ -289,6 +291,9 @@ const pt = {
     editCategory: "Editar categoria",
     deleteCategory: "Excluir categoria",
     deleteBudget: "Excluir orçamento",
+    duplicate: "Duplicar",
+    budgetDuplicated: "Orçamento duplicado com sucesso",
+    errorDuplicatingBudget: "Erro ao duplicar o orçamento",
     updateBudget: "Atualizar orçamento",
     successMessage: "Orçamento atualizado com sucesso",
   },

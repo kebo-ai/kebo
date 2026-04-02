@@ -63,6 +63,8 @@ const de: Translations = {
     today: "Heute",
     yesterday: "Gestern",
     noCategory: "Keine Kategorie",
+    balanceHintTitle: "Gesamtguthaben",
+    balanceHintMessage: "Halte dein Guthaben gedrückt, um es ein- oder auszublenden. Dein Guthaben ist immer sicher — nur du kannst es sehen.",
   },
   profileScreen: {
     profile: "Mein Profil",
@@ -294,6 +296,9 @@ const de: Translations = {
     editCategory: "Kategorie bearbeiten",
     deleteCategory: "Kategorie löschen",
     deleteBudget: "Budget löschen",
+    duplicate: "Duplizieren",
+    budgetDuplicated: "Budget erfolgreich dupliziert",
+    errorDuplicatingBudget: "Fehler beim Duplizieren des Budgets",
   },
   newBudgetScreen: {
     title: "Ein neues Budget erstellen",

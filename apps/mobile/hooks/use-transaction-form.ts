@@ -8,6 +8,7 @@ import { showToast } from "@/components/ui/custom-toast";
 import i18n from "@/i18n/i18n";
 import { runInAction } from "mobx";
 import { useCreateTransaction, useCreateTransfer } from "@/lib/api/hooks";
+import { resetReviewEligibility } from "@/hooks/use-review-modal";
 
 type TransactionSuccessMessages = {
   [key in TransactionType]: TxKeyPath;
@@ -116,6 +117,9 @@ export const useTransactionForm = (navigation: any) => {
         } else {
           createTransaction.mutate(mutationData as any);
         }
+
+        // Reset review eligibility so the happiness gate can trigger
+        resetReviewEligibility();
 
         // Then navigate — home screen will see optimistically updated cache
         navigation.navigate("Home", { transactionCreated: true });

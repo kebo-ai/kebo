@@ -199,7 +199,14 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
         if (route === "NewCategoryScreen") {
           router.push({
             pathname: "/(authenticated)/new-category",
-            params,
+            params: params
+              ? {
+                  ...params,
+                  categoryData: params.categoryData
+                    ? JSON.stringify(params.categoryData)
+                    : undefined,
+                }
+              : undefined,
           });
         }
       },

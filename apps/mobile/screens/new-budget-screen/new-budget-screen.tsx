@@ -45,6 +45,9 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
     isEditing?: string;
     budgetId?: string;
     budgetData?: string;
+    duplicateName?: string;
+    duplicateLines?: string;
+    duplicateAmount?: string;
   }>();
 
   useEffect(() => {
@@ -55,6 +58,7 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
   const updateBudgetMutation = useUpdateBudget();
 
   const isEditing = params.isEditing === "true";
+  const isDuplicate = !!params.duplicateName;
   const budgetId = params.budgetId;
 
   const [budgetData] = useState(() => {
@@ -64,6 +68,15 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
       return undefined;
     }
   });
+
+  const [duplicateLines] = useState(() => {
+    try {
+      return params.duplicateLines ? JSON.parse(params.duplicateLines) : undefined;
+    } catch {
+      return undefined;
+    }
+  });
+  const duplicateAmount = params.duplicateAmount ? Number(params.duplicateAmount) : 0;
 
   const monthNames = [
     "january",
@@ -114,12 +127,16 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
         } else {
           const result = await createBudgetMutation.mutateAsync({
             custom_name: values.name,
-            budget_amount: 0,
+            budget_amount: isDuplicate ? duplicateAmount : 0,
             start_date: startDateStr,
             end_date: endDateStr,
+            ...(isDuplicate && duplicateLines ? { budget_lines: duplicateLines } : {}),
           });
 
           if (result?.id) {
+            if (isDuplicate) {
+              showToast("success", translate("budgetScreen:budgetDuplicated"));
+            }
             router.replace({
               pathname: "/(authenticated)/budget/[budgetId]",
               params: { budgetId: result.id },
@@ -140,7 +157,7 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
 
   const formik = useFormik({
     initialValues: {
-      name: `${translate("newBudgetScreen:budget")} ${translatedMonth}`,
+      name: params.duplicateName || `${translate("newBudgetScreen:budget")} ${translatedMonth}`,
       startDate: now,
       endDate: defaultEndDate,
     },

@@ -61,6 +61,8 @@ const en = {
     today: "Today",
     yesterday: "Yesterday",
     noCategory: "No category",
+    balanceHintTitle: "Total Balance",
+    balanceHintMessage: "Long press on your balance to hide or show it. Your balance is always safe — only you can see it.",
   },
   profileScreen: {
     profile: "My Profile",
@@ -289,6 +291,9 @@ const en = {
     editCategory: "Edit category",
     deleteCategory: "Delete category",
     deleteBudget: "Delete budget",
+    duplicate: "Duplicate",
+    budgetDuplicated: "Budget duplicated successfully",
+    errorDuplicatingBudget: "Error duplicating the budget",
   },
   newBudgetScreen: {
     title: "Create a new budget",

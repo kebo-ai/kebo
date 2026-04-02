@@ -22,6 +22,8 @@ import { useBudgets, useDeleteBudget } from "@/lib/api/hooks";
 import { useProfile } from "@/lib/api/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/api/keys";
+import { getApiClient, unwrap } from "@/lib/api/rpc";
+import type { BudgetWithDetails } from "@/lib/api/types";
 import { Stack, useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { showToast } from "@/components/ui/custom-toast";
@@ -49,8 +51,8 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
     const { data: budgetsData, isLoading: loading } = useBudgets();
     const { data: profile } = useProfile();
     const deleteBudgetMutation = useDeleteBudget();
-    const [showIntroSlider, setShowIntroSlider] = useState(false);
-    const [isCheckingIntro, setIsCheckingIntro] = useState(true);
+    const [showIntroSlider] = useState(false);
+    const [isCheckingIntro] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
 
@@ -171,22 +173,73 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
       [deleteBudgetMutation]
     );
 
+    const handleDuplicate = useCallback(
+      async (budgetId: string) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        swipeableRefs.current[budgetId]?.close();
+        try {
+          const apiClient = getApiClient();
+          const budgetDetail = await queryClient.fetchQuery({
+            queryKey: queryKeys.budgets.detail(budgetId),
+            queryFn: async () =>
+              unwrap<BudgetWithDetails>(
+                await apiClient.budgets[":id"].$get({ param: { id: budgetId } })
+              ),
+          });
+
+          const budgetLines = budgetDetail.budget_lines?.map((line) => ({
+            category_id: line.category_id,
+            amount: Number(line.amount),
+          })) || [];
+          const budgetAmount = budgetLines.reduce((sum, l) => sum + l.amount, 0);
+
+          router.push({
+            pathname: "/(authenticated)/budget/new",
+            params: {
+              duplicateName: `${budgetDetail.custom_name || ""} (copy)`,
+              duplicateLines: JSON.stringify(budgetLines),
+              duplicateAmount: String(budgetAmount),
+            },
+          });
+        } catch (error) {
+          logger.error("Error duplicating budget:", error);
+          showToast("error", translate("budgetScreen:errorDuplicatingBudget"));
+        }
+      },
+      [queryClient, router]
+    );
+
     const renderRightActions = useCallback(
       (progress: Animated.AnimatedInterpolation<number>, budgetId: string) => {
         const translateX = progress.interpolate({
           inputRange: [0, 1],
-          outputRange: [80, 0],
+          outputRange: [160, 0],
         });
 
         return (
           <Animated.View
             style={[
-              tw`w-20 items-center justify-center rounded-r-3xl`,
-              { backgroundColor: colors.secondary, transform: [{ translateX }] },
+              tw`flex-row`,
+              { transform: [{ translateX }] },
             ]}
           >
             <TouchableOpacity
-              style={tw`flex-1 w-full items-center justify-center`}
+              style={[
+                tw`w-20 items-center justify-center`,
+                { backgroundColor: colors.primary },
+              ]}
+              onPress={() => handleDuplicate(budgetId)}
+            >
+              <Ionicons name="copy-outline" size={24} color={colors.white} />
+              <Text type="xs" weight="medium" color="white" style={tw`mt-1`}>
+                {translate("budgetScreen:duplicate")}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                tw`w-20 items-center justify-center rounded-r-3xl`,
+                { backgroundColor: colors.secondary },
+              ]}
               onPress={() => handleDelete(budgetId)}
             >
               <Icon symbol="trash" size={24} color={colors.white} />
@@ -197,7 +250,7 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
           </Animated.View>
         );
       },
-      [handleDelete]
+      [handleDelete, handleDuplicate]
     );
 
     const handleAddBudgetPress = useCallback(() => {

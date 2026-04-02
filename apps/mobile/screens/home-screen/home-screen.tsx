@@ -19,7 +19,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { Text, Icon } from "@/components/ui";
+import { Text, Icon, InfoBadge } from "@/components/ui";
 import tw from "twrnc";
 import moment from "moment";
 import "moment/locale/es";
@@ -419,6 +419,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
 
   const {
     isVisible: isReviewModalVisible,
+    eligibilityData: reviewEligibilityData,
     checkEligibility,
     closeModal: closeReviewModal,
     handleConfirm: handleReviewConfirm,
@@ -686,9 +687,11 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
         style={tw`bg-[#6934D226] dark:bg-[#6934D240] px-[17px] pt-[19px] pb-[15px] rounded-[18px] mb-6`}
       >
         <View style={tw`flex-row items-center justify-center`}>
-          <Text type="sm" weight="light" color={theme.textPrimary} style={tw`text-center`}>
-            {translate("homeScreen:balance")}
-          </Text>
+          <InfoBadge
+            label={translate("homeScreen:balance")}
+            title={translate("homeScreen:balanceHintTitle")}
+            message={translate("homeScreen:balanceHintMessage")}
+          />
         </View>
 
         <View style={tw`mt-2 overflow-hidden`}>
@@ -930,6 +933,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
         onCancel={handleReviewCancel}
         confirmText={getModalTexts().confirmText}
         cancelText={getModalTexts().cancelText}
+        eligibilityData={reviewEligibilityData}
       />
     </>
   );

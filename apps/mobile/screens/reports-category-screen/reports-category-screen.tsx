@@ -66,9 +66,15 @@ export const ReportsCategoryScreen: FC<ReportsCategoryScreenProps> = observer(
     const navigation = {
       navigate: (route: string, navParams?: any) => {
         if (route === "Transactions") {
+          const filters = navParams?.initialFilters;
           router.push({
             pathname: "/(authenticated)/transactions",
-            params: navParams,
+            params: {
+              origin: navParams?.origin,
+              categoryIds: filters?.categoryIds ? JSON.stringify(filters.categoryIds) : undefined,
+              months: filters?.months ? JSON.stringify(filters.months) : undefined,
+              transactionType: filters?.transactionType,
+            },
           });
         } else {
           router.push(route as any);

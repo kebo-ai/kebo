@@ -58,6 +58,7 @@
     "owner": "kebo-app",
     "updates": {
       "url": "https://u.expo.dev/7650e73f-04f2-4f0d-a48b-87f9cda0e56e"
-    }
+    },
+    "runtimeVersion": "1.0.0"
   }
 }

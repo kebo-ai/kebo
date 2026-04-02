@@ -61,6 +61,13 @@ export function AmountDisplay({
     thousandsSeparator,
   ]);
 
+  const fontSize = useMemo(() => {
+    const len = formatted.length;
+    if (len <= 11) return 54;
+    if (len <= 15) return 42;
+    return 32;
+  }, [formatted]);
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: shakeOffset?.value ?? 0 }],
   }));
@@ -69,12 +76,10 @@ export function AmountDisplay({
     <Animated.View style={[styles.container, animatedStyle]}>
       <View style={styles.amountRow}>
         <Text
-          style={[styles.amount, { color: theme.textPrimary }]}
+          style={[styles.amount, { color: theme.textPrimary, fontSize }]}
           weight="light"
-          adjustsFontSizeToFit
           numberOfLines={1}
           allowFontScaling={false}
-          minimumFontScale={0.5}
         >
           {formatted}
         </Text>

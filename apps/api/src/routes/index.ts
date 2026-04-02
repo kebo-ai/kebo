@@ -10,11 +10,13 @@ import referenceRoutes from "./reference.routes"
 import reportsRoutes from "./reports.routes"
 import reviewsRoutes from "./reviews.routes"
 import transactionsRoutes from "./transactions.routes"
+import quickTransactionRoutes from "./quick-transaction.routes"
 import usersRoutes from "./users.routes"
 
 export function registerRoutes(app: OpenAPIHono<AppEnv>) {
   return app
     .route("/transactions", transactionsRoutes)
+    .route("/transactions/quick", quickTransactionRoutes)
     .route("/categories", categoriesRoutes)
     .route("/accounts", accountsRoutes)
     .route("/banks", banksRoutes)

@@ -61,6 +61,8 @@ const hi: Translations = {
     today: "आज",
     yesterday: "कल",
     noCategory: "कोई श्रेणी नहीं",
+    balanceHintTitle: "कुल शेष राशि",
+    balanceHintMessage: "अपनी शेष राशि को छिपाने या दिखाने के लिए उस पर देर तक दबाएं। आपकी शेष राशि हमेशा सुरक्षित है — केवल आप इसे देख सकते हैं।",
   },
   profileScreen: {
     profile: "मेरा प्रोफ़ाइल",
@@ -290,6 +292,9 @@ const hi: Translations = {
     editBudget: "बजट संपादित करें",
     deleteCategory: "श्रेणी हटाएं",
     deleteBudget: "बजट हटाएं",
+    duplicate: "डुप्लिकेट",
+    budgetDuplicated: "बजट सफलतापूर्वक डुप्लिकेट किया गया",
+    errorDuplicatingBudget: "बजट डुप्लिकेट करने में त्रुटि",
     updateBudget: "बजट अपडेट करें",
   },
   newBudgetScreen: {

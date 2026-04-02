@@ -61,6 +61,8 @@ const zh: Translations = {
     today: "今天",
     yesterday: "昨天",
     noCategory: "无分类",
+    balanceHintTitle: "总余额",
+    balanceHintMessage: "长按余额可隐藏或显示。您的余额始终安全——只有您可以看到。",
   },
   profileScreen: {
     profile: "我的个人资料",
@@ -278,6 +280,9 @@ const zh: Translations = {
     editCategory: "编辑类别",
     deleteCategory: "删除类别",
     deleteBudget: "删除预算",
+    duplicate: "复制",
+    budgetDuplicated: "预算复制成功",
+    errorDuplicatingBudget: "复制预算时出错",
     updateBudget: "更新预算",
     successMessage: "预算更新成功",
   },

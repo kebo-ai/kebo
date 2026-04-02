@@ -62,6 +62,8 @@ const it: Translations = {
     today: "Oggi",
     yesterday: "Ieri",
     noCategory: "Nessuna categoria",
+    balanceHintTitle: "Saldo totale",
+    balanceHintMessage: "Tieni premuto il saldo per nasconderlo o mostrarlo. Il tuo saldo è sempre al sicuro — solo tu puoi vederlo.",
   },
   profileScreen: {
     profile: "Il mio profilo",
@@ -291,6 +293,9 @@ const it: Translations = {
     editCategory: "Modifica categoria",
     deleteCategory: "Elimina categoria",
     deleteBudget: "Elimina budget",
+    duplicate: "Duplica",
+    budgetDuplicated: "Budget duplicato con successo",
+    errorDuplicatingBudget: "Errore durante la duplicazione del budget",
     updateBudget: "Aggiorna budget",
   },
   newBudgetScreen: {

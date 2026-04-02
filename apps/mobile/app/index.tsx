@@ -19,7 +19,7 @@ const SplashIndex = observer(function SplashIndex() {
   const analytics = useAnalytics();
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
-  const bgColor = isDark ? colors.dark.background : colors.light.background;
+  const bgColor = isDark ? colors.dark.background : "#FFFFFF";
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isTimeoutCompleted, setIsTimeoutCompleted] = useState(false);
   const [bannerData, setBannerData] = useState<{

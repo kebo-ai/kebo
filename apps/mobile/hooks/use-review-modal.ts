@@ -1,42 +1,48 @@
 import { useState, useCallback } from "react";
 import {
-  ReviewService,
-  RatingModalEligibilityResponse,
-} from "@/services/review-service";
+  checkReviewEligibility,
+  type ReviewEligibility,
+} from "@/lib/api/hooks/use-reviews";
 import { translate } from "@/i18n";
-import { loadString, saveString } from "@/utils/storage/storage";
-import { REVIEW_MODAL_SHOULD_SHOW } from "@/utils/storage/storage-keys";
+import { AnalyticsService } from "@/services/analytics-service";
 import logger from "@/utils/logger";
+
+const analytics = new AnalyticsService();
+
+let _hasCheckedThisSession = false;
+
+export function resetReviewEligibility() {
+  _hasCheckedThisSession = false;
+}
 
 export const useReviewModal = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [eligibilityData, setEligibilityData] =
-    useState<RatingModalEligibilityResponse | null>(null);
+    useState<ReviewEligibility | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const checkEligibility = useCallback(async () => {
+    if (_hasCheckedThisSession) return false;
+    _hasCheckedThisSession = true;
+
     try {
       setIsLoading(true);
 
-      const cachedShouldShow = await loadString(REVIEW_MODAL_SHOULD_SHOW);
+      const data = await checkReviewEligibility();
 
-      if (cachedShouldShow === "false") {
-        logger.debug(
-          "Review modal should_show is cached as false, skipping RPC call"
-        );
-        return false;
-      }
+      const eventProps = {
+        transaction_count: data?.transactionCount,
+        milestone: data?.currentMilestone,
+        account_age_days: data?.accountAgeDays,
+        user_segment: data?.currentMilestone === 1 ? "new_user" : "established_user",
+      };
 
-      const data = await ReviewService.checkRatingModalEligibility();
-
-      if (data) {
-        await saveString(REVIEW_MODAL_SHOULD_SHOW, data.should_show.toString());
-
-        if (data.should_show) {
-          setEligibilityData(data);
-          setIsVisible(true);
-          return true;
-        }
+      if (data?.eligible) {
+        analytics.trackEvent("review_gate_eligible", eventProps);
+        setEligibilityData(data);
+        setIsVisible(true);
+        analytics.trackEvent("review_gate_shown", eventProps);
+        return true;
       }
 
       return false;

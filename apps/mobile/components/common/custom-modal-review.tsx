@@ -12,8 +12,11 @@ import { colors } from "@/theme/colors";
 import { translate } from "@/i18n";
 import { KeboCongratulation } from "@/components/icons/kebo-congratulation";
 import * as StoreReview from "expo-store-review";
-import { ReviewService } from "@/services/review-service";
+import { recordReviewAction, type ReviewEligibility } from "@/lib/api/hooks/use-reviews";
+import { AnalyticsService } from "@/services/analytics-service";
 import logger from "@/utils/logger";
+
+const analytics = new AnalyticsService();
 
 interface CustomModalReviewProps {
   visible: boolean;
@@ -23,6 +26,7 @@ interface CustomModalReviewProps {
   onCancel: () => void;
   confirmText?: string;
   cancelText?: string;
+  eligibilityData?: ReviewEligibility | null;
 }
 
 const CustomModalReview: React.FC<CustomModalReviewProps> = ({
@@ -33,60 +37,57 @@ const CustomModalReview: React.FC<CustomModalReviewProps> = ({
   onCancel,
   confirmText = translate("customModalReview:confirm"),
   cancelText = translate("customModalReview:cancel"),
+  eligibilityData,
 }) => {
+  const trackAction = useCallback(
+    (action: "rated" | "later" | "dismissed") => {
+      analytics.trackEvent("review_gate_action", {
+        action,
+        transaction_count: eligibilityData?.transactionCount,
+        milestone: eligibilityData?.currentMilestone,
+        account_age_days: eligibilityData?.accountAgeDays,
+        user_segment:
+          eligibilityData?.currentMilestone === 1
+            ? "new_user"
+            : "established_user",
+      });
+    },
+    [eligibilityData],
+  );
+
   const handleConfirm = useCallback(async () => {
     try {
-      const response = await ReviewService.handleRatingModalClick("love_it");
-
-      if (response?.success) {
-        logger.debug("Review action recorded:", response.message);
-      } else {
-        logger.error("Failed to record review action");
-      }
-
+      await recordReviewAction("rated");
+      trackAction("rated");
       await StoreReview.requestReview();
       onConfirm();
     } catch (error) {
       logger.error("Error requesting review:", error);
       onConfirm();
     }
-  }, [onConfirm]);
+  }, [onConfirm, trackAction]);
 
   const handleCancel = useCallback(async () => {
     try {
-      const response = await ReviewService.handleRatingModalClick(
-        "maybe_later"
-      );
-
-      if (response?.success) {
-        logger.debug("Review action recorded:", response.message);
-      } else {
-        logger.error("Failed to record review action");
-      }
-
+      await recordReviewAction("later");
+      trackAction("later");
       onCancel();
     } catch (error) {
       logger.error("Error handling cancel action:", error);
       onCancel();
     }
-  }, [onCancel]);
+  }, [onCancel, trackAction]);
 
   const handleClose = useCallback(async () => {
     try {
-      const response = await ReviewService.handleRatingModalClick("dismiss");
-
-      if (response?.success) {
-        logger.debug("Review action recorded:", response.message);
-      } else {
-        logger.error("Failed to record review action");
-      }
-
+      await recordReviewAction("dismissed");
+      trackAction("dismissed");
       onCancel();
     } catch (error) {
       logger.error("Error handling dismiss action:", error);
       onCancel();
     }
-  }, [onCancel]);
+  }, [onCancel, trackAction]);
 
   return (
     <Modal visible={visible} transparent animationType="fade">

@@ -471,16 +471,24 @@ const pt = {
   },
   budgetOnboarding: {
     welcome: "Olá {{name}}!",
-    slide1: {
-      text: "Com seu orçamento, você domina seu dinheiro como um profissional 🐨💰",
+    subtitle: "Vamos criar seu primeiro orçamento em poucos passos",
+    step1: {
+      title: "Nomeie seu orçamento",
+      description: "Dê um nome e escolha o período",
     },
-    slide2: {
-      text: "Te ajudamos a organizar sua grana pra alcançar seus objetivos. Bora lá 💝✨",
+    step2: {
+      title: "Escolha categorias",
+      description: "Selecione as categorias de gastos que quer acompanhar",
     },
-    buttons: {
-      next: "Próximo",
-      done: "Criar orçamento",
+    step3: {
+      title: "Defina valores",
+      description: "Decida quanto destinar para cada categoria",
     },
+    result: {
+      title: "Acompanhe seu progresso",
+      description: "Assim ficará o seu orçamento",
+    },
+    cta: "Criar meu primeiro orçamento",
   },
   modalAccount: {
     cash: "Dinheiro",

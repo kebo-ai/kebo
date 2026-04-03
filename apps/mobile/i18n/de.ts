@@ -474,16 +474,24 @@ const de: Translations = {
   },
   budgetOnboarding: {
     welcome: "Hallo {{name}}!",
-    slide1: {
-      text: "Mit einem Budget in der Hand \nhast du die Macht, dein \nGeld wie ein Profi zu verwalten 🐨💰",
+    subtitle: "Lass uns dein erstes Budget in wenigen Schritten erstellen",
+    step1: {
+      title: "Benenne dein Budget",
+      description: "Gib einen Namen ein und wähle einen Zeitraum",
     },
-    slide2: {
-      text: "Wir helfen dir, zu ordnen, was \ndu verdienst, ausgibst und sparst, damit du \ndeine Ziele erreichst! \nLos geht's 💝✨",
+    step2: {
+      title: "Wähle Kategorien",
+      description: "Wähle die Ausgabenkategorien, die du verfolgen möchtest",
     },
-    buttons: {
-      next: "Weiter",
-      done: "Budget erstellen",
+    step3: {
+      title: "Lege Beträge fest",
+      description: "Bestimme, wie viel du für jede Kategorie einplanen möchtest",
     },
+    result: {
+      title: "Verfolge deinen Fortschritt",
+      description: "So wird dein Budget aussehen",
+    },
+    cta: "Mein erstes Budget erstellen",
   },
   modalAccount: {
     cash: "Bargeld",

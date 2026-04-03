@@ -470,16 +470,24 @@ const fr: Translations = {
   },
   budgetOnboarding: {
     welcome: "Bonjour {{name}} !",
-    slide1: {
-      text: "Avec un budget en main, \nvous avez le pouvoir de gérer votre \nargent comme un pro 🐨💰",
+    subtitle: "Créons votre premier budget en quelques étapes",
+    step1: {
+      title: "Nommez votre budget",
+      description: "Donnez-lui un nom et choisissez une période",
     },
-    slide2: {
-      text: "Nous vous aidons à mettre de l'ordre dans ce que \nvous gagnez, dépensez et économisez, \npour atteindre vos objectifs ! \nAllons-y 💝✨",
+    step2: {
+      title: "Choisissez des catégories",
+      description: "Sélectionnez les catégories de dépenses à suivre",
     },
-    buttons: {
-      next: "Suivant",
-      done: "Créer un budget",
+    step3: {
+      title: "Définissez les montants",
+      description: "Décidez combien allouer à chaque catégorie",
     },
+    result: {
+      title: "Suivez votre progression",
+      description: "Voici à quoi ressemblera votre budget",
+    },
+    cta: "Créer mon premier budget",
   },
   modalAccount: {
     cash: "Espèces",

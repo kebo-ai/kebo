@@ -471,16 +471,24 @@ const es = {
   },
   budgetOnboarding: {
     welcome: "¡Hola {{name}}!",
-    slide1: {
-      text: "Con un presupuesto en mano, \ntienes el poder de manejar tu \ndinero como un pro 🐨💰",
+    subtitle: "Vamos a crear tu primer presupuesto en pocos pasos",
+    step1: {
+      title: "Nombra tu presupuesto",
+      description: "Dale un nombre y elige un periodo de tiempo",
     },
-    slide2: {
-      text: "Te ayudamos a ordenar lo que \nganas, gastas y ahorras, para que \ncumplas tus metas. ¡Vamos por ello! 💝✨",
+    step2: {
+      title: "Elige categorías",
+      description: "Selecciona las categorías de gasto que quieres controlar",
     },
-    buttons: {
-      next: "Siguiente",
-      done: "Crear presupuesto",
+    step3: {
+      title: "Asigna montos",
+      description: "Decide cuánto presupuestar para cada categoría",
     },
+    result: {
+      title: "Controla tu progreso",
+      description: "Así se verá tu presupuesto",
+    },
+    cta: "Crear mi primer presupuesto",
   },
   modalAccount: {
     cash: "Efectivo",

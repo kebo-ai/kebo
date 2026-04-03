@@ -466,16 +466,24 @@ const en = {
   },
   budgetOnboarding: {
     welcome: "Hello {{name}}!",
-    slide1: {
-      text: "With a budget in hand, \nyou have the power to manage your \nmoney like a pro 🐨💰",
+    subtitle: "Let's set up your first budget in a few steps",
+    step1: {
+      title: "Name your budget",
+      description: "Give it a name and pick a time period",
     },
-    slide2: {
-      text: "We help you put in order what \nyou earn, spend, and save, so you \ncan reach your goals! \nLet's go for it 💝✨",
+    step2: {
+      title: "Choose categories",
+      description: "Select the spending categories you want to track",
     },
-    buttons: {
-      next: "Next",
-      done: "Create budget",
+    step3: {
+      title: "Set amounts",
+      description: "Decide how much to budget for each category",
     },
+    result: {
+      title: "Track your progress",
+      description: "See your spending vs. budget at a glance",
+    },
+    cta: "Create my first budget",
   },
   modalAccount: {
     cash: "Cash",

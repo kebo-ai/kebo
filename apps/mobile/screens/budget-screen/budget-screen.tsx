@@ -1,5 +1,5 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from "react";
-import { Stack, useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
+import React, { FC, useCallback, useMemo, useState } from "react";
+import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
   TouchableOpacity,
@@ -17,32 +17,15 @@ import { translate } from "@/i18n";
 import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { CategoriesListBudget } from "@/components/common/categories-list-budget";
 import CustomBudgetCard from "@/components/common/custom-budget-card";
-import { budgetService } from "@/services/budget-service";
 import { CategoryItem } from "@/components/common/category-item";
-import { BudgetResponse } from "@/types/transaction";
 import type { Category } from "@/lib/api/types";
-import { useCategories } from "@/lib/api/hooks";
+import { useBudget, useCategories, useRemoveBudgetLine } from "@/lib/api/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/api/keys";
 import { showToast } from "@/components/ui/custom-toast";
 import * as Haptics from "expo-haptics";
-import moment from "moment";
-import "moment/locale/es";
-import i18n from "@/i18n/i18n";
 import { translateCategoryName } from "@/utils/category-translations";
 import logger from "@/utils/logger";
-
-const ensureValidMomentLocale = () => {
-  try {
-    const currentLocale = i18n.language?.split("-")[0] || "en";
-    if (!moment.localeData(currentLocale)) {
-      moment.locale("en");
-    } else {
-      moment.locale(currentLocale);
-    }
-  } catch (error) {
-    logger.warn("Error setting moment locale:", error);
-    moment.locale("en");
-  }
-};
 
 interface BudgetScreenProps {}
 
@@ -50,72 +33,28 @@ export const BudgetScreen: FC<BudgetScreenProps> =
   function BudgetScreen() {
     const router = useRouter();
     const { theme } = useTheme();
+    const queryClient = useQueryClient();
     const params = useLocalSearchParams<{
       budgetId: string;
       categoryId?: string;
     }>();
 
     const budgetId = params.budgetId;
-    const [budgetData, setBudgetData] = useState<BudgetResponse | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isRefreshing, setIsRefreshing] = useState(false);
+    const { data, isLoading } = useBudget(budgetId);
     const { data: categories = [] } = useCategories();
+    const removeLineMutation = useRemoveBudgetLine();
     const [openRow, setOpenRow] = useState<string | null>(null);
-    const hasLoadedRef = useRef(false);
-
-    useEffect(() => {
-      ensureValidMomentLocale();
-    }, []);
-
-    useEffect(() => {
-      if (!budgetId) {
-        logger.error("No budget ID provided");
-        router.back();
-        return;
-      }
-      loadBudget(true);
-    }, [budgetId]);
-
-    const loadBudget = async (isInitialLoad = false) => {
-      try {
-        if (isInitialLoad) {
-          setIsLoading(true);
-        } else {
-          setIsRefreshing(true);
-        }
-        ensureValidMomentLocale();
-
-        const data = await budgetService.getBudgetById(budgetId);
-        if (!data) {
-          logger.error("Budget not found");
-          router.back();
-          return;
-        }
-        setBudgetData(data);
-        hasLoadedRef.current = true;
-      } catch (error) {
-        logger.error("Error loading budget:", error);
-      } finally {
-        setIsLoading(false);
-        setIsRefreshing(false);
-      }
-    };
-
-    useFocusEffect(
-      useCallback(() => {
-        if (hasLoadedRef.current) {
-          loadBudget(false);
-        }
-      }, [budgetId])
-    );
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     const handleRefresh = useCallback(async () => {
-      await loadBudget(false);
-    }, [budgetId]);
+      setIsRefreshing(true);
+      await queryClient.refetchQueries({ queryKey: queryKeys.budgets.detail(budgetId) });
+      setIsRefreshing(false);
+    }, [budgetId, queryClient]);
 
     const handleCategorySelect = useCallback(
       (category: Category) => {
-        const isAlreadyAdded = budgetData?.budget_lines.some(
+        const isAlreadyAdded = data?.budget_lines.some(
           (line) => line.category_id === category.id
         );
         if (isAlreadyAdded) {
@@ -130,7 +69,7 @@ export const BudgetScreen: FC<BudgetScreenProps> =
           },
         });
       },
-      [budgetData, budgetId, router]
+      [data, budgetId, router]
     );
 
     const navigateToNewCategory = useCallback(() => {
@@ -144,23 +83,20 @@ export const BudgetScreen: FC<BudgetScreenProps> =
 
     const handleDeleteCategory = useCallback(
       async (categoryId: string) => {
+        if (!data) return;
         try {
-          const success = await budgetService.removeBudgetCategory(
+          await removeLineMutation.mutateAsync({
             budgetId,
-            categoryId
-          );
-          if (success) {
-            showToast("success", translate("budgetScreen:categoryRemoved"));
-            loadBudget(false);
-          } else {
-            showToast("error", translate("budgetScreen:errorRemovingCategory"));
-          }
+            categoryId,
+            currentBudget: data,
+          });
+          showToast("success", translate("budgetScreen:categoryRemoved"));
         } catch (error) {
           logger.error("Error deleting category:", error);
           showToast("error", translate("budgetScreen:errorRemovingCategory"));
         }
       },
-      [budgetId]
+      [budgetId, data, removeLineMutation]
     );
 
     const handleConfirmDeleteCategory = useCallback((categoryId: string) => {
@@ -203,45 +139,55 @@ export const BudgetScreen: FC<BudgetScreenProps> =
     }, [router, budgetId]);
 
     const handleEditPress = useCallback(() => {
+      if (!data) return;
       router.push({
         pathname: "/(authenticated)/budget/new",
         params: {
           isEditing: "true",
           budgetId: budgetId,
           budgetData: JSON.stringify({
-            custom_name: budgetData?.budget.custom_name,
-            start_date: parseDate(
-              budgetData?.budget.start_date || ""
-            ).toISOString(),
-            end_date: parseDate(
-              budgetData?.budget.end_date || ""
-            ).toISOString(),
+            custom_name: data.custom_name,
+            start_date: new Date(data.start_date).toISOString(),
+            end_date: new Date(data.end_date).toISOString(),
           }),
         },
       });
-    }, [router, budgetId, budgetData]);
+    }, [router, budgetId, data]);
 
-    const parseDate = (dateString: string) => {
-      try {
-        ensureValidMomentLocale();
+    const budgetCard = useMemo(() => {
+      if (!data) return null;
+      return {
+        budget: {
+          custom_name: data.custom_name || "",
+          start_date: data.start_date,
+          end_date: data.end_date,
+        },
+        total_metrics: {
+          total_budget: Number(data.total_metrics.total_budget),
+          total_spent: Number(data.total_metrics.total_spent),
+          total_remaining: Number(data.total_metrics.total_remaining),
+          overall_progress_percentage: Number(data.total_metrics.overall_progress_percentage),
+        },
+      };
+    }, [data]);
 
-        const parsedDate = moment(dateString, "DD/MM/YYYY");
-        if (parsedDate.isValid()) {
-          return parsedDate.toDate();
-        }
-
-        const isoDate = moment(dateString);
-        if (isoDate.isValid()) {
-          return isoDate.toDate();
-        }
-
-        logger.warn("Invalid date format:", dateString);
-        return new Date();
-      } catch (error) {
-        logger.warn("Error parsing date:", error);
-        return new Date();
-      }
-    };
+    const budgetLines = useMemo(() => {
+      if (!data) return [];
+      return data.budget_lines
+        .map((line) => ({
+          id: line.id,
+          category_id: line.category_id,
+          category_name: line.category_name || "",
+          icon_url: line.icon_url || "",
+          icon_emoji: line.icon_emoji || null,
+          color_id: line.color_id || null,
+          amount: Number(line.amount),
+          spent_amount: Number(line.spent_amount || 0),
+          remaining_amount: Number(line.remaining_amount || 0),
+          progress_percentage: Number(line.progress_percentage || 0),
+        }))
+        .sort((a, b) => b.id.localeCompare(a.id));
+    }, [data]);
 
     const headerOptions = {
       ...standardHeader(theme),
@@ -250,11 +196,11 @@ export const BudgetScreen: FC<BudgetScreenProps> =
       headerBackTitle: translate("budgetScreen:budget"),
     };
 
-    const availableCategories = budgetData
+    const availableCategories = data
       ? categories.filter(
           (category) =>
             category.type === "Expense" &&
-            !budgetData.budget_lines.some(
+            !data.budget_lines.some(
               (line) => line.category_id === category.id
             )
         )
@@ -267,7 +213,7 @@ export const BudgetScreen: FC<BudgetScreenProps> =
           <View style={tw`flex-1 items-center justify-center`}>
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
-        ) : !budgetData ? (
+        ) : !data ? (
           <View style={tw`flex-1 items-center justify-center`}>
             <KeboSadIconSvg width={50} height={50} />
             <Text color={theme.textSecondary} style={tw`mt-2`}>
@@ -284,16 +230,7 @@ export const BudgetScreen: FC<BudgetScreenProps> =
         >
           <View style={tw`px-4 py-4`}>
             <CustomBudgetCard
-              budget={{
-                budget: {
-                  custom_name: budgetData.budget.custom_name,
-                  start_date: parseDate(
-                    budgetData.budget.start_date
-                  ).toISOString(),
-                  end_date: parseDate(budgetData.budget.end_date).toISOString(),
-                },
-                total_metrics: budgetData.total_metrics,
-              }}
+              budget={budgetCard!}
               onEditPress={handleEditPress}
             />
             <View style={tw`mt-4`}>
@@ -345,7 +282,7 @@ export const BudgetScreen: FC<BudgetScreenProps> =
             <View
               style={tw`py-2 bg-[${theme.surface}] border border-[${theme.border}] rounded-[20px] mt-4`}
             >
-              {budgetData.budget_lines.length === 0 ? (
+              {budgetLines.length === 0 ? (
                 <View style={tw`items-center py-8`}>
                   <KeboSadIconSvg width={50} height={50} />
                   <Text color={theme.textSecondary} style={tw`text-center mt-2`}>
@@ -355,9 +292,7 @@ export const BudgetScreen: FC<BudgetScreenProps> =
               ) : (
                 <View>
                   <CategoriesListBudget
-                    data={budgetData.budget_lines.sort((a, b) => {
-                      return b.id.localeCompare(a.id);
-                    })}
+                    data={budgetLines}
                     onCategoryPress={handleCategoryPress}
                     onConfirmDelete={handleConfirmDeleteCategory}
                     onRowOpen={onRowOpen}

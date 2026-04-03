@@ -1,8 +1,9 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi"
-import { and, eq } from "drizzle-orm"
+import { and, eq, inArray } from "drizzle-orm"
 import { authMiddleware } from "@/middleware"
 import { TransactionService } from "@/services"
-import { accounts } from "@/db/schema"
+import { CategorizeService } from "@/services/categorize.service"
+import { accounts, categories, banks } from "@/db/schema"
 import type { AppEnv } from "@/types/env"
 
 const QuickTransactionSchema = z.object({
@@ -15,6 +16,8 @@ const QuickTransactionSchema = z.object({
   currency: z.string().length(3).default("USD"),
   merchant: z.string().min(1).max(500),
   date: z.string().datetime().optional(),
+  transaction_name: z.string().max(500).optional(),
+  card_name: z.string().max(500).optional(),
 })
 
 const quickCreateRoute = createRoute({
@@ -23,7 +26,7 @@ const quickCreateRoute = createRoute({
   tags: ["Transactions"],
   summary: "Quick-create a transaction from Apple Pay Shortcut",
   description:
-    "Minimal endpoint for the iOS Shortcuts automation. Finds the user's default account and creates an expense.",
+    "Endpoint for iOS Shortcuts automation. Auto-categorizes using AI and picks the best account.",
   security: [{ Bearer: [] }],
   request: {
     body: {
@@ -45,53 +48,116 @@ const app = base.openapi(quickCreateRoute, async (c) => {
   const db = c.get("db")
   const body = c.req.valid("json")
 
-  // Find user's default account, fallback to first non-deleted account
-  const [account] = await db
-    .select({ id: accounts.id })
-    .from(accounts)
-    .where(
-      and(
-        eq(accounts.user_id, userId),
-        eq(accounts.is_deleted, false),
-        eq(accounts.is_default, true),
+  // Fetch categories and accounts in parallel
+  const [userCategories, userAccounts] = await Promise.all([
+    db
+      .select({
+        id: categories.id,
+        name: categories.name,
+        icon_emoji: categories.icon_emoji,
+      })
+      .from(categories)
+      .where(
+        and(
+          eq(categories.user_id, userId),
+          eq(categories.is_deleted, false),
+          eq(categories.type, "Expense"),
+        ),
       ),
+    db
+      .select({
+        id: accounts.id,
+        name: accounts.name,
+        is_default: accounts.is_default,
+        bank_id: accounts.bank_id,
+      })
+      .from(accounts)
+      .where(
+        and(eq(accounts.user_id, userId), eq(accounts.is_deleted, false)),
+      ),
+  ])
+
+  if (userAccounts.length === 0) {
+    return c.json(
+      { error: "No account found. Please create an account first." },
+      404,
     )
-    .limit(1)
+  }
 
-  const targetAccount = account
-    ? account
-    : (
-        await db
-          .select({ id: accounts.id })
-          .from(accounts)
-          .where(
-            and(
-              eq(accounts.user_id, userId),
-              eq(accounts.is_deleted, false),
-            ),
-          )
-          .limit(1)
-      )[0]
+  // Resolve bank names
+  const bankIds = [...new Set(userAccounts.map((a) => a.bank_id))]
+  const bankRows =
+    bankIds.length > 0
+      ? await db
+          .select({ id: banks.id, name: banks.name })
+          .from(banks)
+          .where(inArray(banks.id, bankIds))
+      : []
+  const bankMap = new Map(bankRows.map((b) => [b.id, b.name]))
 
-  if (!targetAccount) {
-    return c.json({ error: "No account found. Please create an account first." }, 404)
+  const accountsWithBanks = userAccounts.map((a) => ({
+    ...a,
+    bank_name: bankMap.get(a.bank_id) ?? null,
+  }))
+  const defaultAccount =
+    accountsWithBanks.find((a) => a.is_default) || accountsWithBanks[0]
+
+  // AI categorization
+  let categoryId: string | undefined
+  let accountId = defaultAccount.id
+  let description = body.merchant
+  let categorized = false
+
+  if (c.env.AI_GATEWAY_API_KEY && userCategories.length > 0) {
+    const service = new CategorizeService(c.env.AI_GATEWAY_API_KEY)
+    const result = await service.categorize({
+      merchant: body.merchant,
+      transactionName: body.transaction_name,
+      cardName: body.card_name,
+      amount: body.amount,
+      currency: body.currency,
+      categories: userCategories.map((cat) => ({
+        id: cat.id,
+        name: cat.name ?? "",
+        icon_emoji: cat.icon_emoji,
+      })),
+      accounts: accountsWithBanks.map((a) => ({
+        id: a.id,
+        name: a.name,
+        bank_name: a.bank_name,
+      })),
+    })
+
+    if (result) {
+      categoryId = result.category_id
+      description = result.description || body.merchant
+      const accValid = accountsWithBanks.some(
+        (a) => a.id === result.account_id,
+      )
+      accountId = accValid ? result.account_id : defaultAccount.id
+      categorized = true
+    }
   }
 
   const transaction = await TransactionService.create(db, userId, {
-    account_id: targetAccount.id,
+    account_id: accountId,
     transaction_type: "Expense",
     amount: body.amount,
     currency: body.currency,
-    description: body.merchant,
+    description,
+    category_id: categoryId,
     date: body.date ? new Date(body.date) : new Date(),
     metadata: {
       source: "apple_pay_shortcut",
       merchant: body.merchant,
+      transaction_name: body.transaction_name,
+      card_name: body.card_name,
       pending: true,
+      categorized,
     },
   })
 
-  return c.json({ id: transaction.id, status: "ok" }, 201)
+  return c.json({ id: transaction.id, status: "ok", categorized }, 201)
 })
 
 export default app

@@ -1,4 +1,5 @@
 export { AIService } from "./ai.service"
+export { CategorizeService } from "./categorize.service"
 export { BudgetService } from "./budget.service"
 export { EmbeddingService } from "./embedding.service"
 export { ReportService } from "./report.service"

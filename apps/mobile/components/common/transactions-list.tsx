@@ -35,16 +35,16 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   const currentLocale = i18n.language.split("-")[0];
 
   const formatDate = (date: string) => {
-    const today = moment().startOf("day");
-    const transactionDate = moment(date).startOf("day");
-    const yesterday = moment().subtract(1, "days").startOf("day");
+    const today = moment.utc().startOf("day");
+    const transactionDate = moment.utc(date).startOf("day");
+    const yesterday = moment.utc().subtract(1, "days").startOf("day");
 
     if (transactionDate.isSame(today)) {
       return translate("homeScreen:today");
     } else if (transactionDate.isSame(yesterday)) {
       return translate("homeScreen:yesterday");
     } else {
-      return moment(date)
+      return moment.utc(date)
         .locale(currentLocale)
         .format("MMM DD")
         .replace(/^\w/, (c) => c.toUpperCase());

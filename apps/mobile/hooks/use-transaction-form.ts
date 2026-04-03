@@ -84,10 +84,11 @@ export const useTransactionForm = (navigation: any) => {
         );
 
         // Capture mutation data before navigation/reset
-        // API expects ISO 8601 datetime — combine selected date with current time
+        // API expects ISO 8601 datetime — use UTC midnight for the selected date
+        // to avoid timezone shifts (e.g. UTC+2 user picking April 12 at 1AM → April 11 in UTC)
         const apiDate = selectedDateMoment.isValid()
-          ? moment(selectedDateMoment.format("YYYY-MM-DD") + "T" + now.format("HH:mm:ss.SSSZ")).toISOString()
-          : now.toISOString();
+          ? moment.utc(selectedDateMoment.format("YYYY-MM-DD")).toISOString()
+          : moment.utc(now.format("YYYY-MM-DD")).toISOString();
         const isTransfer = transactionModel.transaction_type === "Transfer";
         const mutationData = isTransfer
           ? {

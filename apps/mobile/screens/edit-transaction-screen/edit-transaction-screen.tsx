@@ -147,14 +147,9 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
           let formattedDate;
 
           if (selectedDateMoment.isValid()) {
-            formattedDate = originalDate
-              .clone()
-              .year(selectedDateMoment.year())
-              .month(selectedDateMoment.month())
-              .date(selectedDateMoment.date())
-              .toISOString();
+            formattedDate = moment.utc(selectedDateMoment.format("YYYY-MM-DD")).toISOString();
           } else {
-            formattedDate = originalDate.toISOString();
+            formattedDate = moment.utc(originalDate.format("YYYY-MM-DD")).toISOString();
           }
 
           await updateTransactionMutation.mutateAsync({
@@ -226,7 +221,7 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
           formik.setValues({
             account: transaction.account_id || "",
             date: transaction.date,
-            displayDate: moment(transaction.date)
+            displayDate: moment.utc(transaction.date)
               .locale(currentLocale)
               .format("dddd, D MMMM")
               .replace(/^\w/, (c) => c.toUpperCase()),

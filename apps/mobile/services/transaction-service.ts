@@ -161,7 +161,7 @@ export class TransactionService {
     );
 
     return sortedData.reduce((acc: any[], transaction: any) => {
-      const date = moment(transaction.date);
+      const date = moment.utc(transaction.date);
       const month = date.format("MMMM");
       const year = date.format("YYYY");
       const monthYear = `${

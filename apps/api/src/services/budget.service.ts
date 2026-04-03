@@ -120,7 +120,9 @@ export class BudgetService {
         return {
           ...line,
           category_name: line.category?.name,
+          icon_url: line.category?.icon_url,
           icon_emoji: line.category?.icon_emoji,
+          color_id: line.category?.color_id,
           spent_amount: spentAmount,
           remaining_amount: (allocatedAmount - spent).toFixed(2),
           progress_percentage:
@@ -190,8 +192,8 @@ export class BudgetService {
 
         budgetId = updated.id
 
-        // Only replace lines if new ones are provided
-        if (params.budget_lines && params.budget_lines.length > 0) {
+        // Only replace lines if budget_lines is explicitly provided
+        if (params.budget_lines !== undefined) {
           await tx.delete(budgetLines).where(eq(budgetLines.budget_id, budgetId))
         }
       } else {
@@ -212,7 +214,7 @@ export class BudgetService {
         budgetId = created.id
       }
 
-      // Insert budget lines
+      // Insert budget lines (only if provided and non-empty)
       if (params.budget_lines && params.budget_lines.length > 0) {
         await tx.insert(budgetLines).values(
           params.budget_lines.map((line) => ({

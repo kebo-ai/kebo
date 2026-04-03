@@ -67,8 +67,7 @@ export const upsertBudgetSchema = z.object({
           .transform((val) => String(val)),
       }),
     )
-    .optional()
-    .default([]),
+    .optional(),
 })
 
 export type Budget = typeof budgets.$inferSelect

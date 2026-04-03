@@ -167,7 +167,7 @@ export const NewBudgetScreen: React.FC<NewBudgetScreenProps> = () => {
   useEffect(() => {
     if (isEditing && budgetData) {
       formik.setValues({
-        name: `${translate("newBudgetScreen:budget")} ${translatedMonth}`,
+        name: budgetData.custom_name || `${translate("newBudgetScreen:budget")} ${translatedMonth}`,
         startDate: new Date(budgetData.start_date),
         endDate: new Date(budgetData.end_date),
       });

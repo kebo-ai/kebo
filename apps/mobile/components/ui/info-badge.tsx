@@ -14,6 +14,8 @@ interface InfoBadgeProps {
   message: string;
   /** Optional dismiss button text */
   dismissLabel?: string;
+  /** Called when the modal is dismissed */
+  onDismiss?: () => void;
 }
 
 export function InfoBadge({
@@ -21,9 +23,15 @@ export function InfoBadge({
   title,
   message,
   dismissLabel = "OK",
+  onDismiss,
 }: InfoBadgeProps) {
   const { theme } = useTheme();
   const [visible, setVisible] = useState(false);
+
+  const handleDismiss = () => {
+    setVisible(false);
+    onDismiss?.();
+  };
 
   return (
     <>
@@ -46,11 +54,11 @@ export function InfoBadge({
         visible={visible}
         transparent
         animationType="fade"
-        onRequestClose={() => setVisible(false)}
+        onRequestClose={handleDismiss}
       >
         <Pressable
           style={styles.backdrop}
-          onPress={() => setVisible(false)}
+          onPress={handleDismiss}
         >
           <View
             style={[
@@ -73,7 +81,7 @@ export function InfoBadge({
             </Text>
 
             <Pressable
-              onPress={() => setVisible(false)}
+              onPress={handleDismiss}
               style={[
                 styles.dismissButton,
                 { backgroundColor: colors.primary },

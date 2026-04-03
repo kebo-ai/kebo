@@ -43,13 +43,16 @@ const quickCreateRoute = createRoute({
 const base = new OpenAPIHono<AppEnv>()
 base.use("/*", authMiddleware)
 
-// Log validation errors for debugging
-base.onError((err, c) => {
-  console.error("[quick-transaction] error:", err.message)
-  return c.json({ error: err.message }, 400)
+// Log raw request body for debugging
+base.use("/*", async (c, next) => {
+  const raw = await c.req.raw.clone().text()
+  console.log("[quick-transaction] raw body:", raw)
+  await next()
 })
 
-const app = base.openapi(quickCreateRoute, async (c) => {
+const app = base.openapi(
+  quickCreateRoute,
+  async (c) => {
   const userId = c.get("userId")
   const db = c.get("db")
   const body = c.req.valid("json")
@@ -164,6 +167,13 @@ const app = base.openapi(quickCreateRoute, async (c) => {
   })
 
   return c.json({ id: transaction.id, status: "ok", categorized }, 201)
-})
+},
+  (result, c) => {
+    if (!result.success) {
+      console.error("[quick-transaction] validation error:", JSON.stringify(result.error.flatten()))
+      return c.json({ error: result.error.flatten() }, 400)
+    }
+  },
+)
 
 export default app

@@ -52,7 +52,8 @@ export const upsertBudgetSchema = z.object({
   custom_name: z.string().max(100).optional(),
   budget_amount: z
     .union([z.string(), z.number()])
-    .transform((val) => String(val)),
+    .transform((val) => String(val))
+    .optional(),
   start_date: z.string(),
   end_date: z.string(),
   is_active: z.boolean().optional().default(true),

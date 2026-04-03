@@ -166,17 +166,21 @@ export class BudgetService {
 
       if (params.id) {
         // Update existing budget
+        const updateData: Record<string, unknown> = {
+          custom_name: params.custom_name,
+          start_date: params.start_date,
+          end_date: params.end_date,
+          is_active: params.is_active,
+          is_recurrent: params.is_recurrent,
+          updated_at: new Date(),
+        }
+        if (params.budget_amount !== undefined) {
+          updateData.budget_amount = params.budget_amount
+        }
+
         const [updated] = await tx
           .update(budgets)
-          .set({
-            custom_name: params.custom_name,
-            budget_amount: params.budget_amount,
-            start_date: params.start_date,
-            end_date: params.end_date,
-            is_active: params.is_active,
-            is_recurrent: params.is_recurrent,
-            updated_at: new Date(),
-          })
+          .set(updateData)
           .where(and(eq(budgets.id, params.id), eq(budgets.user_id, userId)))
           .returning()
 
@@ -186,8 +190,10 @@ export class BudgetService {
 
         budgetId = updated.id
 
-        // Delete existing lines
-        await tx.delete(budgetLines).where(eq(budgetLines.budget_id, budgetId))
+        // Only replace lines if new ones are provided
+        if (params.budget_lines && params.budget_lines.length > 0) {
+          await tx.delete(budgetLines).where(eq(budgetLines.budget_id, budgetId))
+        }
       } else {
         // Create new budget
         const [created] = await tx

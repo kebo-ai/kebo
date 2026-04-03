@@ -9,6 +9,7 @@ export interface Env {
   ENVIRONMENT: "development" | "staging" | "production"
   // AI-related variables
   AI_GATEWAY_API_KEY: string
+  GROQ_API_KEY: string
   ADMIN_API_KEY: string
   // Upstash Redis
   UPSTASH_REDIS_REST_URL: string

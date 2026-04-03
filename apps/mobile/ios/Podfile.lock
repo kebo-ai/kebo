@@ -9,6 +9,8 @@ PODS:
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
+  - ApplePayIntent (1.1.0):
+    - ExpoModulesCore
   - EASClient (1.0.8):
     - ExpoModulesCore
   - EXApplication (7.0.8):
@@ -2483,6 +2485,7 @@ PODS:
   - Yoga (0.0.0)
 
 DEPENDENCIES:
+  - ApplePayIntent (from `../modules/apple-pay-intent/ios`)
   - EASClient (from `../../../node_modules/expo-eas-client/ios`)
   - EXApplication (from `../../../node_modules/expo-application/ios`)
   - EXConstants (from `../../../node_modules/expo-constants/ios`)
@@ -2616,6 +2619,8 @@ SPEC REPOS:
     - ReachabilitySwift
 
 EXTERNAL SOURCES:
+  ApplePayIntent:
+    :path: "../modules/apple-pay-intent/ios"
   EASClient:
     :path: "../../../node_modules/expo-eas-client/ios"
   EXApplication:
@@ -2855,6 +2860,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
+  ApplePayIntent: fcdfbad9f12a38b69456260fd3df1b7ce3ff6c21
   EASClient: 40dd9e740684782610c49becab2643782ea1a20c
   EXApplication: 1e98d4b1dccdf30627f92917f4b2c5a53c330e5f
   EXConstants: fce59a631a06c4151602843667f7cfe35f81e271

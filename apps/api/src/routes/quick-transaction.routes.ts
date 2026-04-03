@@ -15,7 +15,7 @@ const QuickTransactionSchema = z.object({
     }),
   currency: z.string().length(3).default("USD"),
   merchant: z.string().min(1).max(500),
-  date: z.string().datetime().optional(),
+  date: z.string().optional(),
   transaction_name: z.string().max(500).optional(),
   card_name: z.string().max(500).optional(),
 })
@@ -42,6 +42,12 @@ const quickCreateRoute = createRoute({
 
 const base = new OpenAPIHono<AppEnv>()
 base.use("/*", authMiddleware)
+
+// Log validation errors for debugging
+base.onError((err, c) => {
+  console.error("[quick-transaction] error:", err.message)
+  return c.json({ error: err.message }, 400)
+})
 
 const app = base.openapi(quickCreateRoute, async (c) => {
   const userId = c.get("userId")

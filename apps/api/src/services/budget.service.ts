@@ -3,6 +3,13 @@ import type { DrizzleClient } from "@/db"
 import type { UpsertBudgetInput } from "@/db/schema"
 import { budgetLines, budgets, transactions } from "@/db/schema"
 
+/** Set time to 23:59:59.999 so BETWEEN includes the full end date */
+function endOfDay(date: Date): Date {
+  const d = new Date(date)
+  d.setHours(23, 59, 59, 999)
+  return d
+}
+
 export class BudgetService {
   static async list(db: DrizzleClient, userId: string) {
     const budgetList = await db.query.budgets.findMany({
@@ -24,7 +31,7 @@ export class BudgetService {
         const startDate = budget.start_date
           ? new Date(budget.start_date)
           : new Date()
-        const endDate = budget.end_date ? new Date(budget.end_date) : new Date()
+        const endDate = endOfDay(budget.end_date ? new Date(budget.end_date) : new Date())
 
         if (budget.lines.length === 0) {
           return {
@@ -98,7 +105,7 @@ export class BudgetService {
         const startDate = budget.start_date
           ? new Date(budget.start_date)
           : new Date()
-        const endDate = budget.end_date ? new Date(budget.end_date) : new Date()
+        const endDate = endOfDay(budget.end_date ? new Date(budget.end_date) : new Date())
 
         const [spentResult] = await db
           .select({ total: sum(transactions.amount) })
@@ -287,7 +294,7 @@ export class BudgetService {
     const startDate = budget.start_date
       ? new Date(budget.start_date)
       : new Date()
-    const endDate = budget.end_date ? new Date(budget.end_date) : new Date()
+    const endDate = endOfDay(budget.end_date ? new Date(budget.end_date) : new Date())
 
     // Get transactions for this category within budget period
     const categoryTransactions = await db

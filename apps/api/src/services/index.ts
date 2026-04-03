@@ -1,5 +1,7 @@
 export { AIService } from "./ai.service"
 export { CategorizeService } from "./categorize.service"
+export { fetchUserFinancialContext } from "./user-context.service"
+export type { UserFinancialContext } from "./user-context.service"
 export { BudgetService } from "./budget.service"
 export { EmbeddingService } from "./embedding.service"
 export { ReportService } from "./report.service"

@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { generateText, Output } from "ai"
-import { createGateway } from "@ai-sdk/gateway"
+import { createGroq } from "@ai-sdk/groq"
+import type { UserFinancialContext } from "./user-context.service"
 
 const categorizeOutputSchema = z.object({
   category_id: z.string().describe("The ID of the best matching category"),
@@ -18,20 +19,22 @@ export type CategorizeInput = {
   cardName?: string
   amount: string
   currency: string
-  categories: Array<{ id: string; name: string; icon_emoji: string | null }>
-  accounts: Array<{ id: string; name: string; bank_name: string | null }>
 }
 
 export type CategorizeOutput = z.infer<typeof categorizeOutputSchema>
 
-function buildPrompt(input: CategorizeInput): string {
-  const categoryList = input.categories
+function buildPrompt(
+  input: CategorizeInput,
+  ctx: UserFinancialContext,
+): string {
+  const categoryList = ctx.categories
     .map((c) => `- ${c.icon_emoji || "•"} ${c.name} (id: ${c.id})`)
     .join("\n")
 
-  const accountList = input.accounts
+  const accountList = ctx.accounts
     .map(
-      (a) => `- ${a.name}${a.bank_name ? ` - ${a.bank_name}` : ""} (id: ${a.id})`,
+      (a) =>
+        `- ${a.name}${a.bank_name ? ` - ${a.bank_name}` : ""}${a.is_default ? " (default)" : ""} (id: ${a.id})`,
     )
     .join("\n")
 
@@ -58,21 +61,26 @@ Rules:
 }
 
 export class CategorizeService {
-  private gateway
+  private groq
 
-  constructor(apiKey: string) {
-    this.gateway = createGateway({ apiKey })
+  constructor(groqApiKey: string) {
+    this.groq = createGroq({ apiKey: groqApiKey })
   }
 
-  async categorize(input: CategorizeInput): Promise<CategorizeOutput | null> {
+  async categorize(
+    input: CategorizeInput,
+    ctx: UserFinancialContext,
+  ): Promise<CategorizeOutput | null> {
+    if (ctx.categories.length === 0) return null
+
     try {
       const abortController = new AbortController()
       const timeout = setTimeout(() => abortController.abort(), 4000)
 
       const { output } = await generateText({
-        model: this.gateway("openai/gpt-oss-20b"),
+        model: this.groq("openai/gpt-oss-20b"),
         output: Output.object({ schema: categorizeOutputSchema }),
-        prompt: buildPrompt(input),
+        prompt: buildPrompt(input, ctx),
         abortSignal: abortController.signal,
       })
 

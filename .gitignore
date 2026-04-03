@@ -64,3 +64,5 @@ build/
 
 kebo-supabase
 .vercel
+
+apps/mobile/APP_STORE_COPY.md

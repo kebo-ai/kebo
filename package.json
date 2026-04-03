@@ -27,7 +27,9 @@
     "supabase:diff": "supabase db diff",
     "supabase:push": "supabase db push",
     "db:seed": "bun run --cwd apps/api db:seed",
-    "tools": "bun run --cwd apps/tools"
+    "tools": "bun run --cwd apps/tools",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
@@ -36,6 +38,9 @@
   },
   "packageManager": "bun@1.1.38",
   "dependencies": {
-    "posthog-react-native-session-replay": "^1.5.1"
+    "posthog-react-native-session-replay": "^1.5.1",
+    "expo": "~54.0.33",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
   }
 }

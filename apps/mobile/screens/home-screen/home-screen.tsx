@@ -631,7 +631,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     } catch (error) {
       logger.debug("Analytics error:", error);
     }
-    router.push("/(authenticated)/profile");
+    router.navigate("/(authenticated)/profile");
   }, [router]);
 
   const navigateToTransaction = useCallback(

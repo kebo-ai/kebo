@@ -8,6 +8,7 @@ function withAppIntentsLocalization(config, { locales }) {
     const projectName = mod.modRequest.projectName;
     const iosDir = path.join(mod.modRequest.platformProjectRoot, projectName);
 
+    // Ensure all locale directories and files exist
     for (const locale of locales) {
       const lprojDir = path.join(iosDir, `${locale}.lproj`);
       const stringsFile = path.join(lprojDir, "AppIntents.strings");
@@ -15,22 +16,27 @@ function withAppIntentsLocalization(config, { locales }) {
       if (!fs.existsSync(lprojDir)) fs.mkdirSync(lprojDir, { recursive: true });
       if (!fs.existsSync(stringsFile)) fs.writeFileSync(stringsFile, "");
 
-      // Add variant group reference if not already present
-      const groupKey = project.findPBXVariantGroupKey({ name: "AppIntents.strings" });
-      if (!groupKey) {
-        project.addKnownRegion(locale);
-        project.addResourceFile(
-          `${projectName}/${locale}.lproj/AppIntents.strings`,
-          { variantGroup: true },
-          project.getFirstTarget().uuid
-        );
-      } else {
-        project.addKnownRegion(locale);
-        project.addResourceFile(
-          `${projectName}/${locale}.lproj/AppIntents.strings`,
-          { variantGroup: true },
-          project.getFirstTarget().uuid
-        );
+      project.addKnownRegion(locale);
+    }
+
+    // Add the first locale file as a resource to create the variant group
+    const firstLocale = locales[0];
+    const firstFilePath = `${projectName}/${firstLocale}.lproj/AppIntents.strings`;
+    const targetUuid = project.getFirstTarget().uuid;
+
+    try {
+      project.addResourceFile(firstFilePath, { variantGroup: true }, targetUuid);
+    } catch {
+      // File may already exist in the project
+    }
+
+    // Add remaining locales to the variant group
+    for (let i = 1; i < locales.length; i++) {
+      const filePath = `${projectName}/${locales[i]}.lproj/AppIntents.strings`;
+      try {
+        project.addResourceFile(filePath, { variantGroup: true }, targetUuid);
+      } catch {
+        // File may already exist in the project
       }
     }
 

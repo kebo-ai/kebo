@@ -115,6 +115,9 @@ const hi: Translations = {
     discord: "Discord",
     legal: "कानूनी",
     dangerZone: "खतरे का क्षेत्र",
+    dailyReminder: "दैनिक अनुस्मारक",
+    reminderTime: "अनुस्मारक समय",
+    notifications: "सूचनाएं",
   },
   chatbotScreen: {
     errorSesion: "सत्र त्रुटि",

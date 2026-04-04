@@ -116,6 +116,9 @@ const de: Translations = {
     discord: "Discord",
     legal: "Rechtliches",
     dangerZone: "Gefahrenzone",
+    dailyReminder: "Tägliche Erinnerung",
+    reminderTime: "Erinnerungszeit",
+    notifications: "Benachrichtigungen",
   },
 
   chatbotScreen: {

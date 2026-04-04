@@ -116,6 +116,9 @@ const en = {
     legal: "Legal",
     dangerZone: "Danger Zone",
     numberFormat: "Number Format",
+    dailyReminder: "Daily reminder",
+    reminderTime: "Reminder time",
+    notifications: "Notifications",
   },
   chatbotScreen: {
     errorSesion: "Session Error",

@@ -114,6 +114,9 @@ const zh: Translations = {
     discord: "Discord",
     legal: "法律信息",
     dangerZone: "危险区域",
+    dailyReminder: "每日提醒",
+    reminderTime: "提醒时间",
+    notifications: "通知",
   },
   chatbotScreen: {
     errorSesion: "会话错误",

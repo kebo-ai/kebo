@@ -9,6 +9,7 @@ import i18n from "@/i18n/i18n";
 import { runInAction } from "mobx";
 import { useCreateTransaction, useCreateTransfer } from "@/lib/api/hooks";
 import { resetReviewEligibility } from "@/hooks/use-review-modal";
+import { sendImmediateNotification } from "@/hooks/use-notifications";
 
 type TransactionSuccessMessages = {
   [key in TransactionType]: TxKeyPath;
@@ -126,6 +127,7 @@ export const useTransactionForm = (navigation: any) => {
         navigation.navigate("Home", { transactionCreated: true });
         resetForm();
         showToast("success", successMessage);
+        sendImmediateNotification("Kebo", successMessage);
 
         runInAction(() => {
           transactionModel.updateField("amount", 0);

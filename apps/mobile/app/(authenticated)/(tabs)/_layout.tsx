@@ -1,4 +1,4 @@
-import { NativeTabs, Icon, Label } from "expo-router/unstable-native-tabs";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { colors } from "@/theme/colors";
 import { translate } from "@/i18n";
 import { useEffect } from "react";
@@ -44,24 +44,24 @@ export default function TabsLayout() {
       disableTransparentOnScrollEdge={true}
     >
       <NativeTabs.Trigger name="home">
-        <Label>{translate("navigator:home")}</Label>
-        <Icon src={tabIcons.home} />
+        <NativeTabs.Trigger.Label>{translate("navigator:home")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon src={tabIcons.home} renderingMode="original" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="budgets">
-        <Label>{translate("navigator:budget")}</Label>
-        <Icon src={tabIcons.budget} />
+        <NativeTabs.Trigger.Label>{translate("navigator:budget")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon src={tabIcons.budget} renderingMode="original" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="chatbot">
-        <Label>{translate("navigator:chatbot")}</Label>
-        <Icon src={tabIcons.chatbot} />
+        <NativeTabs.Trigger.Label>{translate("navigator:chatbot")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon src={tabIcons.chatbot} renderingMode="original" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="reports">
-        <Label>{translate("navigator:reports")}</Label>
-        <Icon src={tabIcons.reports} />
+        <NativeTabs.Trigger.Label>{translate("navigator:reports")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon src={tabIcons.reports} renderingMode="original" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="transaction-button">
-        <Label>{translate("navigator:newTransaction")}</Label>
-        <Icon src={tabIcons.plus} />
+        <NativeTabs.Trigger.Label>{translate("navigator:newTransaction")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon src={tabIcons.plus} renderingMode="original" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

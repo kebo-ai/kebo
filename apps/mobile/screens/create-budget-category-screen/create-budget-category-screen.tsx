@@ -5,7 +5,6 @@ import React, {
   useState,
   useEffect,
   useMemo,
-  useCallback,
 } from "react";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import {
@@ -18,8 +17,7 @@ import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
 import { showToast } from "@/components/ui/custom-toast";
 import { standardHeader } from "@/theme/header-options";
-import { budgetService } from "@/services/budget-service";
-import { useCategories } from "@/lib/api/hooks";
+import { useBudget, useCategories, useUpdateBudgetLines } from "@/lib/api/hooks";
 import { colors } from "@/theme/colors";
 import { useTheme } from "@/hooks/use-theme";
 import { useNumberEntry } from "@/hooks/use-number-entry";
@@ -68,8 +66,15 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [currentSelectedCategory, setCurrentSelectedCategory] =
       useState(selectedCategory);
-    const [existingCategories, setExistingCategories] = useState<string[]>([]);
+    const [isSaving, setIsSaving] = useState(false);
+    const { data: budgetData } = useBudget(budgetId);
     const { data: allCategories = [] } = useCategories();
+    const updateLinesMutation = useUpdateBudgetLines();
+
+    const existingCategories = useMemo(
+      () => budgetData?.budget_lines.map((line) => line.category_id) ?? [],
+      [budgetData]
+    );
 
     // Navigation adapter for components that still expect navigation prop
     const navigationAdapter = useMemo(
@@ -104,26 +109,6 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
       }
     }, [isEditing, initialAmount]);
 
-    useEffect(() => {
-      const getExistingCategories = async () => {
-        if (budgetId) {
-          try {
-            const budgetData = await budgetService.getBudgetById(budgetId);
-            if (budgetData && budgetData.budget_lines) {
-              const categoryIds = budgetData.budget_lines.map(
-                (line: any) => line.category_id
-              );
-              setExistingCategories(categoryIds);
-            }
-          } catch (error) {
-            logger.error("Error getting existing categories:", error);
-          }
-        }
-      };
-
-      getExistingCategories();
-    }, [budgetId]);
-
     const handleCategorySelect = (category: any) => {
       setCurrentSelectedCategory(category);
       setShowCategoryModal(false);
@@ -146,55 +131,53 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
     ]);
 
     const handleSave = async () => {
+      if (isSaving || !budgetData) return;
       if (numberEntry.amountInCents < 1) {
         amountShake.shake();
         return;
       }
 
+      setIsSaving(true);
       const numericAmount = numberEntry.amountInCents / 100;
 
       try {
-        let success;
+        const currentLines = budgetData.budget_lines.map((line) => ({
+          category_id: line.category_id,
+          amount: Number(line.amount),
+        }));
+
+        let newLines;
 
         if (isEditing && categoryId) {
           if (currentSelectedCategory.id !== categoryId) {
-            success = await budgetService.changeBudgetCategory(
-              budgetId,
-              categoryId,
-              currentSelectedCategory.id,
-              numericAmount
-            );
+            // Change category: remove old, add new
+            newLines = currentLines
+              .filter((l) => l.category_id !== categoryId)
+              .concat({ category_id: currentSelectedCategory.id, amount: numericAmount });
           } else {
-            success = await budgetService.updateBudgetCategory(
-              budgetId,
-              categoryId,
-              numericAmount
+            // Update amount
+            newLines = currentLines.map((l) =>
+              l.category_id === categoryId ? { ...l, amount: numericAmount } : l
             );
           }
         } else {
-          success = await budgetService.addBudgetCategory(
-            budgetId,
-            currentSelectedCategory.id,
-            numericAmount
-          );
+          // Add new category
+          newLines = [...currentLines, { category_id: currentSelectedCategory.id, amount: numericAmount }];
         }
 
-        if (success) {
-          showToast(
-            "success",
-            isEditing
-              ? translate("createBudgetCategoryScreen:categoryUpdated")
-              : translate("createBudgetCategoryScreen:categoryAdded")
-          );
-          router.back();
-        } else {
-          showToast(
-            "error",
-            isEditing
-              ? translate("createBudgetCategoryScreen:errorUpdatingCategory")
-              : translate("createBudgetCategoryScreen:errorAddingCategory")
-          );
-        }
+        await updateLinesMutation.mutateAsync({
+          budgetId,
+          currentBudget: budgetData,
+          lines: newLines,
+        });
+
+        showToast(
+          "success",
+          isEditing
+            ? translate("createBudgetCategoryScreen:categoryUpdated")
+            : translate("createBudgetCategoryScreen:categoryAdded")
+        );
+        router.back();
       } catch (error) {
         logger.error("Error saving budget category:", error);
         showToast(
@@ -203,6 +186,8 @@ export const CreateBudgetCategoryScreen: FC<CreateBudgetCategoryScreenProps> =
             ? translate("createBudgetCategoryScreen:errorUpdatingCategory")
             : translate("createBudgetCategoryScreen:errorAddingCategory")
         );
+      } finally {
+        setIsSaving(false);
       }
     };
 

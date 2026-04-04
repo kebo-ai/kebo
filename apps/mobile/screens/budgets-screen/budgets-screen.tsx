@@ -27,18 +27,11 @@ import type { BudgetWithDetails } from "@/lib/api/types";
 import { Stack, useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { showToast } from "@/components/ui/custom-toast";
-import BudgetIntroSlider from "@/components/common/budget-intro-slider";
+import BudgetOnboardingView from "@/components/common/budget-onboarding-view";
 import { load, save } from "@/utils/storage/storage";
 import logger from "@/utils/logger";
 import moment from "moment";
 import { useAnalytics } from "@/hooks/use-analytics";
-
-interface Slide {
-  key: string;
-  title: string;
-  text: string;
-  image: any;
-}
 
 interface BudgetsScreenProps {}
 
@@ -51,8 +44,8 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
     const { data: budgetsData, isLoading: loading } = useBudgets();
     const { data: profile } = useProfile();
     const deleteBudgetMutation = useDeleteBudget();
-    const [showIntroSlider] = useState(false);
-    const [isCheckingIntro] = useState(false);
+    const [showIntroSlider, setShowIntroSlider] = useState(false);
+    const [isCheckingIntro, setIsCheckingIntro] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
 
@@ -84,29 +77,6 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
       }));
     }, [budgets]);
 
-    const TRANSLATIONS = {
-      welcome: "budgetOnboarding:welcome" as const,
-      slide1Text: "budgetOnboarding:slide1.text" as const,
-      slide2Text: "budgetOnboarding:slide2.text" as const,
-      buttonNext: "budgetOnboarding:buttons.next" as const,
-      buttonDone: "budgetOnboarding:buttons.done" as const,
-    };
-
-    const introSlides: Slide[] = [
-      {
-        key: "budget-management",
-        title: translate(TRANSLATIONS.welcome),
-        text: translate(TRANSLATIONS.slide1Text),
-        image: require("@/assets/images/budget-management.png"),
-      },
-      {
-        key: "budget-goals",
-        title: translate(TRANSLATIONS.welcome),
-        text: translate(TRANSLATIONS.slide2Text),
-        image: require("@/assets/images/budget-goals.png"),
-      },
-    ];
-
     const checkIntroShown = useCallback(async () => {
       try {
         const hasShownIntro = await load<boolean>("budget_intro_shown");
@@ -123,11 +93,12 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
       try {
         await save("budget_intro_shown", true);
         setShowIntroSlider(false);
+        router.push("/(authenticated)/budget/new");
       } catch (error) {
         logger.error("Error saving intro status:", error);
         setShowIntroSlider(false);
       }
-    }, []);
+    }, [router]);
 
     useEffect(() => {
       checkIntroShown();
@@ -272,10 +243,9 @@ export const BudgetsScreen: FC<BudgetsScreenProps> = observer(
 
     if (showIntroSlider) {
       return (
-        <BudgetIntroSlider
-          slides={introSlides}
+        <BudgetOnboardingView
           onDone={markIntroAsShown}
-          name={userName}
+          userName={userName}
         />
       );
     }

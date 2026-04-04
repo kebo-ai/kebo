@@ -9,6 +9,7 @@ import i18n from "@/i18n/i18n";
 import { runInAction } from "mobx";
 import { useCreateTransaction, useCreateTransfer } from "@/lib/api/hooks";
 import { resetReviewEligibility } from "@/hooks/use-review-modal";
+import { sendImmediateNotification } from "@/hooks/use-notifications";
 
 type TransactionSuccessMessages = {
   [key in TransactionType]: TxKeyPath;
@@ -84,10 +85,11 @@ export const useTransactionForm = (navigation: any) => {
         );
 
         // Capture mutation data before navigation/reset
-        // API expects ISO 8601 datetime — combine selected date with current time
+        // API expects ISO 8601 datetime — use UTC midnight for the selected date
+        // to avoid timezone shifts (e.g. UTC+2 user picking April 12 at 1AM → April 11 in UTC)
         const apiDate = selectedDateMoment.isValid()
-          ? moment(selectedDateMoment.format("YYYY-MM-DD") + "T" + now.format("HH:mm:ss.SSSZ")).toISOString()
-          : now.toISOString();
+          ? moment.utc(selectedDateMoment.format("YYYY-MM-DD")).toISOString()
+          : moment.utc(now.format("YYYY-MM-DD")).toISOString();
         const isTransfer = transactionModel.transaction_type === "Transfer";
         const mutationData = isTransfer
           ? {
@@ -125,6 +127,7 @@ export const useTransactionForm = (navigation: any) => {
         navigation.navigate("Home", { transactionCreated: true });
         resetForm();
         showToast("success", successMessage);
+        sendImmediateNotification("Kebo", successMessage);
 
         runInAction(() => {
           transactionModel.updateField("amount", 0);

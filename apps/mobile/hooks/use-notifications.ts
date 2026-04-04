@@ -4,6 +4,41 @@ import { Platform } from "react-native";
 import { translate } from "@/i18n/translate";
 import { TxKeyPath } from "@/i18n/i18n";
 import logger from "@/utils/logger";
+import { load, save } from "@/utils/storage/storage";
+
+const REMINDER_TIME_KEY = "daily_reminder_time";
+const REMINDER_ENABLED_KEY = "daily_reminder_enabled";
+
+export interface ReminderTime {
+  hour: number;
+  minute: number;
+}
+
+const DEFAULT_REMINDER_TIME: ReminderTime = { hour: 18, minute: 0 };
+
+export async function getReminderTime(): Promise<ReminderTime> {
+  const stored = await load<ReminderTime>(REMINDER_TIME_KEY);
+  return stored ?? DEFAULT_REMINDER_TIME;
+}
+
+export async function saveReminderTime(time: ReminderTime): Promise<void> {
+  await save(REMINDER_TIME_KEY, time);
+  await setupDailyNotification();
+}
+
+export async function isDailyReminderEnabled(): Promise<boolean> {
+  const stored = await load<boolean>(REMINDER_ENABLED_KEY);
+  return stored ?? true;
+}
+
+export async function setDailyReminderEnabled(enabled: boolean): Promise<void> {
+  await save(REMINDER_ENABLED_KEY, enabled);
+  if (enabled) {
+    await setupDailyNotification();
+  } else {
+    await cancelDailyNotifications();
+  }
+}
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -60,8 +95,13 @@ export function useNotifications() {
 
 async function setupDailyNotification() {
   try {
-    const hour = 18;
-    const minute = 0;
+    const enabled = await isDailyReminderEnabled();
+    if (!enabled) {
+      await cancelDailyNotifications();
+      return;
+    }
+
+    const { hour, minute } = await getReminderTime();
 
     await scheduleDailyNotification(
       translate("notifications:dailyReminder") as TxKeyPath,

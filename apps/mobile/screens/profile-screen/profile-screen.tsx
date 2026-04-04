@@ -9,7 +9,9 @@ import {
   ScrollView,
   RefreshControl,
   Share,
+  Switch,
 } from "react-native";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import tw from "twrnc";
 import { observer } from "mobx-react-lite";
 import { useQueryClient } from "@tanstack/react-query";
@@ -32,7 +34,14 @@ import {
   ProfileEventName,
 } from "@/services/analytics-service";
 import { updateUserAnalyticsProperties } from "@/utils/analytics-utils";
-import { useNotifications } from "@/hooks/use-notifications";
+import {
+  useNotifications,
+  getReminderTime,
+  saveReminderTime,
+  isDailyReminderEnabled,
+  setDailyReminderEnabled,
+  type ReminderTime,
+} from "@/hooks/use-notifications";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { PencilSvg } from "@/components/icons/pencil-svg";
 import { LanguageService } from "@/services/language-service";
@@ -71,6 +80,28 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
     const { data: incomeCategories = [] } = useIncomeCategories();
     const analytics = useAnalytics();
     const { permissionsGranted } = useNotifications();
+    const [reminderEnabled, setReminderEnabled] = useState(true);
+    const [reminderTime, setReminderTime] = useState<ReminderTime>({ hour: 18, minute: 0 });
+    const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
+
+    useEffect(() => {
+      isDailyReminderEnabled().then(setReminderEnabled);
+      getReminderTime().then(setReminderTime);
+    }, []);
+
+    const handleToggleReminder = useCallback(async (value: boolean) => {
+      setReminderEnabled(value);
+      await setDailyReminderEnabled(value);
+    }, []);
+
+    const handleTimeConfirm = useCallback(async (date: Date) => {
+      const time: ReminderTime = { hour: date.getHours(), minute: date.getMinutes() };
+      setReminderTime(time);
+      setIsTimePickerVisible(false);
+      await saveReminderTime(time);
+    }, []);
+
+    const formattedReminderTime = `${reminderTime.hour.toString().padStart(2, "0")}:${reminderTime.minute.toString().padStart(2, "0")}`;
 
     const trackProfileEvent = useCallback(
       (eventName: ProfileEventName, properties: Record<string, any> = {}) => {
@@ -424,6 +455,64 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
               </View>
             </View>
           ))}
+
+          {/* Notifications */}
+          <Text
+            type="xs"
+            weight="semibold"
+            color="#606A84"
+            style={tw`uppercase tracking-wide px-1 mb-2`}
+          >
+            {translate("profileScreen:notifications")}
+          </Text>
+          <View
+            style={tw`bg-white dark:bg-[#1C1C1E] rounded-2xl overflow-hidden border border-[#EBEBEF] dark:border-[#3A3A3C] mb-6`}
+          >
+            <View
+              style={tw`flex-row items-center px-4 py-3.5 border-b border-[#EBEBEF] dark:border-[#3A3A3C]`}
+            >
+              <Icon symbol="bell.badge" size={18} color={colors.primary} />
+              <Text
+                weight="medium"
+                color={theme.textPrimary}
+                style={tw`flex-1 ml-3`}
+              >
+                {translate("profileScreen:dailyReminder")}
+              </Text>
+              <Switch
+                value={reminderEnabled}
+                onValueChange={handleToggleReminder}
+                trackColor={{ true: colors.primary }}
+              />
+            </View>
+            {reminderEnabled && (
+              <TouchableOpacity
+                style={tw`flex-row items-center px-4 py-3.5`}
+                onPress={() => setIsTimePickerVisible(true)}
+              >
+                <Icon symbol="clock" size={18} color={colors.primary} />
+                <Text
+                  weight="medium"
+                  color={theme.textPrimary}
+                  style={tw`flex-1 ml-3`}
+                >
+                  {translate("profileScreen:reminderTime")}
+                </Text>
+                <Text weight="medium" color={theme.textSecondary}>
+                  {formattedReminderTime}
+                </Text>
+                <Icon symbol="chevron.right" size={14} color={theme.chevron} style={tw`ml-2`} />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <DateTimePickerModal
+            isVisible={isTimePickerVisible}
+            mode="time"
+            date={new Date(2000, 0, 1, reminderTime.hour, reminderTime.minute)}
+            onConfirm={handleTimeConfirm}
+            onCancel={() => setIsTimePickerVisible(false)}
+          />
 
           {/* Danger Zone */}
           <Text

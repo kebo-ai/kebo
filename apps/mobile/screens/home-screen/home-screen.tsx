@@ -54,7 +54,7 @@ import { translateCategoryName } from "@/utils/category-translations";
 import { useReviewModal } from "@/hooks/use-review-modal";
 import CustomModalReview from "@/components/common/custom-modal-review";
 import { loadString, saveString } from "@/utils/storage/storage";
-import { BALANCE_VISIBILITY } from "@/utils/storage/storage-keys";
+import { BALANCE_VISIBILITY, HAS_SEEN_BALANCE_INFO } from "@/utils/storage/storage-keys";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { initializeUserAnalytics } from "@/utils/analytics-utils";
 
@@ -104,16 +104,16 @@ const TransactionItem = memo(
       : translate("homeScreen:noCategory");
 
     const formatDate = (date: string) => {
-      const today = moment().startOf("day");
-      const transactionDate = moment(date).startOf("day");
-      const yesterday = moment().subtract(1, "days").startOf("day");
+      const today = moment.utc().startOf("day");
+      const transactionDate = moment.utc(date).startOf("day");
+      const yesterday = moment.utc().subtract(1, "days").startOf("day");
 
       if (transactionDate.isSame(today)) {
         return translate("homeScreen:today");
       } else if (transactionDate.isSame(yesterday)) {
         return translate("homeScreen:yesterday");
       } else {
-        return moment(date)
+        return moment.utc(date)
           .locale(currentLocale)
           .format("MMM DD")
           .replace(/^\w/, (c) => c.toUpperCase());
@@ -400,6 +400,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
   const { formatAmount } = useCurrencyFormatter();
   const rootStore = useStores();
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const [hasSeenBalanceInfo, setHasSeenBalanceInfo] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const analytics = useAnalytics();
   const animatedIdsRef = useRef(new Set<string>());
@@ -429,13 +430,17 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
 
 
   useEffect(() => {
-    const loadBalanceVisibility = async () => {
-      const savedVisibility = await loadString(BALANCE_VISIBILITY);
+    const loadStoredPrefs = async () => {
+      const [savedVisibility, seenInfo] = await Promise.all([
+        loadString(BALANCE_VISIBILITY),
+        loadString(HAS_SEEN_BALANCE_INFO),
+      ]);
       if (savedVisibility !== null) {
         setIsBalanceVisible(savedVisibility === "true");
       }
+      setHasSeenBalanceInfo(seenInfo === "true");
     };
-    loadBalanceVisibility();
+    loadStoredPrefs();
   }, []);
 
   // Check review modal eligibility when user returns to Home
@@ -626,7 +631,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     } catch (error) {
       logger.debug("Analytics error:", error);
     }
-    router.push("/(authenticated)/profile");
+    router.navigate("/(authenticated)/profile");
   }, [router]);
 
   const navigateToTransaction = useCallback(
@@ -681,17 +686,29 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     await saveString(BALANCE_VISIBILITY, newVisibility.toString());
   }, [isBalanceVisible]);
 
+  const handleBalanceInfoDismiss = useCallback(async () => {
+    setHasSeenBalanceInfo(true);
+    await saveString(HAS_SEEN_BALANCE_INFO, "true");
+  }, []);
+
   const renderBudgetCard = useCallback(() => {
     return (
       <View
         style={tw`bg-[#6934D226] dark:bg-[#6934D240] px-[17px] pt-[19px] pb-[15px] rounded-[18px] mb-6`}
       >
         <View style={tw`flex-row items-center justify-center`}>
-          <InfoBadge
-            label={translate("homeScreen:balance")}
-            title={translate("homeScreen:balanceHintTitle")}
-            message={translate("homeScreen:balanceHintMessage")}
-          />
+          {hasSeenBalanceInfo ? (
+            <Text type="sm" weight="medium" color={theme.textPrimary}>
+              {translate("homeScreen:balance")}
+            </Text>
+          ) : (
+            <InfoBadge
+              label={translate("homeScreen:balance")}
+              title={translate("homeScreen:balanceHintTitle")}
+              message={translate("homeScreen:balanceHintMessage")}
+              onDismiss={handleBalanceInfoDismiss}
+            />
+          )}
         </View>
 
         <View style={tw`mt-2 overflow-hidden`}>
@@ -761,6 +778,8 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
     navigateToTransaction,
     navigateToSelectBank,
     handleBalanceVisibilityToggle,
+    handleBalanceInfoDismiss,
+    hasSeenBalanceInfo,
     isBalanceVisible,
     theme,
   ]);
@@ -820,7 +839,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
           headerRight: () => (
             <TouchableOpacity
               onPress={handleProfileNavigation}
-              style={{ width: 32, height: 32, transform: [{ translateX: 2 }] }}
+              style={{ width: 32, height: 32 }}
             >
               <View style={{ width: 32, height: 32, borderRadius: 16, overflow: "hidden" }}>
                 <Image

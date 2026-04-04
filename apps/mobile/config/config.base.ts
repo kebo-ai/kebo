@@ -27,4 +27,6 @@ const BaseConfig: ConfigBaseProps = {
 
 export default BaseConfig;
 
-export const APP_VERSION = "1.2.6";
+import * as Application from "expo-application";
+
+export const APP_VERSION = Application.nativeApplicationVersion ?? "1.0.0";

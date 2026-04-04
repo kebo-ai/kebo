@@ -30,6 +30,7 @@ import CustomToast from "@/components/ui/custom-toast";
 import Loader from "@/components/ui/custom-loader";
 import i18n from "@/i18n/i18n";
 import { useNotifications } from "@/hooks/use-notifications";
+import { useRetryFailedTransactions } from "@/hooks/use-retry-failed-transactions";
 import * as Notifications from "expo-notifications";
 import { postHogClient } from "@/services/post-hog-client";
 import { StatusBar } from "expo-status-bar";
@@ -47,6 +48,11 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
+
+function FailedTransactionRetry() {
+  useRetryFailedTransactions();
+  return null;
+}
 
 export default function RootLayout() {
   useDeviceContext(tw);
@@ -109,6 +115,7 @@ export default function RootLayout() {
                 config={{ minScale: 0.97 }}
               >
                 <QueryProvider>
+                  <FailedTransactionRetry />
                   <StatusBar style={colorScheme === "dark" ? "light" : "dark"} backgroundColor="transparent" translucent />
                   <Stack
                     screenOptions={{

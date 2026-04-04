@@ -114,6 +114,9 @@ const zh: Translations = {
     discord: "Discord",
     legal: "法律信息",
     dangerZone: "危险区域",
+    dailyReminder: "每日提醒",
+    reminderTime: "提醒时间",
+    notifications: "通知",
   },
   chatbotScreen: {
     errorSesion: "会话错误",
@@ -450,16 +453,24 @@ const zh: Translations = {
   },
   budgetOnboarding: {
     welcome: "您好，{{name}}！",
-    slide1: {
-      text: "有了预算，\n您就能像专业人士一样管理您的资金 🐨💰",
+    subtitle: "让我们用几个简单步骤创建您的第一个预算",
+    step1: {
+      title: "为预算命名",
+      description: "选择名称和时间范围",
     },
-    slide2: {
-      text: "我们帮助您整理收入、支出和储蓄，\n让您更快实现目标！\n加油吧 💝✨",
+    step2: {
+      title: "选择类别",
+      description: "选择您要跟踪的支出类别",
     },
-    buttons: {
-      next: "下一步",
-      done: "创建预算",
+    step3: {
+      title: "设定金额",
+      description: "决定每个类别的预算金额",
     },
+    result: {
+      title: "跟踪进度",
+      description: "您的预算将如此呈现",
+    },
+    cta: "创建我的第一个预算",
   },
   modalAccount: {
     cash: "现金",

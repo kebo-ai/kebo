@@ -123,6 +123,8 @@ type RouteParams = {
   transactionType?: "Income" | "Expense";
 };
 
+const EMPTY_CATEGORIES: any[] = [];
+
 const parseArrayParam = (param?: string): string[] | undefined => {
   if (!param) return undefined;
   try {
@@ -192,7 +194,7 @@ export const TransactionsScreen: FC<TransactionsScreenProps> = observer(
     const [selectedType, setSelectedType] = useState<
       "Ingreso" | "Gasto" | null
     >(null);
-    const { data: categories = [] } = useCategories();
+    const { data: categories = EMPTY_CATEGORIES } = useCategories();
     const currentLocale = i18n.language.split("-")[0];
     const [refreshing, setRefreshing] = useState(false);
     const [tempSelectedBanks, setTempSelectedBanks] = useState<string[]>([]);

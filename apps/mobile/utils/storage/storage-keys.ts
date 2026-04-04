@@ -9,3 +9,4 @@ export const HAS_SEEN_BANNER = "has_seen_banner";
 export const REPORTS_INCOME_PERIOD = "reports_income_period";
 export const BALANCE_VISIBILITY = "balance_visibility";
 export const REVIEW_MODAL_SHOULD_SHOW = "review_modal_should_show";
+export const HAS_SEEN_BALANCE_INFO = "has_seen_balance_info";

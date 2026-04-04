@@ -116,6 +116,9 @@ const it: Translations = {
     discord: "Discord",
     legal: "Legale",
     dangerZone: "Zona pericolosa",
+    dailyReminder: "Promemoria giornaliero",
+    reminderTime: "Orario del promemoria",
+    notifications: "Notifiche",
   },
   chatbotScreen: {
     errorSesion: "Errore di sessione",
@@ -472,16 +475,24 @@ const it: Translations = {
   },
   budgetOnboarding: {
     welcome: "Ciao {{name}}!",
-    slide1: {
-      text: "Con un budget a portata di mano,\nhai il potere di gestire i tuoi\nsoldi come un professionista 🐨💰",
+    subtitle: "Creiamo il tuo primo budget in pochi passi",
+    step1: {
+      title: "Dai un nome al budget",
+      description: "Scegli un nome e un periodo di tempo",
     },
-    slide2: {
-      text: "Ti aiutiamo a mettere in ordine\nciò che guadagni, spendi e risparmi,\nper raggiungere i tuoi obiettivi!\nAndiamo! 💝✨",
+    step2: {
+      title: "Scegli le categorie",
+      description: "Seleziona le categorie di spesa da monitorare",
     },
-    buttons: {
-      next: "Avanti",
-      done: "Crea budget",
+    step3: {
+      title: "Imposta gli importi",
+      description: "Decidi quanto destinare a ogni categoria",
     },
+    result: {
+      title: "Monitora i tuoi progressi",
+      description: "Ecco come apparirà il tuo budget",
+    },
+    cta: "Crea il mio primo budget",
   },
   modalAccount: {
     cash: "Contanti",

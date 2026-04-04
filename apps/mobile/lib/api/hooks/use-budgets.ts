@@ -2,7 +2,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getApiClient, unwrap } from "../rpc"
 import { queryKeys } from "../keys"
 import { queryConfig } from "../query-config"
-import type { Budget, BudgetWithDetails, CreateBudgetInput } from "../types"
+import type {
+  Budget,
+  BudgetWithDetails,
+  CreateBudgetInput,
+} from "../types"
 
 const client = getApiClient()
 
@@ -61,6 +65,80 @@ export function useUpdateBudget() {
       queryClient.invalidateQueries({ queryKey: queryKeys.budgets.all })
       queryClient.invalidateQueries({
         queryKey: queryKeys.budgets.detail(variables.id),
+      })
+    },
+  })
+}
+
+export function useUpdateBudgetLines() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      budgetId,
+      currentBudget,
+      lines,
+    }: {
+      budgetId: string
+      currentBudget: BudgetWithDetails
+      lines: Array<{ category_id: string; amount: number }>
+    }) =>
+      unwrap<Budget>(
+        await client.budgets.$put({
+          json: {
+            id: budgetId,
+            custom_name: currentBudget.custom_name,
+            start_date: currentBudget.start_date,
+            end_date: currentBudget.end_date,
+            budget_lines: lines,
+          } as never,
+        })
+      ),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgets.all })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.budgets.detail(variables.budgetId),
+      })
+    },
+  })
+}
+
+export function useRemoveBudgetLine() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      budgetId,
+      categoryId,
+      currentBudget,
+    }: {
+      budgetId: string
+      categoryId: string
+      currentBudget: BudgetWithDetails
+    }) => {
+      const remainingLines = currentBudget.budget_lines
+        .filter((line) => line.category_id !== categoryId)
+        .map((line) => ({
+          category_id: line.category_id,
+          amount: Number(line.amount),
+        }))
+
+      return unwrap<Budget>(
+        await client.budgets.$put({
+          json: {
+            id: budgetId,
+            custom_name: currentBudget.custom_name,
+            start_date: currentBudget.start_date,
+            end_date: currentBudget.end_date,
+            budget_lines: remainingLines,
+          } as never,
+        })
+      )
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgets.all })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.budgets.detail(variables.budgetId),
       })
     },
   })

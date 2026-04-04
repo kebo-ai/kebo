@@ -81,8 +81,7 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       });
     }, [navigation, messages.length]);
 
-    // iOS tab bar ~49px, Android Material bottom nav ~64px
-    const tabBarOffset = Platform.OS === "ios" ? 50 : 80;
+    const tabBarOffset = insets.bottom;
 
     // Android: use adjustNothing so keyboard covers the tab bar
     // and KeyboardStickyView can properly position the input above the keyboard
@@ -245,7 +244,7 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
     const inputAreaHeight = 70;
     const bottomPadding = keyboardHeight > 0
       ? keyboardHeight + inputAreaHeight
-      : inputAreaHeight + insets.bottom + tabBarOffset;
+      : inputAreaHeight + tabBarOffset;
 
     return (
       <Pressable style={[tw`flex-1`, { backgroundColor: theme.background }]} onPress={Keyboard.dismiss}>
@@ -302,11 +301,11 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
         <KeyboardStickyView
           style={{
             position: "absolute",
-            bottom: insets.bottom + tabBarOffset,
+            bottom: tabBarOffset,
             left: 0,
             right: 0,
           }}
-          offset={{ opened: insets.bottom + tabBarOffset, closed: 0 }}
+          offset={{ opened: tabBarOffset, closed: 0 }}
         >
           <ChatInput
             onSendMessage={handleSendMessage}

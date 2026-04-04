@@ -839,7 +839,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen() {
           headerRight: () => (
             <TouchableOpacity
               onPress={handleProfileNavigation}
-              style={{ width: 32, height: 32, transform: [{ translateX: 2 }] }}
+              style={{ width: 32, height: 32 }}
             >
               <View style={{ width: 32, height: 32, borderRadius: 16, overflow: "hidden" }}>
                 <Image

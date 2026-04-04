@@ -1,5 +1,6 @@
 import AppIntents
 import Foundation
+import UserNotifications
 
 @available(iOS 16.0, *)
 struct KeboTransactionIntent: AppIntent {
@@ -22,6 +23,15 @@ struct KeboTransactionIntent: AppIntent {
     Summary("Log \(\.$amount) at \(\.$merchant) named \(\.$transactionName) from \(\.$cardName)")
   }
 
+  private func scheduleNotification(body: String) {
+    let content = UNMutableNotificationContent()
+    content.title = "Kebo"
+    content.body = body
+    content.sound = .default
+    let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+    UNUserNotificationCenter.current().add(request)
+  }
+
   func perform() async throws -> some IntentResult & ProvidesDialog {
     let parsed = AmountParser.parse(amount)
     let amountString = String(format: "%.2f", parsed.value)
@@ -37,6 +47,7 @@ struct KeboTransactionIntent: AppIntent {
         cardName: cardName.isEmpty ? nil : cardName
       )
       let msg = String(format: String(localized: "Logged %@ at %@", table: "AppIntents"), amount, merchant)
+      scheduleNotification(body: msg)
       return .result(dialog: IntentDialog(stringLiteral: msg))
     } catch {
       let failed = FailedTransaction(

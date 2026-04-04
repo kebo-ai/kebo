@@ -4,7 +4,7 @@ import Foundation
 @available(iOS 16.0, *)
 struct KeboTransactionIntent: AppIntent {
   static var title: LocalizedStringResource = "Log Transaction in Kebo"
-  static var description = IntentDescription("Log an expense from Apple Pay in Kebo")
+  static var description = IntentDescription("Log an expense in Kebo")
 
   @Parameter(title: "Amount", default: "0.00")
   var amount: String

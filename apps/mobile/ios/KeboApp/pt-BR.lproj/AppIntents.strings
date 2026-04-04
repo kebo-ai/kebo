@@ -1,0 +1,14 @@
+/* KeboTransactionIntent */
+"Log Transaction in Kebo" = "Registrar Transa\U00e7\U00e3o no Kebo";
+"Log an expense in Kebo" = "Registre uma despesa no Kebo";
+"Amount" = "Valor";
+"Merchant" = "Estabelecimento";
+"Name" = "Nome";
+"Card or Pass" = "Cart\U00e3o ou Passe";
+
+/* KeboShortcuts */
+"Log Transaction" = "Registrar Transa\U00e7\U00e3o";
+
+/* Result dialogs */
+"Logged %@ at %@" = "Registrado %@ em %@";
+"Saved %@ at %@ for sync later" = "Salvo %@ em %@ para sincronizar depois";

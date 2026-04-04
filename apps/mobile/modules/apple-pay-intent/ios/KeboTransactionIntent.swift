@@ -4,18 +4,18 @@ import Foundation
 @available(iOS 16.0, *)
 struct KeboTransactionIntent: AppIntent {
   static var title: LocalizedStringResource = "Log Transaction in Kebo"
-  static var description = IntentDescription("Log an expense in Kebo")
+  static var description = IntentDescription(LocalizedStringResource("Log an expense in Kebo"))
 
-  @Parameter(title: "Amount", default: "0.00")
+  @Parameter(title: LocalizedStringResource("Amount"), default: "0.00")
   var amount: String
 
-  @Parameter(title: "Merchant", default: "Unknown")
+  @Parameter(title: LocalizedStringResource("Merchant"), default: "Unknown")
   var merchant: String
 
-  @Parameter(title: "Name", default: "")
+  @Parameter(title: LocalizedStringResource("Name"), default: "")
   var transactionName: String
 
-  @Parameter(title: "Card or Pass", default: "")
+  @Parameter(title: LocalizedStringResource("Card or Pass"), default: "")
   var cardName: String
 
   static var parameterSummary: some ParameterSummary {
@@ -36,7 +36,8 @@ struct KeboTransactionIntent: AppIntent {
         transactionName: transactionName.isEmpty ? nil : transactionName,
         cardName: cardName.isEmpty ? nil : cardName
       )
-      return .result(dialog: "Logged \(amount) at \(merchant)")
+      let msg = String(format: String(localized: "Logged %@ at %@", table: "AppIntents"), amount, merchant)
+      return .result(dialog: IntentDialog(stringLiteral: msg))
     } catch {
       let failed = FailedTransaction(
         amount: amountString,
@@ -47,7 +48,8 @@ struct KeboTransactionIntent: AppIntent {
         cardName: cardName.isEmpty ? nil : cardName
       )
       FailedTransactionQueue.shared.enqueue(failed)
-      return .result(dialog: "Saved \(amount) at \(merchant) for sync later")
+      let msg = String(format: String(localized: "Saved %@ at %@ for sync later", table: "AppIntents"), amount, merchant)
+      return .result(dialog: IntentDialog(stringLiteral: msg))
     }
   }
 }

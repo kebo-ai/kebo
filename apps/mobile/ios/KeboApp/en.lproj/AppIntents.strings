@@ -1,0 +1,14 @@
+/* KeboTransactionIntent */
+"Log Transaction in Kebo" = "Log Transaction in Kebo";
+"Log an expense in Kebo" = "Log an expense in Kebo";
+"Amount" = "Amount";
+"Merchant" = "Merchant";
+"Name" = "Name";
+"Card or Pass" = "Card or Pass";
+
+/* KeboShortcuts */
+"Log Transaction" = "Log Transaction";
+
+/* Result dialogs */
+"Logged %@ at %@" = "Logged %@ at %@";
+"Saved %@ at %@ for sync later" = "Saved %@ at %@ for sync later";

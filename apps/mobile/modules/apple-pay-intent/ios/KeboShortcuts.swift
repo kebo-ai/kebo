@@ -10,7 +10,7 @@ struct KeboShortcuts: AppShortcutsProvider {
         "Add expense to \(.applicationName)",
         "Log payment in \(.applicationName)"
       ],
-      shortTitle: "Log Transaction",
+      shortTitle: LocalizedStringResource("Log Transaction"),
       systemImageName: "creditcard"
     )
   }

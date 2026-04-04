@@ -10,6 +10,10 @@ const config: ExpoConfig = {
       "./plugins/with-app-groups",
       { groups: ["group.com.kebo.app.mobile"] },
     ],
+    [
+      "./plugins/with-app-intents-localization",
+      { locales: ["en", "pt-BR"] },
+    ],
   ],
 };
 

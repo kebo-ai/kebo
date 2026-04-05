@@ -67,6 +67,7 @@ export class BudgetService {
 
         return {
           ...budget,
+          budget_amount: sumOfAllocations.toFixed(2),
           total_spent: totalSpent.toFixed(2),
           total_remaining: remaining.toFixed(2),
           progress_percentage:

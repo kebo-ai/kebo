@@ -42,7 +42,7 @@ import { NumberPad } from "@/components/transaction/number-pad";
 import { AmountDisplay } from "@/components/transaction/amount-display";
 import { TransactionTypeToggle } from "@/components/transaction/transaction-type-toggle";
 import { TransactionFieldRow } from "@/components/transaction/transaction-field-row";
-import { useSharedValue } from "react-native-reanimated";
+import { useSharedValue, withTiming } from "react-native-reanimated";
 
 export const TransactionScreen: FC<TransactionScreenProps> = observer(
   function TransactionScreen({ navigation, route }) {
@@ -151,16 +151,53 @@ export const TransactionScreen: FC<TransactionScreenProps> = observer(
       prevCategoryId.current = category_id;
     }, [category_id]);
 
-    // --- Tab transition shared values (fuse-home-tabs-transition-animation) ---
-    const activeTabIndex = useSharedValue(0);
-    const prevActiveTabIndex = useSharedValue(0);
-
     // --- Transaction type options ---
     const mappedTransactionTypes = [
       TransactionType.EXPENSE,
       TransactionType.INCOME,
       TransactionType.TRANSFER,
     ];
+
+    // --- Tab transition shared values (fuse-home-tabs-transition-animation) ---
+    // Initial index comes from the route param so the correct tab is
+    // highlighted when the screen mounts from a home-screen shortcut
+    // (Expense / Income / Transfer). Falling back to 0 (Expense) keeps
+    // existing behavior for entries without a param.
+    //
+    // IMPORTANT: we read from `route.params.transactionType` — NOT from
+    // `transaction_type` on the MST store — because the store update runs
+    // from sibling effects (`useTransactionType` / the reset-on-focus
+    // effect below) and is therefore stale during the first render pass
+    // of a fresh push. Reading the route param avoids that race so the
+    // toggle never briefly animates toward the previous tab's value.
+    const initialTabIndex = Math.max(
+      0,
+      mappedTransactionTypes.indexOf(
+        (route.params?.transactionType as TransactionType) ??
+          TransactionType.EXPENSE,
+      ),
+    );
+    const activeTabIndex = useSharedValue(initialTabIndex);
+    const prevActiveTabIndex = useSharedValue(initialTabIndex);
+
+    // If the same transaction screen instance receives a new
+    // `transactionType` param (e.g. deep link / router.setParams), snap
+    // the toggle to the new position. On a fresh push this effect is a
+    // no-op because `useSharedValue(initialTabIndex)` already seeded the
+    // shared values correctly.
+    useEffect(() => {
+      const paramType = route.params?.transactionType as
+        | TransactionType
+        | undefined;
+      if (!paramType) return;
+      const targetIndex = mappedTransactionTypes.indexOf(paramType);
+      if (targetIndex < 0) return;
+      if (activeTabIndex.value === targetIndex) return;
+      prevActiveTabIndex.value = activeTabIndex.value;
+      activeTabIndex.value = withTiming(targetIndex, { duration: 250 });
+      // `mappedTransactionTypes` is a local const array — effectively stable.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route.params?.transactionType]);
 
     const handleTypeChange = useCallback(
       (option: string) => {

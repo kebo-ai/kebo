@@ -142,6 +142,7 @@ const AuthenticatedLayout = observer(function AuthenticatedLayout() {
         <Stack.Screen name="language" options={nativeHeader} />
         <Stack.Screen name="country" options={nativeHeader} />
         <Stack.Screen name="number-format" options={nativeHeader} />
+        <Stack.Screen name="appearance" options={nativeHeader} />
         <Stack.Screen name="profile" options={nativeHeader} />
         <Stack.Screen name="banner-features" options={nativeHeader} />
         <Stack.Screen name="reports-income" options={nativeHeader} />

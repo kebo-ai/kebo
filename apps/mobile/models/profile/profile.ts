@@ -1,5 +1,7 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree";
 
+import type { ThemePreference } from "@/services/theme-preference-service";
+
 /**
  * Modelo de Perfil en MST
  */
@@ -24,6 +26,15 @@ export const ProfileModel = types
     user_id: types.maybe(types.string),
     // Local-only preference: "1,234.56" | "1.234,56" | "1 234.56" | "1 234,56"
     number_format: types.optional(types.string, "1,234.56"),
+    // Local-only preference: "system" (follow OS) | "light" | "dark"
+    theme_preference: types.optional(
+      types.enumeration<ThemePreference>("ThemePreference", [
+        "system",
+        "light",
+        "dark",
+      ]),
+      "system",
+    ),
   })
   .actions((self) => ({
     save(modelSnapshot: ProfileSnapshotIn) {
@@ -76,6 +87,9 @@ export const ProfileModel = types
     },
     setNumberFormat(format: string) {
       self.number_format = format;
+    },
+    setThemePreference(preference: ThemePreference) {
+      self.theme_preference = preference;
     },
   }));
 

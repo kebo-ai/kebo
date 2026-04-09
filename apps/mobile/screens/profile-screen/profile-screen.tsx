@@ -265,6 +265,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(
           { symbol: "globe", label: translate("profileScreen:language"), onPress: () => router.push("/(authenticated)/language") },
           { symbol: "dollarsign.circle", label: translate("profileScreen:currency"), onPress: () => router.push("/(authenticated)/country") },
           { symbol: "textformat.123", label: translate("profileScreen:numberFormat"), onPress: () => router.push("/(authenticated)/number-format") },
+          { symbol: "paintpalette", label: translate("profileScreen:appearance"), onPress: () => router.push("/(authenticated)/appearance") },
           { symbol: "building.columns", label: translate("accountScreen:myAccounts"), onPress: () => router.push("/(authenticated)/accounts") },
           { symbol: "tag", label: translate("profileScreen:myCategories"), onPress: handleOpenCategoryModal },
         ],

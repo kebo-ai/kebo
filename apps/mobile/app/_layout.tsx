@@ -40,6 +40,7 @@ import { PressablesConfig } from "pressto";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { QueryProvider } from "@/lib/api/providers/QueryProvider";
+import { ThemePreferenceService } from "@/services/theme-preference-service";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -59,7 +60,15 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad);
   const [isI18nInitialized, setIsI18nInitialized] = useState(false);
+  const [isThemeHydrated, setIsThemeHydrated] = useState(false);
   useNotifications();
+
+  // Load the persisted theme override (system / light / dark) and push it
+  // through `Appearance.setColorScheme` BEFORE anything renders, so the
+  // splash and first painted screens already use the right color scheme.
+  useEffect(() => {
+    ThemePreferenceService.hydrate().finally(() => setIsThemeHydrated(true));
+  }, []);
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -85,7 +94,11 @@ export default function RootLayout() {
     initializeApp();
   }, []);
 
-  if (!isI18nInitialized || (!areFontsLoaded && !fontLoadError)) {
+  if (
+    !isThemeHydrated ||
+    !isI18nInitialized ||
+    (!areFontsLoaded && !fontLoadError)
+  ) {
     return null;
   }
 

@@ -1,9 +1,13 @@
+import { Tabs } from "expo-router";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
-import { colors } from "@/theme/colors";
-import { translate } from "@/i18n";
 import { useEffect } from "react";
+import { Platform } from "react-native";
+
+import { AndroidTabBar } from "@/components/navigation/android-tab-bar";
 import { useAnalytics } from "@/hooks/use-analytics";
+import { translate } from "@/i18n";
 import { registerAnalyticsService } from "@/navigators/navigationUtilities";
+import { colors } from "@/theme/colors";
 
 const tabIcons = {
   home: {
@@ -36,6 +40,27 @@ export default function TabsLayout() {
       registerAnalyticsService(analytics);
     }
   }, [analytics]);
+
+  // Android uses a custom JS tab bar (NativeTabs on Android is Material You
+  // and does not match the iOS look we want). iOS keeps NativeTabs for its
+  // liquid-glass/minimize-on-scroll behavior.
+  if (Platform.OS === "android") {
+    return (
+      <Tabs
+        screenOptions={{ headerShown: false }}
+        tabBar={(props) => <AndroidTabBar {...props} />}
+      >
+        <Tabs.Screen name="home" options={{ title: translate("navigator:home") }} />
+        <Tabs.Screen name="budgets" options={{ title: translate("navigator:budget") }} />
+        <Tabs.Screen name="chatbot" options={{ title: translate("navigator:chatbot") }} />
+        <Tabs.Screen name="reports" options={{ title: translate("navigator:reports") }} />
+        <Tabs.Screen
+          name="transaction-button"
+          options={{ title: translate("navigator:newTransaction") }}
+        />
+      </Tabs>
+    );
+  }
 
   return (
     <NativeTabs

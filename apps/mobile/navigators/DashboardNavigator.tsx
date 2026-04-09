@@ -1,3 +1,7 @@
+// LEGACY — kept for reference. The app uses expo-router (see
+// `app/(authenticated)/(tabs)/_layout.tsx`) and no longer mounts this
+// custom bottom tab navigator. Do not delete — preserved as the source
+// of truth for the pre-migration tab layout.
 import {
   BottomTabScreenProps,
   createBottomTabNavigator,

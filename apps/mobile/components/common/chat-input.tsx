@@ -73,7 +73,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <View
-      style={tw`px-4 pb-${Platform.OS === "ios" ? "3" : "3"} bg-[${theme.background}]`}
+      style={[
+        tw`px-4 bg-[${theme.background}]`,
+        // iOS keeps a 12px breathing gap above the tab bar / home indicator.
+        // On Android the input sits flush against the custom tab bar (keyboard
+        // closed) or the keyboard top (keyboard open) to match native chat UIs.
+        { paddingBottom: Platform.OS === "ios" ? 12 : 0 },
+      ]}
     >
       <View
         style={[

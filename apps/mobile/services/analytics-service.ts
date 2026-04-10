@@ -168,82 +168,26 @@ export interface UserProperties {
 }
 
 export class AnalyticsService {
-  private readonly posthog: any;
   private currentScreen: string | null = null;
 
-  constructor(posthog?: any) {
-    this.posthog = posthog || postHogClient.getClient();
-  }
-
   identify(userId: string, properties: UserProperties): void {
-    if (!this.posthog) {
-      logger.warn("PostHog not available for identify");
-      return;
-    }
-
     if (!userId) {
       logger.warn("User ID is required for identify");
       return;
     }
 
-    try {
-      this.posthog.identify(userId, properties);
-      logger.debug("User identified successfully", { userId });
-    } catch (error) {
-      logger.error("Analytics identify error:", error);
-    }
+    postHogClient.identify(userId, properties);
+    logger.debug("User identified successfully", { userId });
   }
 
   setUserProperties(properties: Partial<UserProperties>): void {
-    if (!this.posthog) {
-      logger.warn("PostHog not available for setUserProperties");
-      return;
-    }
-
     if (!properties || Object.keys(properties).length === 0) {
       logger.warn("No properties provided for setUserProperties");
       return;
     }
 
-    try {
-      if (this.posthog.setPersonProperties) {
-        this.posthog.setPersonProperties(properties);
-        logger.debug(
-          "User properties set successfully via setPersonProperties",
-          properties
-        );
-      } else if (this.posthog.identify) {
-        let currentUserId = null;
-
-        try {
-          if (this.posthog.get_distinct_id) {
-            currentUserId = this.posthog.get_distinct_id();
-          }
-        } catch (idError) {
-          logger.debug("Could not get distinct ID, proceeding without it");
-        }
-
-        if (currentUserId) {
-          this.posthog.identify(currentUserId, properties);
-          logger.debug(
-            "User properties set successfully via identify with ID",
-            properties
-          );
-        } else {
-          this.posthog.identify(properties);
-          logger.debug(
-            "User properties set successfully via identify without ID",
-            properties
-          );
-        }
-      } else {
-        logger.warn(
-          "No PostHog method available for setting user properties"
-        );
-      }
-    } catch (error) {
-      logger.error("Analytics setUserProperties error:", error);
-    }
+    postHogClient.setUserProperties(properties);
+    logger.debug("User properties set successfully", properties);
   }
 
   trackAuthEvent(
@@ -283,75 +227,44 @@ export class AnalyticsService {
   }
 
   trackEvent(eventName: string, properties?: Record<string, any>): void {
-    if (!this.posthog) {
-      logger.warn("PostHog not available for trackEvent");
-      return;
-    }
-
     if (!eventName) {
       logger.warn("Event name is required for trackEvent");
       return;
     }
 
-    try {
-      const eventProperties = {
-        ...properties,
-      };
-
-      this.posthog.capture(eventName, eventProperties);
-      logger.debug("Event tracked successfully", {
-        eventName,
-        currentScreen: this.currentScreen,
-        properties: eventProperties,
-      });
-    } catch (error) {
-      logger.error("Analytics trackEvent error:", error);
-    }
+    postHogClient.capture(eventName, properties);
+    logger.debug("Event tracked successfully", {
+      eventName,
+      currentScreen: this.currentScreen,
+      properties,
+    });
   }
 
   trackScreen(screenName: string, properties?: Record<string, any>): void {
-    if (!this.posthog) {
-      logger.warn("PostHog not available for trackScreen");
-      return;
-    }
-
     if (!screenName) {
       logger.warn("Screen name is required for trackScreen");
       return;
     }
 
-    try {
-      const screenProperties = {
-        [EVENT_PROPERTIES.SCREEN_NAME]: screenName,
-        ...properties,
-      };
+    const screenProperties = {
+      [EVENT_PROPERTIES.SCREEN_NAME]: screenName,
+      ...properties,
+    };
 
-      this.posthog.screen(screenName, screenProperties);
-      this.currentScreen = screenName;
+    postHogClient.screen(screenName, screenProperties);
+    this.currentScreen = screenName;
 
-      logger.debug("Screen tracked successfully", {
-        screenName,
-        currentScreen: this.currentScreen,
-        properties: screenProperties,
-      });
-    } catch (error) {
-      logger.error("Analytics trackScreen error:", error);
-    }
+    logger.debug("Screen tracked successfully", {
+      screenName,
+      currentScreen: this.currentScreen,
+      properties: screenProperties,
+    });
   }
 
   reset(): void {
-    if (!this.posthog) {
-      logger.warn("PostHog not available for reset");
-      return;
-    }
-
-    try {
-      this.posthog.reset();
-      this.currentScreen = null;
-      logger.debug("Analytics session reset successfully");
-    } catch (error) {
-      logger.error("Analytics reset error:", error);
-    }
+    postHogClient.reset();
+    this.currentScreen = null;
+    logger.debug("Analytics session reset successfully");
   }
 
   getCurrentScreen(): string | null {

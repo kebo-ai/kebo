@@ -4,6 +4,7 @@ import {
   View,
   StyleSheet,
   Keyboard,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableScale } from "pressto";
@@ -32,7 +33,7 @@ import {
 import { useFormik } from "formik";
 import { showToast } from "@/components/ui/custom-toast";
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
-import { useUpdateTransaction, useExpenseCategories, useIncomeCategories, useAccounts } from "@/lib/api/hooks";
+import { useUpdateTransaction, useDeleteTransaction, useExpenseCategories, useIncomeCategories, useAccounts } from "@/lib/api/hooks";
 import { useTransactionDates } from "@/hooks/use-transaction-dates";
 import { CategorySnapshotIn } from "@/models/category/category";
 import { useSharedValue } from "react-native-reanimated";
@@ -105,6 +106,7 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
     const { data: accounts = [] } = useAccounts();
 
     const updateTransactionMutation = useUpdateTransaction();
+    const deleteTransactionMutation = useDeleteTransaction();
 
     const currentLocale = i18n.language.startsWith("es") ? "es" : "en";
 
@@ -430,6 +432,26 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
       [handleRecurrenceChange]
     );
 
+    // --- Delete ---
+    const handleDelete = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      Alert.alert(
+        translate("homeScreen:titleAlert"),
+        translate("homeScreen:messageAlert"),
+        [
+          { text: translate("homeScreen:cancel"), style: "cancel" },
+          {
+            text: translate("homeScreen:delete"),
+            style: "destructive",
+            onPress: () => {
+              deleteTransactionMutation.mutate(params.transactionId!);
+              router.back();
+            },
+          },
+        ]
+      );
+    }, [deleteTransactionMutation, params.transactionId, router]);
+
     // --- Submit with validation ---
     const handleSubmitWithValidation = useCallback(() => {
       let hasError = false;
@@ -517,7 +539,12 @@ export const EditTransactionScreen: FC<EditTransactionScreenProps> = observer(
             />
           </View>
 
-          <View style={styles.closeButton} />
+          <PressableScale
+            onPress={handleDelete}
+            style={styles.closeButton}
+          >
+            <Ionicons name="trash-outline" size={18} color={colors.primary} />
+          </PressableScale>
         </View>
 
         {/* Amount display */}

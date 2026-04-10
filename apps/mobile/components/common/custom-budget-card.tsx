@@ -45,6 +45,8 @@ interface CustomBudgetCardProps {
     total_metrics: BudgetMetrics;
   };
   onEditPress?: () => void;
+  onDuplicatePress?: () => void;
+  onDeletePress?: () => void;
   onArrowPress?: () => void;
   isSwipeOpen?: boolean;
 }
@@ -52,6 +54,8 @@ interface CustomBudgetCardProps {
 const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
   budget,
   onEditPress,
+  onDuplicatePress,
+  onDeletePress,
   onArrowPress,
   isSwipeOpen = false,
 }) => {
@@ -129,10 +133,24 @@ const CustomBudgetCard: React.FC<CustomBudgetCardProps> = ({
               })()}
             </Text>
           </View>
-          {onEditPress && (
-            <TouchableOpacity onPress={onEditPress}>
-              <PencilSvg width={20} height={20} />
-            </TouchableOpacity>
+          {(onEditPress || onDuplicatePress || onDeletePress) && (
+            <View style={tw`flex-row items-center gap-3`}>
+              {onEditPress && (
+                <TouchableOpacity onPress={onEditPress}>
+                  <PencilSvg width={18} height={18} />
+                </TouchableOpacity>
+              )}
+              {onDuplicatePress && (
+                <TouchableOpacity onPress={onDuplicatePress}>
+                  <Ionicons name="copy-outline" size={18} color={colors.primary} />
+                </TouchableOpacity>
+              )}
+              {onDeletePress && (
+                <TouchableOpacity onPress={onDeletePress}>
+                  <Ionicons name="trash-outline" size={18} color={colors.primary} />
+                </TouchableOpacity>
+              )}
+            </View>
           )}
           {onArrowPress && (
             <View style={tw`items-center justify-center`}>

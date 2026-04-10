@@ -4,7 +4,7 @@ import { Text } from "@/components/ui";
 import { translate } from "@/i18n";
 import tw from "@/hooks/use-tailwind";
 import { useCurrencyFormatter } from "./currency-formatter";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { PencilSvg } from "@/components/icons/pencil-svg";
@@ -26,12 +26,16 @@ interface CustomBudgetCategoryCardProps {
   category_metrics: CategoryMetrics;
   router?: any;
   editCategory: () => void;
+  onDuplicate?: () => void;
+  onDelete?: () => void;
 }
 
 const CustomBudgetCategoryCard: React.FC<CustomBudgetCategoryCardProps> = ({
   category_metrics,
   router,
   editCategory,
+  onDuplicate,
+  onDelete,
 }) => {
   const { formatAmount } = useCurrencyFormatter();
   const { theme } = useTheme();
@@ -66,9 +70,21 @@ const CustomBudgetCategoryCard: React.FC<CustomBudgetCategoryCardProps> = ({
               {category_metrics.category_name}
             </Text>
           </View>
-          <TouchableOpacity onPress={editCategory}>
-            <PencilSvg width={20} height={20} />
-          </TouchableOpacity>
+          <View style={tw`flex-row items-center gap-3`}>
+            <TouchableOpacity onPress={editCategory}>
+              <PencilSvg width={18} height={18} />
+            </TouchableOpacity>
+            {onDuplicate && (
+              <TouchableOpacity onPress={onDuplicate}>
+                <Ionicons name="copy-outline" size={18} color={colors.primary} />
+              </TouchableOpacity>
+            )}
+            {onDelete && (
+              <TouchableOpacity onPress={onDelete}>
+                <Ionicons name="trash-outline" size={18} color={colors.primary} />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
         <View style={tw`mt-2`}>
           <View style={tw`flex-row justify-between items-center mb-2`}>

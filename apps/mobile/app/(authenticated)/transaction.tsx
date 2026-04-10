@@ -16,7 +16,14 @@ export default function TransactionRoute() {
       } else if (route === "NewCategoryScreen") {
         router.push({
           pathname: "/(authenticated)/new-category",
-          params: navParams,
+          params: navParams
+            ? {
+                ...navParams,
+                categoryData: navParams.categoryData
+                  ? JSON.stringify(navParams.categoryData)
+                  : undefined,
+              }
+            : undefined,
         });
       } else {
         router.push(route as any);

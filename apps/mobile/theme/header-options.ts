@@ -1,12 +1,15 @@
 import { Platform } from "react-native";
+import { AndroidHeader } from "@/components/navigation/android-header";
 import { colors } from "./colors";
 
 type Theme = typeof colors.light | typeof colors.dark;
 
 /**
  * Standard header (no large title).
- * iOS: transparent with blur effect.
- * Android: solid background.
+ * iOS: transparent with blur effect (native stack header).
+ * Android: JS header via `@react-navigation/elements` — bypasses the
+ *   native-stack toolbar's inconsistent top-inset handling in edge-to-edge
+ *   mode so the system status bar icons never overlap the header content.
  */
 export function standardHeader(theme: Theme) {
   return {
@@ -21,7 +24,9 @@ export function standardHeader(theme: Theme) {
         headerBlurEffect: theme.blurEffect,
       },
       default: {
+        header: AndroidHeader,
         headerStyle: { backgroundColor: theme.background },
+        headerShadowVisible: false,
       },
     }),
   };
@@ -30,7 +35,8 @@ export function standardHeader(theme: Theme) {
 /**
  * Large title header for tab roots and detail screens.
  * iOS: collapsible large title with transparent blur.
- * Android: standard header with solid background.
+ * Android: standard JS header with solid background (no large title — that
+ *   is iOS-only).
  */
 export function largeTitleHeader(theme: Theme) {
   return {

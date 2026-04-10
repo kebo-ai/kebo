@@ -19,7 +19,7 @@ import { CategoriesListBudget } from "@/components/common/categories-list-budget
 import CustomBudgetCard from "@/components/common/custom-budget-card";
 import { CategoryItem } from "@/components/common/category-item";
 import type { Category } from "@/lib/api/types";
-import { useBudget, useCategories, useRemoveBudgetLine } from "@/lib/api/hooks";
+import { useBudget, useCategories, useRemoveBudgetLine, useDeleteBudget } from "@/lib/api/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/api/keys";
 import { showToast } from "@/components/ui/custom-toast";
@@ -43,6 +43,7 @@ export const BudgetScreen: FC<BudgetScreenProps> =
     const { data, isLoading } = useBudget(budgetId);
     const { data: categories = [] } = useCategories();
     const removeLineMutation = useRemoveBudgetLine();
+    const deleteBudgetMutation = useDeleteBudget();
     const [openRow, setOpenRow] = useState<string | null>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -154,6 +155,50 @@ export const BudgetScreen: FC<BudgetScreenProps> =
       });
     }, [router, budgetId, data]);
 
+    const handleDeleteBudget = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      Alert.alert(
+        translate("budgetScreen:deleteBudget"),
+        translate("budgetScreen:deleteConfirmationMessage"),
+        [
+          { text: translate("common:cancel"), style: "cancel" },
+          {
+            text: translate("common:delete"),
+            style: "destructive",
+            onPress: async () => {
+              try {
+                await deleteBudgetMutation.mutateAsync(budgetId);
+                showToast("success", translate("budgetScreen:budgetDeleted"));
+                router.back();
+              } catch (error) {
+                logger.error("Error deleting budget:", error);
+                showToast("error", translate("budgetScreen:errorDeletingBudget"));
+              }
+            },
+          },
+        ]
+      );
+    }, [deleteBudgetMutation, budgetId, router]);
+
+    const handleDuplicateBudget = useCallback(() => {
+      if (!data) return;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      const budgetLines = data.budget_lines?.map((line) => ({
+        category_id: line.category_id,
+        amount: Number(line.amount),
+      })) || [];
+      const budgetAmount = budgetLines.reduce((sum, l) => sum + l.amount, 0);
+
+      router.push({
+        pathname: "/(authenticated)/budget/new",
+        params: {
+          duplicateName: `${data.custom_name || ""} (copy)`,
+          duplicateLines: JSON.stringify(budgetLines),
+          duplicateAmount: String(budgetAmount),
+        },
+      });
+    }, [data, router]);
+
     const budgetCard = useMemo(() => {
       if (!data) return null;
       return {
@@ -232,6 +277,8 @@ export const BudgetScreen: FC<BudgetScreenProps> =
             <CustomBudgetCard
               budget={budgetCard!}
               onEditPress={handleEditPress}
+              onDuplicatePress={handleDuplicateBudget}
+              onDeletePress={handleDeleteBudget}
             />
             <View style={tw`mt-4`}>
               <Text weight="medium" color={theme.textPrimary}>

@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { BottomTabBarHeightContext } from "@react-navigation/bottom-tabs";
 import {
   KeyboardStickyView,
   KeyboardController,
@@ -81,7 +82,27 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       });
     }, [navigation, messages.length]);
 
-    const tabBarOffset = insets.bottom;
+    // iOS NativeTabs registers itself as a bottom safe-area inset in SDK 55, so
+    // `insets.bottom` already includes the tab bar + home indicator there, and
+    // the screen content extends behind the translucent tab bar.
+    //
+    // Android uses expo-router's JS Tabs with a custom tab bar: react-navigation
+    // insets the screen content by the tab bar height, so the content's bottom
+    // edge is flush with the tab bar's top. We still need the real tab bar
+    // height to offset `KeyboardStickyView` above the keyboard when it opens
+    // (with SOFT_INPUT_ADJUST_NOTHING the keyboard overlays the tab bar, so the
+    // view must be lifted by `keyboardHeight - tabBarHeight`).
+    const androidTabBarHeight =
+      React.useContext(BottomTabBarHeightContext) ?? 0;
+    // Distance from the bottom of the content viewport to the input when the
+    // keyboard is closed.
+    const inputBottomInset =
+      Platform.OS === "android" ? 0 : insets.bottom;
+    // Amount `KeyboardStickyView` should *not* translate by when the keyboard
+    // opens — i.e. the portion of the keyboard height that is already covered
+    // by layout below the content viewport.
+    const keyboardStickyOpenedOffset =
+      Platform.OS === "android" ? androidTabBarHeight : insets.bottom;
 
     // Android: use adjustNothing so keyboard covers the tab bar
     // and KeyboardStickyView can properly position the input above the keyboard
@@ -240,11 +261,18 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
       setShowScrollToEnd(!isAtBottom && messages.length > 0);
     };
 
-    // Dynamic bottom padding: ensures last message is always above the input
+    // Dynamic bottom padding: ensures last message is always above the input.
+    // On Android the screen content is already inset above the tab bar by the
+    // navigator, so the keyboard only overlaps `keyboardHeight - tabBarHeight`
+    // of the visible content.
     const inputAreaHeight = 70;
+    const keyboardOverlap =
+      Platform.OS === "android"
+        ? Math.max(0, keyboardHeight - androidTabBarHeight)
+        : keyboardHeight;
     const bottomPadding = keyboardHeight > 0
-      ? keyboardHeight + inputAreaHeight
-      : inputAreaHeight + tabBarOffset;
+      ? keyboardOverlap + inputAreaHeight
+      : inputAreaHeight + inputBottomInset;
 
     return (
       <Pressable style={[tw`flex-1`, { backgroundColor: theme.background }]} onPress={Keyboard.dismiss}>
@@ -301,11 +329,11 @@ export const ChatbotScreen: FC<ChatbotScreenProps> = observer(
         <KeyboardStickyView
           style={{
             position: "absolute",
-            bottom: tabBarOffset,
+            bottom: inputBottomInset,
             left: 0,
             right: 0,
           }}
-          offset={{ opened: tabBarOffset, closed: 0 }}
+          offset={{ opened: keyboardStickyOpenedOffset, closed: 0 }}
         >
           <ChatInput
             onSendMessage={handleSendMessage}

@@ -1,6 +1,7 @@
 import { supabase } from "@/config/supabase";
 import { RootStore } from "@/models/root-store";
 import { NumberFormatService } from "@/services/number-format-service";
+import { ThemePreferenceService } from "@/services/theme-preference-service";
 import logger from "./logger";
 
 export const isUserAuthenticated = async (): Promise<boolean> => {
@@ -50,6 +51,13 @@ export const getUserInfo = async (rootStore: RootStore): Promise<any | null> => 
     if (savedFormat) {
       rootStore.profileModel.setNumberFormat(savedFormat);
     }
+
+    // Restore locally-persisted theme preference (not stored in Supabase).
+    // The actual `Appearance.setColorScheme` call already happened at boot
+    // in `app/_layout.tsx`; here we just keep the MST store in sync so the
+    // Appearance picker highlights the correct option.
+    const savedThemePreference = await ThemePreferenceService.getPreference();
+    rootStore.profileModel.setThemePreference(savedThemePreference);
 
     return {
       user: userData.user,

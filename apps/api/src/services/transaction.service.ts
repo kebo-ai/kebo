@@ -124,7 +124,7 @@ export class TransactionService {
           and(eq(accounts.bank_id, banks.id), eq(banks.is_deleted, false)),
         )
         .where(and(...conditions))
-        .orderBy(desc(transactions.date))
+        .orderBy(desc(transactions.date), desc(transactions.created_at))
         .limit(limit)
         .offset(offset),
       db
@@ -239,7 +239,7 @@ export class TransactionService {
           eq(transactions.is_deleted, false),
         ),
       )
-      .orderBy(desc(transactions.date))
+      .orderBy(desc(transactions.date), desc(transactions.created_at))
   }
 
   static async createTransfer(

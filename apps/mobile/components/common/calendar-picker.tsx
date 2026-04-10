@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import { View, Modal, TouchableWithoutFeedback } from "react-native";
 import { Calendar, DateData } from "react-native-calendars";
+import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import tw from "@/hooks/use-tailwind";
 import i18n from "@/i18n/i18n";
@@ -65,9 +66,17 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
               )}
               <Calendar
                 key={theme.surface}
-                current={format(currentDate, "yyyy-MM-dd")}
+                initialDate={format(currentDate, "yyyy-MM-dd")}
                 onDayPress={handleDayPress}
                 markedDates={markedDates}
+                enableSwipeMonths={true}
+                renderArrow={(direction) => (
+                  <Ionicons
+                    name={direction === "left" ? "chevron-back" : "chevron-forward"}
+                    size={20}
+                    color={colors.primary}
+                  />
+                )}
                 style={{ height: 350 }}
                 theme={{
                   backgroundColor: theme.surface,

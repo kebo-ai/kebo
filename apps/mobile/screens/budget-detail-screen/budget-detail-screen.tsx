@@ -7,6 +7,7 @@ import {
   ScrollView,
   InteractionManager,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { Text } from "@/components/ui";
 import { colors } from "@/theme/colors";
@@ -16,6 +17,7 @@ import tw from "@/hooks/use-tailwind";
 import { translate } from "@/i18n";
 import { KeboSadIconSvg } from "@/components/icons/kebo-sad-icon-svg";
 import { budgetService } from "@/services/budget-service";
+import { useRemoveBudgetLine, useBudget } from "@/lib/api/hooks";
 import { useCurrencyFormatter } from "@/components/common/currency-formatter";
 import { TransactionList } from "@/components/common/transactions-list";
 import { SwipeableListWrapper } from "@/components/swipeable-list-wrapper/swipeable-list-wrapper";
@@ -84,6 +86,38 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
       string | null
     >(null);
     const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState(false);
+    const { data: budgetData } = useBudget(budgetId);
+    const removeLineMutation = useRemoveBudgetLine();
+
+    const handleDeleteBudgetLine = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      Alert.alert(
+        translate("budgetScreen:deleteCategory"),
+        translate("budgetScreen:deleteCategoryConfirmationMessage"),
+        [
+          { text: translate("common:cancel"), style: "cancel" },
+          {
+            text: translate("common:delete"),
+            style: "destructive",
+            onPress: async () => {
+              if (!budgetData) return;
+              try {
+                await removeLineMutation.mutateAsync({
+                  budgetId,
+                  categoryId,
+                  currentBudget: budgetData,
+                });
+                showToast("success", translate("budgetScreen:categoryRemoved"));
+                router.back();
+              } catch (error) {
+                logger.error("Error deleting budget line:", error);
+                showToast("error", translate("budgetScreen:errorRemovingCategory"));
+              }
+            },
+          },
+        ]
+      );
+    }, [budgetData, budgetId, categoryId, removeLineMutation, router]);
 
     useEffect(() => {
       if (!budgetId || !categoryId) {
@@ -284,6 +318,7 @@ export const BudgetDetailScreen: FC<BudgetDetailScreenProps> = observer(
                 },
               });
             }}
+            onDelete={handleDeleteBudgetLine}
           />
 
           <View style={tw`px-4 mt-2`}>

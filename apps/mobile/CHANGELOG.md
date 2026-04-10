@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.3.1 (2026-04-10)
+
+### Features
+- Add delete button to transaction detail header
+- Add duplicate and delete actions to budget detail screens
+- Add theme preference override in settings
+- Add daily reminder toggle and time picker in settings
+- Add custom Android tab bar
+- Localize App Intents for English and Portuguese
+- Send local notification after adding a transaction
+
+### Bug Fixes
+- Fix PostHog analytics broken since 1.3.0 (null client race condition)
+- Fix transaction list ordering for same-day entries (created_at tiebreaker)
+- Fix calendar picker month navigation (arrows + swipe)
+- Fix category params crash in add transaction flow
+- Sync transaction type toggle with route param
+- Prevent report card text and image overflow
+- Fix chatbot keyboard inset math on Android
+- Use JS header on Android to handle status bar inset
+- Remove splash screen animated icon on Android
+
+### Chores
+- Upgrade to Expo SDK 55
+
 ## 1.2.9 (2026-04-01)
 
 ### Features

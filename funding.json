@@ -1,0 +1,60 @@
+{
+  "$schema": "https://fundingjson.org/schema/v1.1.0.json",
+  "version": "v1.1.0",
+  "entity": {
+    "type": "organisation",
+    "role": "owner",
+    "name": "Kebo",
+    "email": "dev@kebo.app",
+    "description": "Kebo is a small team in Latin America building an open-source personal finance app for people the big finance apps ignore: users who live on cash, bank transfers and mobile wallets, in their own currency and language. About 100,000 people have signed up for Kebo and roughly 10,000 use it every month.",
+    "webpageUrl": {
+      "url": "https://github.com/kebo-ai"
+    }
+  },
+  "projects": [
+    {
+      "guid": "kebo",
+      "name": "Kebo",
+      "description": "Kebo is an open-source, multi-language budgeting app for iOS and Android. People log income and expenses in a few taps, track several accounts and currencies, set budgets and see where their money goes. It is built for Latin America, where most money moves through cash and wallets and bank APIs are not available, so it does not depend on bank sync. The app is available in 8 languages and is written in TypeScript with React Native (Expo) and Supabase.",
+      "webpageUrl": {
+        "url": "https://github.com/kebo-ai/kebo"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/kebo-ai/kebo"
+      },
+      "licenses": ["spdx:Apache-2.0"],
+      "tags": ["personal-finance", "budgeting", "mobile-app", "react-native", "expo", "latin-america", "financial-inclusion", "typescript"]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "bank",
+        "type": "bank",
+        "description": "Bank transfer to the company account. Contact us by email for details."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "maintenance-yearly",
+        "status": "active",
+        "name": "Maintenance and infrastructure",
+        "description": "Pays for a year of maintainer time and the servers, database and app store costs that keep Kebo free and open source for its users.",
+        "amount": 50000,
+        "currency": "USD",
+        "frequency": "yearly",
+        "channels": ["bank"]
+      },
+      {
+        "guid": "goodwill",
+        "status": "active",
+        "name": "Any amount",
+        "description": "Support Kebo with any amount.",
+        "amount": 0,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["bank"]
+      }
+    ]
+  }
+}
